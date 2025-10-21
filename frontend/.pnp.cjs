@@ -35,6 +35,7 @@ const RAW_RUNTIME_STATE =
           ["@tailwindcss/vite", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:4.1.14"],\
           ["@tanstack/react-router", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:1.133.15"],\
           ["@tanstack/router-devtools", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:1.133.15"],\
+          ["@tanstack/router-vite-plugin", "npm:1.133.15"],\
           ["@types/node", "npm:24.8.1"],\
           ["@types/react", "npm:19.2.2"],\
           ["@types/react-dom", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:19.2.2"],\
@@ -288,7 +289,7 @@ const RAW_RUNTIME_STATE =
           ["@babel/types", "npm:7.28.4"],\
           ["@jridgewell/remapping", "npm:2.3.5"],\
           ["convert-source-map", "npm:2.0.0"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["gensync", "npm:1.0.0-beta.2"],\
           ["json5", "npm:2.2.3"],\
           ["semver", "npm:6.3.1"]\
@@ -310,6 +311,16 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@babel/helper-annotate-as-pure", [\
+      ["npm:7.27.3", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-annotate-as-pure-npm-7.27.3-d8daa5b949-10c0.zip/node_modules/@babel/helper-annotate-as-pure/",\
+        "packageDependencies": [\
+          ["@babel/helper-annotate-as-pure", "npm:7.27.3"],\
+          ["@babel/types", "npm:7.28.4"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@babel/helper-compilation-targets", [\
       ["npm:7.27.2", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-compilation-targets-npm-7.27.2-111dda04b6-10c0.zip/node_modules/@babel/helper-compilation-targets/",\
@@ -324,11 +335,51 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@babel/helper-create-class-features-plugin", [\
+      ["npm:7.28.3", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-create-class-features-plugin-npm-7.28.3-de056c24da-10c0.zip/node_modules/@babel/helper-create-class-features-plugin/",\
+        "packageDependencies": [\
+          ["@babel/helper-create-class-features-plugin", "npm:7.28.3"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.28.3", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-helper-create-class-features-plugin-virtual-64512fcdaf/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-create-class-features-plugin-npm-7.28.3-de056c24da-10c0.zip/node_modules/@babel/helper-create-class-features-plugin/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-annotate-as-pure", "npm:7.27.3"],\
+          ["@babel/helper-create-class-features-plugin", "virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.28.3"],\
+          ["@babel/helper-member-expression-to-functions", "npm:7.27.1"],\
+          ["@babel/helper-optimise-call-expression", "npm:7.27.1"],\
+          ["@babel/helper-replace-supers", "virtual:64512fcdafea1f6b5701e3f0ba3004a8282cc06dc4aec8477b94001e1cae9f7a5e9a73e23f4cd055e39a5ee141ca725c116e7d277cbca94d0c0525b0f73ce056#npm:7.27.1"],\
+          ["@babel/helper-skip-transparent-expression-wrappers", "npm:7.27.1"],\
+          ["@babel/traverse", "npm:7.28.4"],\
+          ["@types/babel__core", null],\
+          ["semver", "npm:6.3.1"]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@babel/helper-globals", [\
       ["npm:7.28.0", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-globals-npm-7.28.0-8d79c12faf-10c0.zip/node_modules/@babel/helper-globals/",\
         "packageDependencies": [\
           ["@babel/helper-globals", "npm:7.28.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@babel/helper-member-expression-to-functions", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-member-expression-to-functions-npm-7.27.1-39af2b31f0-10c0.zip/node_modules/@babel/helper-member-expression-to-functions/",\
+        "packageDependencies": [\
+          ["@babel/helper-member-expression-to-functions", "npm:7.27.1"],\
+          ["@babel/traverse", "npm:7.28.4"],\
+          ["@babel/types", "npm:7.28.4"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -369,11 +420,57 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@babel/helper-optimise-call-expression", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-optimise-call-expression-npm-7.27.1-84d2c8f7d3-10c0.zip/node_modules/@babel/helper-optimise-call-expression/",\
+        "packageDependencies": [\
+          ["@babel/helper-optimise-call-expression", "npm:7.27.1"],\
+          ["@babel/types", "npm:7.28.4"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@babel/helper-plugin-utils", [\
       ["npm:7.27.1", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-plugin-utils-npm-7.27.1-4f91e7999b-10c0.zip/node_modules/@babel/helper-plugin-utils/",\
         "packageDependencies": [\
           ["@babel/helper-plugin-utils", "npm:7.27.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@babel/helper-replace-supers", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-replace-supers-npm-7.27.1-f784132f4b-10c0.zip/node_modules/@babel/helper-replace-supers/",\
+        "packageDependencies": [\
+          ["@babel/helper-replace-supers", "npm:7.27.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:64512fcdafea1f6b5701e3f0ba3004a8282cc06dc4aec8477b94001e1cae9f7a5e9a73e23f4cd055e39a5ee141ca725c116e7d277cbca94d0c0525b0f73ce056#npm:7.27.1", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-helper-replace-supers-virtual-fad7e35211/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-replace-supers-npm-7.27.1-f784132f4b-10c0.zip/node_modules/@babel/helper-replace-supers/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-member-expression-to-functions", "npm:7.27.1"],\
+          ["@babel/helper-optimise-call-expression", "npm:7.27.1"],\
+          ["@babel/helper-replace-supers", "virtual:64512fcdafea1f6b5701e3f0ba3004a8282cc06dc4aec8477b94001e1cae9f7a5e9a73e23f4cd055e39a5ee141ca725c116e7d277cbca94d0c0525b0f73ce056#npm:7.27.1"],\
+          ["@babel/traverse", "npm:7.28.4"],\
+          ["@types/babel__core", null]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@babel/helper-skip-transparent-expression-wrappers", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-helper-skip-transparent-expression-wrappers-npm-7.27.1-c539e02d36-10c0.zip/node_modules/@babel/helper-skip-transparent-expression-wrappers/",\
+        "packageDependencies": [\
+          ["@babel/helper-skip-transparent-expression-wrappers", "npm:7.27.1"],\
+          ["@babel/traverse", "npm:7.28.4"],\
+          ["@babel/types", "npm:7.28.4"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -426,6 +523,76 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@babel/plugin-syntax-jsx", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-syntax-jsx-npm-7.27.1-2f6039b8f0-10c0.zip/node_modules/@babel/plugin-syntax-jsx/",\
+        "packageDependencies": [\
+          ["@babel/plugin-syntax-jsx", "npm:7.27.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-jsx-virtual-26ac97c8b3/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-syntax-jsx-npm-7.27.1-2f6039b8f0-10c0.zip/node_modules/@babel/plugin-syntax-jsx/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-plugin-utils", "npm:7.27.1"],\
+          ["@babel/plugin-syntax-jsx", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1"],\
+          ["@types/babel__core", null]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@babel/plugin-syntax-typescript", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-syntax-typescript-npm-7.27.1-5d60015570-10c0.zip/node_modules/@babel/plugin-syntax-typescript/",\
+        "packageDependencies": [\
+          ["@babel/plugin-syntax-typescript", "npm:7.27.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.27.1", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-typescript-virtual-9128d4e547/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-syntax-typescript-npm-7.27.1-5d60015570-10c0.zip/node_modules/@babel/plugin-syntax-typescript/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-plugin-utils", "npm:7.27.1"],\
+          ["@babel/plugin-syntax-typescript", "virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.27.1"],\
+          ["@types/babel__core", null]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@babel/plugin-transform-modules-commonjs", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-transform-modules-commonjs-npm-7.27.1-2ad2271dea-10c0.zip/node_modules/@babel/plugin-transform-modules-commonjs/",\
+        "packageDependencies": [\
+          ["@babel/plugin-transform-modules-commonjs", "npm:7.27.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-plugin-transform-modules-commonjs-virtual-1b87088f9a/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-transform-modules-commonjs-npm-7.27.1-2ad2271dea-10c0.zip/node_modules/@babel/plugin-transform-modules-commonjs/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-module-transforms", "virtual:cb5fd966cc0f771275597c5aca3369c8164a2bcf171c237ee6cc4846ca8ef9a53870ddd48fbd1c7a680b0f66f2149c2a7694b56f9145852a93e325e1934103f4#npm:7.28.3"],\
+          ["@babel/helper-plugin-utils", "npm:7.27.1"],\
+          ["@babel/plugin-transform-modules-commonjs", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1"],\
+          ["@types/babel__core", null]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@babel/plugin-transform-react-jsx-self", [\
       ["npm:7.27.1", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-transform-react-jsx-self-npm-7.27.1-bd0fa344f1-10c0.zip/node_modules/@babel/plugin-transform-react-jsx-self/",\
@@ -472,6 +639,60 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@babel/plugin-transform-typescript", [\
+      ["npm:7.28.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-transform-typescript-npm-7.28.0-9d196c6ac3-10c0.zip/node_modules/@babel/plugin-transform-typescript/",\
+        "packageDependencies": [\
+          ["@babel/plugin-transform-typescript", "npm:7.28.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.28.0", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-plugin-transform-typescript-virtual-303ea56bef/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-plugin-transform-typescript-npm-7.28.0-9d196c6ac3-10c0.zip/node_modules/@babel/plugin-transform-typescript/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-annotate-as-pure", "npm:7.27.3"],\
+          ["@babel/helper-create-class-features-plugin", "virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.28.3"],\
+          ["@babel/helper-plugin-utils", "npm:7.27.1"],\
+          ["@babel/helper-skip-transparent-expression-wrappers", "npm:7.27.1"],\
+          ["@babel/plugin-syntax-typescript", "virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.27.1"],\
+          ["@babel/plugin-transform-typescript", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.28.0"],\
+          ["@types/babel__core", null]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@babel/preset-typescript", [\
+      ["npm:7.27.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-preset-typescript-npm-7.27.1-b9b5e53f61-10c0.zip/node_modules/@babel/preset-typescript/",\
+        "packageDependencies": [\
+          ["@babel/preset-typescript", "npm:7.27.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:b97847764923f92885b3d5e424507e8d86d3c610e17a61705f6ad769f5044fe74c55038180ff8dae6a0d0fb2a28aec66a4949c96b364bf940dd1a963c18c352a#npm:7.27.1", {\
+        "packageLocation": "./.yarn/__virtual__/@babel-preset-typescript-virtual-ce77905471/10/home/nguyen-thanh-hung/.yarn/berry/cache/@babel-preset-typescript-npm-7.27.1-b9b5e53f61-10c0.zip/node_modules/@babel/preset-typescript/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/helper-plugin-utils", "npm:7.27.1"],\
+          ["@babel/helper-validator-option", "npm:7.27.1"],\
+          ["@babel/plugin-syntax-jsx", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1"],\
+          ["@babel/plugin-transform-modules-commonjs", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1"],\
+          ["@babel/plugin-transform-typescript", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.28.0"],\
+          ["@babel/preset-typescript", "virtual:b97847764923f92885b3d5e424507e8d86d3c610e17a61705f6ad769f5044fe74c55038180ff8dae6a0d0fb2a28aec66a4949c96b364bf940dd1a963c18c352a#npm:7.27.1"],\
+          ["@types/babel__core", null]\
+        ],\
+        "packagePeers": [\
+          "@babel/core",\
+          "@types/babel__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@babel/runtime", [\
       ["npm:7.28.4", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@babel-runtime-npm-7.28.4-31bc1b0001-10c0.zip/node_modules/@babel/runtime/",\
@@ -504,7 +725,7 @@ const RAW_RUNTIME_STATE =
           ["@babel/template", "npm:7.27.2"],\
           ["@babel/traverse", "npm:7.28.4"],\
           ["@babel/types", "npm:7.28.4"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"]\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -841,7 +1062,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@eslint/config-array", "npm:0.21.1"],\
           ["@eslint/object-schema", "npm:2.1.7"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["minimatch", "npm:3.1.2"]\
         ],\
         "linkType": "HARD"\
@@ -873,7 +1094,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@eslint/eslintrc", "npm:3.3.1"],\
           ["ajv", "npm:6.12.6"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["espree", "npm:10.4.0"],\
           ["globals", "npm:14.0.0"],\
           ["ignore", "npm:5.3.2"],\
@@ -2000,11 +2221,116 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@tanstack/router-generator", [\
+      ["npm:1.133.15", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-router-generator-npm-1.133.15-1206f674a6-10c0.zip/node_modules/@tanstack/router-generator/",\
+        "packageDependencies": [\
+          ["@tanstack/router-core", "npm:1.133.15"],\
+          ["@tanstack/router-generator", "npm:1.133.15"],\
+          ["@tanstack/router-utils", "npm:1.133.3"],\
+          ["@tanstack/virtual-file-routes", "npm:1.133.3"],\
+          ["prettier", "npm:3.6.2"],\
+          ["recast", "npm:0.23.11"],\
+          ["source-map", "npm:0.7.6"],\
+          ["tsx", "npm:4.20.6"],\
+          ["zod", "npm:3.25.76"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@tanstack/router-plugin", [\
+      ["npm:1.133.15", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-router-plugin-npm-1.133.15-c9e116ea92-10c0.zip/node_modules/@tanstack/router-plugin/",\
+        "packageDependencies": [\
+          ["@tanstack/router-plugin", "npm:1.133.15"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:8b37a27d860a0ba798d32eeb05644f8c7c5b7d51b04b724cce80762bfd55855ecaf1e7dd6c85e6c832a3298b70fff61b5cae50dc477eb7475ed748aa516c5c9d#npm:1.133.15", {\
+        "packageLocation": "./.yarn/__virtual__/@tanstack-router-plugin-virtual-70de3cfdd1/10/home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-router-plugin-npm-1.133.15-c9e116ea92-10c0.zip/node_modules/@tanstack/router-plugin/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/plugin-syntax-jsx", "virtual:ce77905471e778f58d7b1db4122eed0d4d2a5778935f6f4ddae7fe71ca59ae5e59896cf723fc00f0184b080847ec2ae6db4ace37260387e5cbde150c79f8ecc5#npm:7.27.1"],\
+          ["@babel/plugin-syntax-typescript", "virtual:303ea56befde829e42490794f4c5b5ba058b31c093f1d32b23969b3d9980bd0b6f7314154903a0198552461a4b09e4c49dbce0af2490711ed542b7ba5ef5b132#npm:7.27.1"],\
+          ["@babel/template", "npm:7.27.2"],\
+          ["@babel/traverse", "npm:7.28.4"],\
+          ["@babel/types", "npm:7.28.4"],\
+          ["@rsbuild/core", null],\
+          ["@tanstack/react-router", null],\
+          ["@tanstack/router-core", "npm:1.133.15"],\
+          ["@tanstack/router-generator", "npm:1.133.15"],\
+          ["@tanstack/router-plugin", "virtual:8b37a27d860a0ba798d32eeb05644f8c7c5b7d51b04b724cce80762bfd55855ecaf1e7dd6c85e6c832a3298b70fff61b5cae50dc477eb7475ed748aa516c5c9d#npm:1.133.15"],\
+          ["@tanstack/router-utils", "npm:1.133.3"],\
+          ["@tanstack/virtual-file-routes", "npm:1.133.3"],\
+          ["@types/rsbuild__core", null],\
+          ["@types/tanstack__react-router", null],\
+          ["@types/vite", null],\
+          ["@types/vite-plugin-solid", null],\
+          ["@types/webpack", null],\
+          ["babel-dead-code-elimination", "npm:1.0.10"],\
+          ["chokidar", "npm:3.6.0"],\
+          ["unplugin", "npm:2.3.10"],\
+          ["vite", null],\
+          ["vite-plugin-solid", null],\
+          ["webpack", null],\
+          ["zod", "npm:3.25.76"]\
+        ],\
+        "packagePeers": [\
+          "@rsbuild/core",\
+          "@tanstack/react-router",\
+          "@types/rsbuild__core",\
+          "@types/tanstack__react-router",\
+          "@types/vite-plugin-solid",\
+          "@types/vite",\
+          "@types/webpack",\
+          "vite-plugin-solid",\
+          "vite",\
+          "webpack"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@tanstack/router-utils", [\
+      ["npm:1.133.3", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-router-utils-npm-1.133.3-b978477649-10c0.zip/node_modules/@tanstack/router-utils/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/generator", "npm:7.28.3"],\
+          ["@babel/parser", "npm:7.28.4"],\
+          ["@babel/preset-typescript", "virtual:b97847764923f92885b3d5e424507e8d86d3c610e17a61705f6ad769f5044fe74c55038180ff8dae6a0d0fb2a28aec66a4949c96b364bf940dd1a963c18c352a#npm:7.27.1"],\
+          ["@tanstack/router-utils", "npm:1.133.3"],\
+          ["ansis", "npm:4.2.0"],\
+          ["diff", "npm:8.0.2"],\
+          ["pathe", "npm:2.0.3"],\
+          ["tinyglobby", "npm:0.2.15"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@tanstack/router-vite-plugin", [\
+      ["npm:1.133.15", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-router-vite-plugin-npm-1.133.15-8b37a27d86-10c0.zip/node_modules/@tanstack/router-vite-plugin/",\
+        "packageDependencies": [\
+          ["@tanstack/router-plugin", "virtual:8b37a27d860a0ba798d32eeb05644f8c7c5b7d51b04b724cce80762bfd55855ecaf1e7dd6c85e6c832a3298b70fff61b5cae50dc477eb7475ed748aa516c5c9d#npm:1.133.15"],\
+          ["@tanstack/router-vite-plugin", "npm:1.133.15"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@tanstack/store", [\
       ["npm:0.7.7", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-store-npm-0.7.7-1368904e6c-10c0.zip/node_modules/@tanstack/store/",\
         "packageDependencies": [\
           ["@tanstack/store", "npm:0.7.7"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@tanstack/virtual-file-routes", [\
+      ["npm:1.133.3", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/@tanstack-virtual-file-routes-npm-1.133.3-bce81bd9d8-10c0.zip/node_modules/@tanstack/virtual-file-routes/",\
+        "packageDependencies": [\
+          ["@tanstack/virtual-file-routes", "npm:1.133.3"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2179,7 +2505,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/types", "npm:8.46.1"],\
           ["@typescript-eslint/typescript-estree", "virtual:967845ca4f1a488b94671ceba0a6504f91c415eb7a543c43eea2c3606a17e5dc7e677eeab2a0d34cebe263b5109540afcd58fa5a2b9a889ad67dd7425f356782#npm:8.46.1"],\
           ["@typescript-eslint/visitor-keys", "npm:8.46.1"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["eslint", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:9.38.0"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
         ],\
@@ -2207,7 +2533,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/project-service", "virtual:c8e61aebe0839adbe9f21c514f143a7a5c07d9f542aad512c357688ca0aa5b2fc2fb833e1276649092883a9972ba48542962bd7f192076a4ffdb52416d7c9c23#npm:8.46.1"],\
           ["@typescript-eslint/tsconfig-utils", "virtual:c8e61aebe0839adbe9f21c514f143a7a5c07d9f542aad512c357688ca0aa5b2fc2fb833e1276649092883a9972ba48542962bd7f192076a4ffdb52416d7c9c23#npm:8.46.1"],\
           ["@typescript-eslint/types", "npm:8.46.1"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
         ],\
         "packagePeers": [\
@@ -2267,7 +2593,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/types", "npm:8.46.1"],\
           ["@typescript-eslint/typescript-estree", "virtual:967845ca4f1a488b94671ceba0a6504f91c415eb7a543c43eea2c3606a17e5dc7e677eeab2a0d34cebe263b5109540afcd58fa5a2b9a889ad67dd7425f356782#npm:8.46.1"],\
           ["@typescript-eslint/utils", "virtual:967845ca4f1a488b94671ceba0a6504f91c415eb7a543c43eea2c3606a17e5dc7e677eeab2a0d34cebe263b5109540afcd58fa5a2b9a889ad67dd7425f356782#npm:8.46.1"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["eslint", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:9.38.0"],\
           ["ts-api-utils", "virtual:826e9f3b6d6e8b18d485856edc956e1817cc7d2ff53d16e75b7bc17455d688ba4d52a1926b6721416fafb790035d5dd745d623481fe56eed4096d6a04a91eb8c#npm:2.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
@@ -2307,7 +2633,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/types", "npm:8.46.1"],\
           ["@typescript-eslint/typescript-estree", "virtual:967845ca4f1a488b94671ceba0a6504f91c415eb7a543c43eea2c3606a17e5dc7e677eeab2a0d34cebe263b5109540afcd58fa5a2b9a889ad67dd7425f356782#npm:8.46.1"],\
           ["@typescript-eslint/visitor-keys", "npm:8.46.1"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["fast-glob", "npm:3.3.3"],\
           ["is-glob", "npm:4.0.3"],\
           ["minimatch", "npm:9.0.5"],\
@@ -2486,6 +2812,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["ansis", [\
+      ["npm:4.2.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/ansis-npm-4.2.0-35ae97bdc2-10c0.zip/node_modules/ansis/",\
+        "packageDependencies": [\
+          ["ansis", "npm:4.2.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["antd", [\
       ["npm:5.27.6", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/antd-npm-5.27.6-3367ae5869-10c0.zip/node_modules/antd/",\
@@ -2561,11 +2896,32 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["anymatch", [\
+      ["npm:3.1.3", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/anymatch-npm-3.1.3-bc81d103b1-10c0.zip/node_modules/anymatch/",\
+        "packageDependencies": [\
+          ["anymatch", "npm:3.1.3"],\
+          ["normalize-path", "npm:3.0.0"],\
+          ["picomatch", "npm:2.3.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["argparse", [\
       ["npm:2.0.1", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/argparse-npm-2.0.1-faff7999e6-10c0.zip/node_modules/argparse/",\
         "packageDependencies": [\
           ["argparse", "npm:2.0.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["ast-types", [\
+      ["npm:0.16.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/ast-types-npm-0.16.1-596f974e68-10c0.zip/node_modules/ast-types/",\
+        "packageDependencies": [\
+          ["ast-types", "npm:0.16.1"],\
+          ["tslib", "npm:2.8.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2609,6 +2965,19 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["babel-dead-code-elimination", [\
+      ["npm:1.0.10", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/babel-dead-code-elimination-npm-1.0.10-9dd77530c5-10c0.zip/node_modules/babel-dead-code-elimination/",\
+        "packageDependencies": [\
+          ["@babel/core", "npm:7.28.4"],\
+          ["@babel/parser", "npm:7.28.4"],\
+          ["@babel/traverse", "npm:7.28.4"],\
+          ["@babel/types", "npm:7.28.4"],\
+          ["babel-dead-code-elimination", "npm:1.0.10"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["babel-plugin-react-compiler", [\
       ["npm:19.1.0-rc.3", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/babel-plugin-react-compiler-npm-19.1.0-rc.3-6f95876f91-10c0.zip/node_modules/babel-plugin-react-compiler/",\
@@ -2633,6 +3002,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/baseline-browser-mapping-npm-2.8.18-66115fb2ff-10c0.zip/node_modules/baseline-browser-mapping/",\
         "packageDependencies": [\
           ["baseline-browser-mapping", "npm:2.8.18"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["binary-extensions", [\
+      ["npm:2.3.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/binary-extensions-npm-2.3.0-bd3f20d865-10c0.zip/node_modules/binary-extensions/",\
+        "packageDependencies": [\
+          ["binary-extensions", "npm:2.3.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2737,6 +3115,23 @@ const RAW_RUNTIME_STATE =
           ["ansi-styles", "npm:4.3.0"],\
           ["chalk", "npm:4.1.2"],\
           ["supports-color", "npm:7.2.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["chokidar", [\
+      ["npm:3.6.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/chokidar-npm-3.6.0-3c413a828f-10c0.zip/node_modules/chokidar/",\
+        "packageDependencies": [\
+          ["anymatch", "npm:3.1.3"],\
+          ["braces", "npm:3.0.3"],\
+          ["chokidar", "npm:3.6.0"],\
+          ["fsevents", "patch:fsevents@npm%3A2.3.3#optional!builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"],\
+          ["glob-parent", "npm:5.1.2"],\
+          ["is-binary-path", "npm:2.1.0"],\
+          ["is-glob", "npm:4.0.3"],\
+          ["normalize-path", "npm:3.0.0"],\
+          ["readdirp", "npm:3.6.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2890,11 +3285,11 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3", {\
-        "packageLocation": "./.yarn/__virtual__/debug-virtual-5da9fc757d/10/home/nguyen-thanh-hung/.yarn/berry/cache/debug-npm-4.4.3-0105c6123a-10c0.zip/node_modules/debug/",\
+      ["virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3", {\
+        "packageLocation": "./.yarn/__virtual__/debug-virtual-d9a70864af/10/home/nguyen-thanh-hung/.yarn/berry/cache/debug-npm-4.4.3-0105c6123a-10c0.zip/node_modules/debug/",\
         "packageDependencies": [\
           ["@types/supports-color", null],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["ms", "npm:2.1.3"],\
           ["supports-color", null]\
         ],\
@@ -2928,6 +3323,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/detect-libc-npm-2.1.2-d0c382b1e2-10c0.zip/node_modules/detect-libc/",\
         "packageDependencies": [\
           ["detect-libc", "npm:2.1.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["diff", [\
+      ["npm:8.0.2", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/diff-npm-8.0.2-8e9bd0086d-10c0.zip/node_modules/diff/",\
+        "packageDependencies": [\
+          ["diff", "npm:8.0.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -3138,7 +3542,7 @@ const RAW_RUNTIME_STATE =
           ["ajv", "npm:6.12.6"],\
           ["chalk", "npm:4.1.2"],\
           ["cross-spawn", "npm:7.0.6"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["escape-string-regexp", "npm:4.0.0"],\
           ["eslint", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:9.38.0"],\
           ["eslint-scope", "npm:8.4.0"],\
@@ -3246,6 +3650,15 @@ const RAW_RUNTIME_STATE =
           ["acorn-jsx", "virtual:9633b00e55c5aebf81b0127f50addd44705c175a47a287258963782da8f9f4e66c2da6640a60ed2826e19f024f73cd554a58729ee1644f93800bbd0d7b7ddd79#npm:5.3.2"],\
           ["eslint-visitor-keys", "npm:4.2.1"],\
           ["espree", "npm:10.4.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["esprima", [\
+      ["npm:4.0.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/esprima-npm-4.0.1-1084e98778-10c0.zip/node_modules/esprima/",\
+        "packageDependencies": [\
+          ["esprima", "npm:4.0.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -3548,6 +3961,16 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["get-tsconfig", [\
+      ["npm:4.12.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/get-tsconfig-npm-4.12.0-f16a5596e4-10c0.zip/node_modules/get-tsconfig/",\
+        "packageDependencies": [\
+          ["get-tsconfig", "npm:4.12.0"],\
+          ["resolve-pkg-maps", "npm:1.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["glob", [\
       ["npm:10.4.5", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/glob-npm-10.4.5-8c63175f05-10c0.zip/node_modules/glob/",\
@@ -3698,7 +4121,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/http-proxy-agent-npm-7.0.2-643ed7cc33-10c0.zip/node_modules/http-proxy-agent/",\
         "packageDependencies": [\
           ["agent-base", "npm:7.1.4"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["http-proxy-agent", "npm:7.0.2"]\
         ],\
         "linkType": "HARD"\
@@ -3709,7 +4132,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/https-proxy-agent-npm-7.0.6-27a95c2690-10c0.zip/node_modules/https-proxy-agent/",\
         "packageDependencies": [\
           ["agent-base", "npm:7.1.4"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["https-proxy-agent", "npm:7.0.6"]\
         ],\
         "linkType": "HARD"\
@@ -3766,6 +4189,16 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/ip-address-npm-10.0.1-862be6199a-10c0.zip/node_modules/ip-address/",\
         "packageDependencies": [\
           ["ip-address", "npm:10.0.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["is-binary-path", [\
+      ["npm:2.1.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/is-binary-path-npm-2.1.0-e61d46f557-10c0.zip/node_modules/is-binary-path/",\
+        "packageDependencies": [\
+          ["binary-extensions", "npm:2.3.0"],\
+          ["is-binary-path", "npm:2.1.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4352,6 +4785,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["normalize-path", [\
+      ["npm:3.0.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/normalize-path-npm-3.0.0-658ba7d77f-10c0.zip/node_modules/normalize-path/",\
+        "packageDependencies": [\
+          ["normalize-path", "npm:3.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["optionator", [\
       ["npm:0.9.4", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/optionator-npm-0.9.4-1f114b00e8-10c0.zip/node_modules/optionator/",\
@@ -4444,6 +4886,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["pathe", [\
+      ["npm:2.0.3", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/pathe-npm-2.0.3-0924246ee0-10c0.zip/node_modules/pathe/",\
+        "packageDependencies": [\
+          ["pathe", "npm:2.0.3"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["picocolors", [\
       ["npm:1.1.1", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/picocolors-npm-1.1.1-4fede47cf1-10c0.zip/node_modules/picocolors/",\
@@ -4497,6 +4948,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/prelude-ls-npm-1.2.1-3e4d272a55-10c0.zip/node_modules/prelude-ls/",\
         "packageDependencies": [\
           ["prelude-ls", "npm:1.2.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["prettier", [\
+      ["npm:3.6.2", {\
+        "packageLocation": "./.yarn/unplugged/prettier-npm-3.6.2-2668152203/node_modules/prettier/",\
+        "packageDependencies": [\
+          ["prettier", "npm:3.6.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -5667,6 +6127,30 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["readdirp", [\
+      ["npm:3.6.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/readdirp-npm-3.6.0-f950cc74ab-10c0.zip/node_modules/readdirp/",\
+        "packageDependencies": [\
+          ["picomatch", "npm:2.3.1"],\
+          ["readdirp", "npm:3.6.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["recast", [\
+      ["npm:0.23.11", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/recast-npm-0.23.11-1ecce54038-10c0.zip/node_modules/recast/",\
+        "packageDependencies": [\
+          ["ast-types", "npm:0.16.1"],\
+          ["esprima", "npm:4.0.1"],\
+          ["recast", "npm:0.23.11"],\
+          ["source-map", "npm:0.6.1"],\
+          ["tiny-invariant", "npm:1.3.3"],\
+          ["tslib", "npm:2.8.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["resize-observer-polyfill", [\
       ["npm:1.5.1", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/resize-observer-polyfill-npm-1.5.1-603120e8a0-10c0.zip/node_modules/resize-observer-polyfill/",\
@@ -5681,6 +6165,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/resolve-from-npm-4.0.0-f758ec21bf-10c0.zip/node_modules/resolve-from/",\
         "packageDependencies": [\
           ["resolve-from", "npm:4.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["resolve-pkg-maps", [\
+      ["npm:1.0.0", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/resolve-pkg-maps-npm-1.0.0-135b70c854-10c0.zip/node_modules/resolve-pkg-maps/",\
+        "packageDependencies": [\
+          ["resolve-pkg-maps", "npm:1.0.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -5874,9 +6367,25 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/socks-proxy-agent-npm-8.0.5-24d77a90dc-10c0.zip/node_modules/socks-proxy-agent/",\
         "packageDependencies": [\
           ["agent-base", "npm:7.1.4"],\
-          ["debug", "virtual:643ed7cc338bcf145a82d8b05b3bef6bcf150ca545df386225596f10ce53cc90b88b3ca83e348ade1ccea5f3f8e76c92d2f0e2ba544da60d40aff9921c56872d#npm:4.4.3"],\
+          ["debug", "virtual:ffade2903a4701eb4335a8fa42fa50796f82be3ca5c115da3b817ada5adedc1813f0898772f15874e5d8b4e98346e9b24720d1a1180ea98d64817037afb9b443#npm:4.4.3"],\
           ["socks", "npm:2.8.7"],\
           ["socks-proxy-agent", "npm:8.0.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["source-map", [\
+      ["npm:0.6.1", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/source-map-npm-0.6.1-1a3621db16-10c0.zip/node_modules/source-map/",\
+        "packageDependencies": [\
+          ["source-map", "npm:0.6.1"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:0.7.6", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/source-map-npm-0.7.6-a3854be193-10c0.zip/node_modules/source-map/",\
+        "packageDependencies": [\
+          ["source-map", "npm:0.7.6"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6097,6 +6606,18 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["tsx", [\
+      ["npm:4.20.6", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/tsx-npm-4.20.6-78231068b5-10c0.zip/node_modules/tsx/",\
+        "packageDependencies": [\
+          ["esbuild", "npm:0.25.11"],\
+          ["fsevents", "patch:fsevents@npm%3A2.3.3#optional!builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"],\
+          ["get-tsconfig", "npm:4.12.0"],\
+          ["tsx", "npm:4.20.6"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["type-check", [\
       ["npm:0.4.0", {\
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/type-check-npm-0.4.0-60565800ce-10c0.zip/node_modules/type-check/",\
@@ -6171,6 +6692,19 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["imurmurhash", "npm:0.1.4"],\
           ["unique-slug", "npm:5.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["unplugin", [\
+      ["npm:2.3.10", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/unplugin-npm-2.3.10-04c7e6a6b7-10c0.zip/node_modules/unplugin/",\
+        "packageDependencies": [\
+          ["@jridgewell/remapping", "npm:2.3.5"],\
+          ["acorn", "npm:8.15.0"],\
+          ["picomatch", "npm:4.0.3"],\
+          ["unplugin", "npm:2.3.10"],\
+          ["webpack-virtual-modules", "npm:0.6.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6383,6 +6917,7 @@ const RAW_RUNTIME_STATE =
           ["@tailwindcss/vite", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:4.1.14"],\
           ["@tanstack/react-router", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:1.133.15"],\
           ["@tanstack/router-devtools", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:1.133.15"],\
+          ["@tanstack/router-vite-plugin", "npm:1.133.15"],\
           ["@types/node", "npm:24.8.1"],\
           ["@types/react", "npm:19.2.2"],\
           ["@types/react-dom", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:19.2.2"],\
@@ -6405,6 +6940,15 @@ const RAW_RUNTIME_STATE =
           ["zustand", "virtual:c56b46d83dc705f61d645efafd50b5dd10b694a413a2075f2bfa433bbaa41df431f824c0f747468efbf1694d7d2f15adbae617c2c5c3f6b6e0b1978b92526b7c#npm:5.0.8"]\
         ],\
         "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["webpack-virtual-modules", [\
+      ["npm:0.6.2", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/webpack-virtual-modules-npm-0.6.2-6785315785-10c0.zip/node_modules/webpack-virtual-modules/",\
+        "packageDependencies": [\
+          ["webpack-virtual-modules", "npm:0.6.2"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["which", [\
@@ -6484,6 +7028,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/yocto-queue-npm-0.1.0-c6c9a7db29-10c0.zip/node_modules/yocto-queue/",\
         "packageDependencies": [\
           ["yocto-queue", "npm:0.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["zod", [\
+      ["npm:3.25.76", {\
+        "packageLocation": "../../../../../../../../../home/nguyen-thanh-hung/.yarn/berry/cache/zod-npm-3.25.76-7de26333f8-10c0.zip/node_modules/zod/",\
+        "packageDependencies": [\
+          ["zod", "npm:3.25.76"]\
         ],\
         "linkType": "HARD"\
       }]\

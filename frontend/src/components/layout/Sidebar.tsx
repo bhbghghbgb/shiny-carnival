@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+
 import { Menu } from 'antd';
 import {
   AppstoreOutlined,
@@ -30,23 +30,20 @@ interface SidebarProps {
   collapsed: boolean;
 }
 
-class Sidebar extends Component<SidebarProps> {
-  render() {
-    const { collapsed } = this.props;
-    return (
-      <div>
-        <div className="p-4 text-2xl font-bold text-white text-center">Logo</div>
-        <Menu
-          defaultSelectedKeys={['1']}
-          mode="inline"
-          theme="dark"
-          inlineCollapsed={collapsed}
-          items={items}
-        />
-      </div>
-    );
-  }
-}
+const Sidebar = ({ collapsed }: SidebarProps) => {
+  return (
+    <div>
+      <div className="p-4 text-2xl font-bold text-white text-center">Logo</div>
+      <Menu
+        defaultSelectedKeys={['1']}
+        mode="inline"
+        theme="dark"
+        inlineCollapsed={collapsed}
+        items={items}
+      />
+    </div>
+  );
+};
 
 export default Sidebar;
 

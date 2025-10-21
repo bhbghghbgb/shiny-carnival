@@ -2,7 +2,9 @@
 
 ## Giới thiệu
 
-Tài liệu này mô tả cấu trúc file được đề xuất cho một dự án React RestAPI sử dụng các công nghệ như Tailwind CSS, Axios, Ant Design, TanStack Table và Zustand. Cấu trúc này được thiết kế dựa trên các nguyên tắc của Clean Architecture và Feature-Sliced Design (FSD) nhằm đảm bảo tính **clean**, **khả năng mở rộng (scalability)**, **tái sử dụng (reusability)** và **dễ bảo trì (maintainability)**.
+Tài liệu này mô tả cấu trúc file được đề xuất cho một dự án React RestAPI sử dụng các công nghệ như Tailwind CSS, Axios, Ant Design, TanStack Table, Zustand và **TanStack Router** cho việc định tuyến.
+
+Cấu trúc này được thiết kế dựa trên các nguyên tắc của Clean Architecture và Feature-Sliced Design (FSD) nhằm đảm bảo tính **clean**, **khả năng mở rộng (scalability)**, **tái sử dụng (reusability)** và **dễ bảo trì (maintainability)**.
 
 ## Các nguyên tắc thiết kế chính
 
@@ -16,7 +18,8 @@ Tài liệu này mô tả cấu trúc file được đề xuất cho một dự 
 
 ```
 src/
-├── app/                  // Cấu hình ứng dụng toàn cục, routing, store
+├── app/                  // Cấu hình ứng dụng toàn cục, store, và định nghĩa routing
+│   └── routes/           // Chứa các file định nghĩa route "mỏng"
 ├── assets/               // Tài nguyên tĩnh (ảnh, font, icon)
 ├── components/           // Các UI component dùng chung (presentational components)
 ├── config/               // Cấu hình môi trường, hằng số
@@ -25,11 +28,9 @@ src/
 ├── hooks/                // Custom React Hooks dùng chung
 ├── layouts/              // Bố cục trang (layout components)
 ├── lib/                  // Thư viện tiện ích, helpers, cấu hình Axios
-├── pages/                // Các trang ứng dụng (container components/routes)
-├── services/             // Các service tương tác với API (data layer)
+├── pages/                // Chứa các component trang dùng chung (HomePage, AboutPage,...)
 ├── types/                // Định nghĩa kiểu dữ liệu TypeScript dùng chung
-├── utils/                // Các hàm tiện ích chung
-└── App.tsx               // Component gốc của ứng dụng
+└── utils/                // Các hàm tiện ích chung
 ```
 
 ## Giải thích chi tiết từng thư mục
@@ -38,10 +39,10 @@ src/
 
 Chứa các file cấu hình và khởi tạo cấp ứng dụng. Đây là nơi tập trung các cài đặt toàn cục.
 
-*   `App.tsx`: Component React gốc, nơi các `Layout` và `Router` được render.
-*   `main.tsx`: Điểm khởi chạy của ứng dụng (entry point), nơi React DOM được render.
-*   `router.tsx`: Cấu hình định tuyến (routing) của ứng dụng, thường sử dụng `react-router-dom`.
-*   `store.ts`: Cấu hình Zustand store toàn cục, nơi định nghĩa các slice của store và cách chúng tương tác.
+*   `main.tsx`: Điểm khởi chạy của ứng dụng (entry point), nơi React DOM được render và **TanStack Router** được khởi tạo.
+*   `routes/`: Thư mục chứa các file định nghĩa route cho cơ chế **file-based routing** của TanStack Router. Mỗi file trong đây là một định nghĩa "mỏng", liên kết một URL với một component trang cụ thể.
+*   `routeTree.gen.ts`: File được **TanStack Router** tự động tạo ra, chứa toàn bộ cây định tuyến của ứng dụng. **Không được chỉnh sửa file này bằng tay.**
+*   `store.ts`: Cấu hình Zustand store toàn cục (nếu có).
 
 ### `src/assets/`
 
@@ -145,18 +146,11 @@ Chứa các cấu hình và instance của các thư viện bên thứ ba, hoặ
 
 ### `src/pages/`
 
-Chứa các trang chính của ứng dụng. Trong cấu trúc này, `pages` thường đóng vai trò là container cho các `features` hoặc các `components` lớn. Nếu một trang thuộc về một tính năng cụ thể, nó nên nằm trong `features/[feature-name]/pages/`.
+Chứa các component trang **dùng chung**, không thuộc về một feature cụ thể nào. Đây là nơi chứa giao diện và logic hiển thị cho các trang như trang chủ, giới thiệu, liên hệ.
 
 *   `HomePage.tsx`
+*   `AboutPage.tsx`
 *   `NotFoundPage.tsx`
-
-### `src/services/`
-
-Chứa các module chịu trách nhiệm tương tác với API backend. Đây là lớp `data layer` của ứng dụng. Các hàm trong đây nên là pure functions hoặc các hàm chỉ tập trung vào việc gọi API và xử lý dữ liệu thô từ API.
-
-*   `authService.ts`: Các hàm liên quan đến xác thực (login, register).
-*   `userService.ts`: Các hàm liên quan đến người dùng.
-*   `productService.ts`: Các hàm liên quan đến sản phẩm. (Có thể được di chuyển vào `features/products/api/` nếu muốn tách biệt hơn theo feature).
 
 ### `src/types/`
 
@@ -174,23 +168,45 @@ Chứa các hàm tiện ích nhỏ, độc lập, không phụ thuộc vào Reac
 *   `validators.ts`: Các hàm kiểm tra tính hợp lệ của dữ liệu.
 *   `helpers.ts`: Các hàm tiện ích chung khác.
 
-## Ví dụ về luồng dữ liệu (Data Flow)
+## Quy trình tạo một trang mới (Data Flow & Routing)
 
-1.  **UI (Page/Component):** Người dùng tương tác với một component UI (ví dụ: `ProductListPage.tsx`).
-2.  **Hook/Store:** Component này gọi một custom hook (ví dụ: `useProductStore` từ Zustand)
-3.  **Service/API:** Hook hoặc action trong store gọi một hàm từ `features/products/api/productApi.ts` để tương tác với backend thông qua instance Axios đã được cấu hình.
-4.  **Backend:** Backend xử lý yêu cầu và trả về dữ liệu.
-5.  **Service/API:** Hàm API nhận dữ liệu từ backend, có thể thực hiện một số biến đổi dữ liệu sơ bộ.
-6.  **Store:** Dữ liệu được cập nhật vào Zustand store.
-7.  **UI:** Component UI tự động re-render với dữ liệu mới từ store.
+Với cấu trúc sử dụng **TanStack Router**, luồng tạo và hiển thị một trang mới được thực hiện qua hai bước chính, tách biệt rõ ràng giữa định nghĩa định tuyến và logic giao diện:
+
+**Bước 1: Tạo Component Trang (UI & Logic Layer)**
+
+Component giao diện của trang được đặt ở nơi phù hợp theo kiến trúc FSD:
+
+*   **Nếu là trang dùng chung:** Tạo file component trong `src/pages/`. Ví dụ: `src/pages/AboutPage.tsx`.
+*   **Nếu là trang thuộc một tính năng:** Tạo file component trong `src/features/[feature-name]/pages/`. Ví dụ: `src/features/products/pages/ProductDetailsPage.tsx`.
+
+**Bước 2: Tạo File Định nghĩa Route (Routing Definition Layer)**
+
+Để TanStack Router nhận biết trang mới, bạn cần tạo một file định nghĩa route "mỏng" tương ứng trong `src/app/routes/`.
+
+*   **Tạo file route:** Tên và cấu trúc thư mục của file này sẽ quyết định URL của trang. Ví dụ, để tạo route `/products/:productId`, bạn tạo file `src/app/routes/products/$productId.tsx`.
+*   **Liên kết với component:** Trong file route vừa tạo, sử dụng `createFileRoute` hoặc `createLazyFileRoute` để liên kết URL với component đã tạo ở Bước 1.
+
+**Ví dụ luồng hoàn chỉnh cho trang chi tiết sản phẩm:**
+
+1.  **Tạo Component:** Tạo file `src/features/products/pages/ProductDetailsPage.tsx` chứa UI và logic để hiển thị chi tiết sản phẩm.
+2.  **Tạo Định nghĩa Route:** Tạo file `src/app/routes/products/$productId.tsx` với nội dung:
+    ```tsx
+    import { createLazyFileRoute } from '@tanstack/react-router';
+    import { ProductDetailsPage } from '../../../features/products/pages/ProductDetailsPage';
+
+    export const Route = createLazyFileRoute('/products/$productId')({
+      component: ProductDetailsPage,
+    });
+    ```
+3.  **Tự động hóa:** **TanStack Router** sẽ tự động phát hiện file route mới này, cập nhật `routeTree.gen.ts`, và ứng dụng sẽ có route `/products/:productId` hoạt động.
 
 ## Kết luận
 
-Cấu trúc file này cung cấp một nền tảng vững chắc cho việc phát triển các ứng dụng React RestAPI có khả năng mở rộng và dễ bảo trì. Bằng cách tuân thủ các nguyên tắc tách biệt mối quan tâm và tổ chức code theo tính năng, dự án của bạn sẽ trở nên dễ quản lý hơn, đặc biệt khi quy mô ứng dụng và số lượng thành viên trong nhóm phát triển tăng lên. Việc sử dụng TypeScript cùng với cấu trúc này sẽ nâng cao hơn nữa chất lượng code và khả năng phát hiện lỗi sớm.
+Cấu trúc file này cung cấp một nền tảng vững chắc cho việc phát triển các ứng dụng React RestAPI có khả năng mở rộng và dễ bảo trì. Bằng cách sử dụng **TanStack Router** và tuân thủ các nguyên tắc tách biệt mối quan tâm, tổ chức code theo tính năng, dự án của bạn sẽ trở nên dễ quản lý hơn, đặc biệt khi quy mô ứng dụng và số lượng thành viên trong nhóm phát triển tăng lên.
 
 ## Tài liệu tham khảo
 
+*   [TanStack Router Docs](https://tanstack.com/router/latest)
 *   [Clean Architecture in React](https://alexkondov.com/full-stack-tao-clean-architecture-react/)
-*   [Folder Structuring Techniques for Advanced React Projects](https://dev.to/fpaghar/folder-structuring-techniques-for-beginner-to-advanced-react-projects-30d7)
-*   [Mastering React Folder Structures: Your Ultimate Guide to Scalable and Maintainable Projects](https://medium.com/@deltaromeoyanki/mastering-react-folder-structures-your-ultimate-guide-to-scalable-and-maintainable-projects-5e200d630025)
+*   [Feature-Sliced Design](https://feature-sliced.design/)
 
