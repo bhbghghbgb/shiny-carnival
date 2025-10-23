@@ -1,21 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form } from 'antd';
-import { productService } from '../api/productService';
+import { useState } from 'react';
+import { Table, Button, Modal, Form, Input } from 'antd';
 import { ProductForm } from '../components/ProductForm';
+import { Route } from '../../../app/routes/products';
 
 export function ProductManagementPage() {
-  const [products, setProducts] = useState<any[]>([]);
+  // Lấy dữ liệu và search params từ route context
+  const { data: productsData } = Route.useLoaderData();
+  const { page, pageSize, search } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    // Mock
-    const fetchProducts = async () => {
-      const data = await productService.getProducts() as any[];
-      setProducts(data);
-    };
-    fetchProducts();
-  }, []);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -26,7 +21,7 @@ export function ProductManagementPage() {
       .validateFields()
       .then((values) => {
         console.log('Form Values: ', values);
-        // Here you would typically call a service to add the product
+        // Logic để thêm sản phẩm
         form.resetFields();
         setIsModalVisible(false);
       })
@@ -37,6 +32,12 @@ export function ProductManagementPage() {
 
   const handleCancel = () => {
     setIsModalVisible(false);
+  };
+
+  const handleSearch = (value: string) => {
+    navigate({
+      search: (prev) => ({ ...prev, search: value || undefined, page: 1 }),
+    });
   };
 
   const columns = [
@@ -59,15 +60,36 @@ export function ProductManagementPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
         <Button type="primary" onClick={showModal}>
           Add Product
         </Button>
+        <Input.Search
+          placeholder="Search products"
+          onSearch={handleSearch}
+          style={{ width: 300 }}
+          defaultValue={search}
+          allowClear
+        />
       </div>
-      <Table dataSource={products} columns={columns} rowKey="id" />
+      <Table
+        dataSource={productsData?.data?.items}
+        columns={columns}
+        rowKey="id"
+        pagination={{
+          current: page,
+          pageSize: pageSize,
+          total: productsData?.data?.totalCount,
+          onChange: (newPage, newPageSize) => {
+            navigate({
+              search: (prev) => ({ ...prev, page: newPage, pageSize: newPageSize }),
+            });
+          },
+        }}
+      />
       <Modal
         title="Add New Product"
-        visible={isModalVisible}
+        open={isModalVisible} // 'visible' is deprecated, use 'open'
         onOk={handleOk}
         onCancel={handleCancel}
       >

@@ -1,37 +1,177 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
-// Create an Axios instance
+// Định nghĩa types cho API response theo tài liệu đặc tả
+export interface ApiResponse<T = any> {
+  isError: boolean;
+  message: string;
+  data: T | null;
+  timestamp: string;
+}
+
+// Định nghĩa interface cho login response
+export interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    username: string;
+    fullName: string;
+    role: number; // 0: Admin, 1: Staff
+  };
+}
+
+const TOKEN_KEY = 'accessToken';
+const REFRESH_TOKEN_KEY = 'refreshToken';
+
+export const tokenUtils = {
+  getToken: (): string | null => localStorage.getItem(TOKEN_KEY),
+  setToken: (token: string): void => localStorage.setItem(TOKEN_KEY, token),
+  removeToken: (): void => localStorage.removeItem(TOKEN_KEY),
+
+  getRefreshToken: (): string | null => localStorage.getItem(REFRESH_TOKEN_KEY),
+  setRefreshToken: (token: string): void => localStorage.setItem(REFRESH_TOKEN_KEY, token),
+  removeRefreshToken: (): void => localStorage.removeItem(REFRESH_TOKEN_KEY),
+
+  clearAllTokens: (): void => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  }
+};
+
+// Tạo Axios instance với cấu hình đầy đủ
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
+  timeout: 10000, // 10 giây timeout
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor for API calls
+// Biến để theo dõi việc refresh token đang diễn ra
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+// Xử lý queue khi refresh token hoàn thành
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
+// Request interceptor - Tự động thêm token vào headers
 axiosClient.interceptors.request.use(
-  async (config) => {
-    // Handle token here, for example, add it to headers
-    // const token = localStorage.getItem('accessToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+  async (config: InternalAxiosRequestConfig) => {
+    const token = tokenUtils.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
-    Promise.reject(error);
+    return Promise.reject(error);
   }
 );
 
-// Response interceptor for API calls
+// Response interceptor - Xử lý response và error handling
 axiosClient.interceptors.response.use(
-  (response) => {
-    // Any status code that lie within the range of 2xx cause this function to trigger
+  (response: AxiosResponse<ApiResponse>) => {
+    // Trả về data từ ApiResponse structure
     return response.data;
   },
-  (error) => {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Handle errors here
+  async (error: AxiosError<ApiResponse>) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    // Xử lý lỗi 401 (Unauthorized) - Token hết hạn
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Nếu đang refresh token, thêm request vào queue
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return axiosClient(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = tokenUtils.getRefreshToken();
+
+      if (refreshToken) {
+        try {
+          // Gọi API refresh token (sẽ implement sau khi có auth module)
+          const response = await axios.post<ApiResponse<LoginResponse>>(
+            `${axiosClient.defaults.baseURL}/auth/refresh`,
+            { refreshToken }
+          );
+
+          if (!response.data.isError && response.data.data) {
+            const newToken = response.data.data.token;
+            tokenUtils.setToken(newToken);
+
+            // Cập nhật header cho request gốc
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
+            processQueue(null, newToken);
+
+            return axiosClient(originalRequest);
+          } else {
+            throw new Error('Refresh token failed');
+          }
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          tokenUtils.clearAllTokens();
+
+          // Redirect về trang login
+          window.location.href = '/login';
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      } else {
+        // Không có refresh token, redirect về login
+        tokenUtils.clearAllTokens();
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+    }
+
+    // Xử lý các lỗi khác
+    if (error.response?.data) {
+      // Trả về error message từ API response
+      return Promise.reject({
+        ...error,
+        message: error.response.data.message || 'Có lỗi xảy ra',
+        data: error.response.data
+      });
+    }
+
+    // Xử lý lỗi network hoặc timeout
+    if (error.code === 'ECONNABORTED') {
+      return Promise.reject({
+        ...error,
+        message: 'Yêu cầu bị timeout. Vui lòng thử lại.'
+      });
+    }
+
+    if (!error.response) {
+      return Promise.reject({
+        ...error,
+        message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.'
+      });
+    }
+
     return Promise.reject(error);
   }
 );
