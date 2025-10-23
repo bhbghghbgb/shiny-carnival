@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RetailStoreManagement.Entities;
 
@@ -23,5 +24,6 @@ public class SupplierEntity : BaseEntity<int>
     public string? Address { get; set; }
 
     // Navigation properties
+    [JsonIgnore]
     public virtual ICollection<ProductEntity> Products { get; set; } = new List<ProductEntity>();
 }

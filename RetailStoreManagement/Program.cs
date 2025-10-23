@@ -12,33 +12,48 @@ using RetailStoreManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// ============================================================================
+// Database Configuration
+// ============================================================================
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    if (string.IsNullOrEmpty(connectionString))
+        throw new InvalidOperationException("⚠️ Connection string 'DefaultConnection' không được tìm thấy trong appsettings.json.");
+
     options.UseMySQL(connectionString);
 });
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+// ============================================================================
+// Dependency Injection (DI)
+// ============================================================================
 
-// Register generic repository
+// Generic repository & service
 builder.Services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
 
 // Register generic service
 builder.Services.AddScoped(typeof(IBaseService<,>), typeof(BaseService<,>));
 
-// Register specific services
-builder.Services.AddScoped<IAuthService, AuthService>();
+// Unit of Work (nếu có)
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// AutoMapper
+// Specific repositories & services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+// ============================================================================
+// AutoMapper & FluentValidation
+// ============================================================================
 builder.Services.AddAutoMapper(typeof(Program));
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-// Authentication
+// ============================================================================
+// Authentication (JWT Bearer Token)
+// ============================================================================
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -50,30 +65,54 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = "store-management",
             ValidAudience = "store-management",
-            IssuerSigningKey =
-                new SymmetricSecurityKey("your-super-secret-key-at-least-32-chars"u8.ToArray())
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes("your-super-secret-key-at-least-32-chars"))
         };
     });
 
+// ============================================================================
+// Controllers & Global Filters + JSON Options
+// ============================================================================
+builder.Services.AddControllers(options =>
+{
+    // Bộ lọc chuẩn hóa phản hồi API & xử lý lỗi
+    options.Filters.Add<ApiResponseFilter>();
+})
+.AddJsonOptions(options =>
+{
+    // Bỏ qua vòng lặp tuần hoàn khi serialize JSON (Category <-> Product)
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.WriteIndented = true;
+});
 
-builder.Services.AddControllers(options => { options.Filters.Add<ApiResponseFilter>(); });
+// ============================================================================
+// Swagger / OpenAPI
+// ============================================================================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-// builder.Services.AddOpenApi();
-
-builder.Services.AddEndpointsApiExplorer(); // Required for Swagger
-builder.Services.AddSwaggerGen(); // Adds Swagger generator
-
+// ============================================================================
+// Build Application
+// ============================================================================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Tự động tạo database + bảng nếu chưa có
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.EnsureCreated();
+}
+
+// ============================================================================
+// HTTP Request Pipeline
+// ============================================================================
 if (app.Environment.IsDevelopment())
 {
     // app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    // Redirect root to Swagger UI
+    // Redirect "/" → Swagger UI
     app.Use(async (context, next) =>
     {
         if (context.Request.Path == "/")
@@ -86,6 +125,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// ============================================================================
+// Middlewares thứ tự chuẩn
+// ============================================================================
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

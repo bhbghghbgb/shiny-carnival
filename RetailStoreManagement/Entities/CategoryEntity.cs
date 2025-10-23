@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RetailStoreManagement.Entities;
 
@@ -11,5 +12,6 @@ public class CategoryEntity : BaseEntity<int>
     public string CategoryName { get; set; } = string.Empty;
 
     // Navigation properties
+    [JsonIgnore]
     public virtual ICollection<ProductEntity> Products { get; set; } = new List<ProductEntity>();
 }

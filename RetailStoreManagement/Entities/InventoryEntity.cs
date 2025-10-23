@@ -14,5 +14,5 @@ public class InventoryEntity : BaseEntity<int>
 
     // Navigation properties
     [ForeignKey("ProductId")]
-    public virtual ProductEntity Product { get; set; } = null!;
+    public virtual ProductEntity Product { get; set; } = null!; // (1-1)
 }

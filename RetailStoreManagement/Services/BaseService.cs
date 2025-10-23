@@ -14,7 +14,7 @@ public class BaseService<TEntity, TKey> : IBaseService<TEntity, TKey>
 
     public virtual async Task<ApiResponse<TEntity>> GetByIdAsync(TKey id)
     {
-        var entity = await _repository.GetByIdAsync(id);
+    var entity = await _repository.GetByIdAsync(id);
         if (entity == null)
             return ApiResponse<TEntity>.Fail("Entity not found");
 
