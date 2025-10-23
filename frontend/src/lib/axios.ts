@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Định nghĩa types cho API response theo tài liệu đặc tả
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = never> {
   isError: boolean;
   message: string;
   data: T | null;
@@ -18,6 +18,26 @@ export interface LoginResponse {
     fullName: string;
     role: number; // 0: Admin, 1: Staff
   };
+}
+
+export interface PagedRequest {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    sortBy?: string;
+    sortDesc?: boolean;
+    categoryId?: number;
+    supplierId?: number;
+}
+
+export interface PagedList<T> {
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+    hasPrevious: boolean;
+    hasNext: boolean;
+    items: T[];
 }
 
 const TOKEN_KEY = 'accessToken';
@@ -50,8 +70,8 @@ const axiosClient: AxiosInstance = axios.create({
 // Biến để theo dõi việc refresh token đang diễn ra
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value?: any) => void;
-  reject: (reason?: any) => void;
+  resolve: (value?: string | null) => void;
+  reject: (reason?: never) => void;
 }> = [];
 
 // Xử lý queue khi refresh token hoàn thành
@@ -76,7 +96,7 @@ axiosClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
+  (error: any) => {
     return Promise.reject(error);
   }
 );

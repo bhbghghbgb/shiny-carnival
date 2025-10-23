@@ -1,17 +1,6 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
-
-// Types cho Product API
-export interface ProductEntity {
-  id: number;
-  categoryId: number;
-  supplierId: number;
-  productName: string;
-  barcode: string;
-  price: number;
-  unit: string;
-  createdAt: string;
-}
+import axiosClient, {type ApiResponse, type PagedList, type PagedRequest} from '../../../lib/axios';
+import {API_CONFIG} from '../../../config/api';
+import type { ProductEntity } from "../product";
 
 export interface CreateProductRequest {
   categoryId: number;
@@ -22,40 +11,21 @@ export interface CreateProductRequest {
   unit: string;
 }
 
-export interface UpdateProductRequest extends ProductEntity {}
-
-export interface PagedRequest {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-  sortBy?: string;
-  sortDesc?: boolean;
-  categoryId?: number;
-  supplierId?: number;
-}
-
-export interface PagedList<T> {
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
-  hasPrevious: boolean;
-  hasNext: boolean;
-  items: T[];
-}
+export type UpdateProductRequest = ProductEntity
 
 // Product API functions
 export const productApi = {
   /**
    * Lấy danh sách sản phẩm với phân trang và lọc
    */
-  getProducts: async (params?: PagedRequest): Promise<ApiResponse<PagedList<ProductEntity>>> => {
+  getProducts: async (params?: PagedRequest): Promise<ApiResponse<PagedList<ProductEntity[]>>> => {
     try {
       const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity>>>(
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
         { params },
       );
-      return response;
+      const products = response.data.data.items ?? [];
+      return products;
     } catch (error: any) {
       throw {
         isError: true,
@@ -74,7 +44,7 @@ export const productApi = {
       const response = await axiosClient.get<ApiResponse<ProductEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCT_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -94,7 +64,7 @@ export const productApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
         productData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -114,7 +84,7 @@ export const productApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCT_BY_ID(id),
         productData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -133,7 +103,7 @@ export const productApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCT_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -148,26 +118,40 @@ export const productApi = {
    * Tìm kiếm sản phẩm theo barcode
    */
   searchByBarcode: async (barcode: string): Promise<ApiResponse<ProductEntity[]>> => {
-    try {
-      const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity>>>(
-        API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
-        { params: { search: barcode, pageSize: 10 } },
-      );
-      
-      // Trả về items thay vì PagedList để dễ sử dụng
-      return {
-        ...response,
-        data: response.data?.items || []
-      };
-    } catch (error: any) {
-      throw {
-        isError: true,
-        message: error.message || 'Không thể tìm kiếm sản phẩm',
-        data: null,
-        timestamp: new Date().toISOString()
-      };
-    }
-  },
+      try {
+          // 1. Gọi API để lấy danh sách sản phẩm theo barcode
+          const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity>>>(
+              API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
+              { params: { search: barcode, pageSize: 10 } },
+          );
+
+          // 2. Trích xuất dữ liệu sản phẩm từ phản hồi
+          // Sử dụng "optional chaining" (?.) và "nullish coalescing" (??) để xử lý an toàn các trường hợp null/undefined
+          const products = response.data.data?.items ?? [];
+
+          // 3. Trả về kết quả thành công với danh sách sản phẩm tìm được
+          return {
+              isError: false,
+              message: "Tìm kiếm thành công", // Cung cấp message rõ ràng hơn
+              data: products,
+              timestamp: new Date().toISOString(), // Thêm timestamp cho sự nhất quán
+          };
+
+      } catch (error: any) {
+          // 4. Xử lý lỗi một cách nhất quán
+          // Ghi lại lỗi để debug (tùy chọn nhưng rất hữu ích)
+          console.error("Lỗi khi tìm kiếm sản phẩm bằng barcode:", error);
+
+          // Ném ra một đối tượng lỗi có cấu trúc tương tự như phản hồi thành công
+          throw {
+              isError: true,
+              message: error.response?.data?.message || 'Không thể tìm kiếm sản phẩm do lỗi hệ thống.',
+              data: null,
+              timestamp: new Date().toISOString(),
+          };
+      }
+  }
+    ,
 
   /**
    * Lấy sản phẩm theo danh mục
@@ -178,7 +162,7 @@ export const productApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
         { params: { ...params, categoryId } },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -198,7 +182,7 @@ export const productApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
         { params: { ...params, supplierId } },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

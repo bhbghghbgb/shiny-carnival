@@ -1,6 +1,13 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { productApi, ProductEntity, CreateProductRequest, UpdateProductRequest, PagedRequest, PagedList } from '../api';
+import type {
+    productApi,
+    ProductEntity,
+    CreateProductRequest,
+    UpdateProductRequest,
+    PagedRequest,
+    PagedList
+} from '../api';
 
 // Types cho Product Store
 interface ProductState {
