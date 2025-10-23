@@ -1,4 +1,5 @@
-import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Định nghĩa types cho API response theo tài liệu đặc tả
 export interface ApiResponse<T = any> {
@@ -38,7 +39,7 @@ export const tokenUtils = {
 };
 
 // Tạo Axios instance với cấu hình đầy đủ
-const axiosClient = axios.create({
+const axiosClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
   timeout: 10000, // 10 giây timeout
   headers: {
@@ -82,9 +83,9 @@ axiosClient.interceptors.request.use(
 
 // Response interceptor - Xử lý response và error handling
 axiosClient.interceptors.response.use(
-  (response: AxiosResponse<ApiResponse>) => {
+  (response: AxiosResponse) => {
     // Trả về data từ ApiResponse structure
-    return response.data;
+    return response.data as never;
   },
   async (error: AxiosError<ApiResponse>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };

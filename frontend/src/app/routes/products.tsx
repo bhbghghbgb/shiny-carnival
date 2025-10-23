@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { ProductManagementPage } from '../../features/products/pages/ProductManagementPage';
 
@@ -18,7 +18,7 @@ import { productApi } from '../../features/products/api/productApi';
 import { PendingComponent } from '../../components/feedback/PendingComponent';
 import { ErrorComponent } from '../../components/feedback/ErrorComponent';
 
-export const Route = createLazyFileRoute('/products')({
+export const Route = createFileRoute('/products')({
   validateSearch: productSearchSchema,
   loaderDeps: ({ search }: { search: TProductSearch }) => search,
   loader: ({ deps }: { deps: TProductSearch }) => productApi.getProducts(deps),
