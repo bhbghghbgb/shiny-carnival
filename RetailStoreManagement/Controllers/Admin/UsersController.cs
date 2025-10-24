@@ -4,6 +4,7 @@ using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Models;
+using RetailStoreManagement.Models.UserModel;
 
 namespace RetailStoreManagement.Controllers.Admin;
 
@@ -12,32 +13,53 @@ namespace RetailStoreManagement.Controllers.Admin;
 // [Authorize]
 public class UsersController : ControllerBase
 {
-    private readonly IBaseService<UserEntity, int> _service;
+    private readonly IUserService _service;
 
-    public UsersController(IBaseService<UserEntity, int> service)
+    public UsersController(IUserService service)
     {
         _service = service;
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<UserEntity>>> Get(int id)
+    private UserResponse ToResponse(UserEntity entity)
     {
-        return await _service.GetByIdAsync(id);
+        return new UserResponse
+        {
+            Id = entity.Id,
+            Username = entity.Username,
+            FullName = entity.FullName,
+            Role = entity.Role
+        };
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ApiResponse<UserResponse>>> Get(int id)
+    {
+        var result = await _service.GetByIdAsync(id);
+        if (result.IsError || result.Data == null)
+            return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "User not found"));
+        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IPagedList<UserEntity>>>> GetPaged([FromQuery] PagedRequest request)
+    public async Task<ActionResult<ApiResponse<IPagedList<UserResponse>>>> GetPaged([FromQuery] PagedRequest request)
     {
-        return await _service.GetPagedAsync(request);
+        var result = await _service.GetPagedAsync(request);
+        if (result.IsError || result.Data == null)
+            return BadRequest(ApiResponse<IPagedList<UserResponse>>.Fail(result.Message ?? "No users found"));
+        var paged = new PagedList<UserResponse>(
+            result.Data.Items.Select(ToResponse),
+            result.Data.TotalCount,
+            result.Data.Page,
+            result.Data.PageSize
+        );
+        return ApiResponse<IPagedList<UserResponse>>.Success(paged);
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<UserEntity>>> Create([FromBody] UserCreateRequest req)
+    public async Task<ActionResult<ApiResponse<UserResponse>>> Create([FromBody] UserCreateRequest req)
     {
         if (!ModelState.IsValid)
-        {
-            return BadRequest(ApiResponse<UserEntity>.Fail("Invalid request"));
-        }
+            return BadRequest(ApiResponse<UserResponse>.Fail("Invalid request"));
 
         var entity = new UserEntity
         {
@@ -47,14 +69,17 @@ public class UsersController : ControllerBase
             Role = req.Role
         };
 
-        return await _service.CreateAsync(entity);
+        var result = await _service.CreateAsync(entity);
+        if (result.IsError || result.Data == null)
+            return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "Create failed"));
+        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ApiResponse<UserEntity>>> Update(int id, [FromBody] UserUpdateRequest req)
+    public async Task<ActionResult<ApiResponse<UserResponse>>> Update(int id, [FromBody] UserUpdateRequest req)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ApiResponse<UserEntity>.Fail("Invalid request"));
+            return BadRequest(ApiResponse<UserResponse>.Fail("Invalid request"));
 
         var entity = new UserEntity
         {
@@ -63,12 +88,18 @@ public class UsersController : ControllerBase
             Role = req.Role ?? default
         };
 
-        return await _service.UpdateAsync(id, entity);
+        var result = await _service.UpdateAsync(id, entity);
+        if (result.IsError || result.Data == null)
+            return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "Update failed"));
+        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> Delete(int id)
     {
-        return await _service.DeleteAsync(id);
+        var result = await _service.DeleteAsync(id);
+        if (result.IsError)
+            return BadRequest(result);
+        return result;
     }
 }

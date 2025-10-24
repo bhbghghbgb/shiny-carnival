@@ -8,75 +8,23 @@ using RetailStoreManagement.Interfaces;
 
 namespace RetailStoreManagement.Services;
 
-public class UserService : BaseService<UserEntity, int>
+public class UserService : BaseService<UserEntity, int>, IUserService
 {
-    private readonly IUserRepository _repo;
+    private readonly IUserRepository _userRepository;
 
-    public UserService(IUserRepository repository) : base(repository)
+    public UserService(IUserRepository userRepository) : base(userRepository)
     {
-        _repo = repository;
+        _userRepository = userRepository;
     }
 
-    public override async Task<ApiResponse<UserEntity>> GetByIdAsync(int id)
+    public async Task<ApiResponse<UserEntity>> GetByNameAsync(string username)
     {
-        var entity = await _repo.GetByIdAsync(id);
-        if (entity == null)
+        var user = await _userRepository.GetByNameAsync(username);
+        if (user == null)
         {
-            return ApiResponse<UserEntity>.Fail("User not found");
+            return ApiResponse<UserEntity>.Fail($"User '{username}' not found.");
         }
 
-        // Do not return password
-        entity.Password = string.Empty;
-        return ApiResponse<UserEntity>.Success(entity);
-    }
-
-    public override async Task<ApiResponse<IPagedList<UserEntity>>> GetPagedAsync(PagedRequest request)
-    {
-        var result = await _repo.GetPagedAsync(request);
-
-        // Clear passwords in items
-        foreach (var item in result.Items)
-        {
-            item.Password = string.Empty;
-        }
-
-        return ApiResponse<IPagedList<UserEntity>>.Success(result);
-    }
-
-    public override async Task<ApiResponse<UserEntity>> CreateAsync(UserEntity entity)
-    {
-        // Ensure username uniqueness using IUserRepository helper
-        var exists = await _repo.GetByNameAsync(entity.Username);
-        if (exists != null)
-        {
-            return ApiResponse<UserEntity>.Fail("Username already exists");
-        }
-
-        var created = await _repo.AddAsync(entity);
-        created.Password = string.Empty;
-        return ApiResponse<UserEntity>.Success(created, "Created successfully");
-    }
-
-    public override async Task<ApiResponse<UserEntity>> UpdateAsync(int id, UserEntity entity)
-    {
-        var existing = await _repo.GetByIdAsync(id);
-        if (existing == null)
-        {
-            return ApiResponse<UserEntity>.Fail("User not found");
-        }
-
-        // Update allowed fields
-        existing.FullName = entity.FullName;
-        existing.Role = entity.Role;
-
-        await _repo.UpdateAsync(existing);
-        existing.Password = string.Empty;
-        return ApiResponse<UserEntity>.Success(existing, "Updated successfully");
-    }
-
-    public override async Task<ApiResponse<bool>> DeleteAsync(int id)
-    {
-        await _repo.SoftDeleteAsync(id);
-        return ApiResponse<bool>.Success(true, "Deleted successfully");
+        return ApiResponse<UserEntity>.Success(user);
     }
 }
