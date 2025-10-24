@@ -10,9 +10,9 @@ namespace RetailStoreManagement.Services;
 
 public class UserService : BaseService<UserEntity, int>
 {
-    private readonly IRepository<UserEntity, int> _repo;
+    private readonly IUserRepository _repo;
 
-    public UserService(IRepository<UserEntity, int> repository) : base(repository)
+    public UserService(IUserRepository repository) : base(repository)
     {
         _repo = repository;
     }
@@ -45,15 +45,12 @@ public class UserService : BaseService<UserEntity, int>
 
     public override async Task<ApiResponse<UserEntity>> CreateAsync(UserEntity entity)
     {
-        // Ensure username uniqueness
-        var exists = await _repo.GetQueryable().AnyAsync(u => u.Username == entity.Username);
-        if (exists)
+        // Ensure username uniqueness using IUserRepository helper
+        var exists = await _repo.GetByNameAsync(entity.Username);
+        if (exists != null)
         {
             return ApiResponse<UserEntity>.Fail("Username already exists");
         }
-
-        // Hash password before saving
-        entity.Password = HashPassword(entity.Password);
 
         var created = await _repo.AddAsync(entity);
         created.Password = string.Empty;
@@ -72,11 +69,6 @@ public class UserService : BaseService<UserEntity, int>
         existing.FullName = entity.FullName;
         existing.Role = entity.Role;
 
-        if (!string.IsNullOrWhiteSpace(entity.Password))
-        {
-            existing.Password = HashPassword(entity.Password);
-        }
-
         await _repo.UpdateAsync(existing);
         existing.Password = string.Empty;
         return ApiResponse<UserEntity>.Success(existing, "Updated successfully");
@@ -86,42 +78,5 @@ public class UserService : BaseService<UserEntity, int>
     {
         await _repo.SoftDeleteAsync(id);
         return ApiResponse<bool>.Success(true, "Deleted successfully");
-    }
-
-    private static string HashPassword(string password)
-    {
-        var salt = RandomNumberGenerator.GetBytes(16);
-        using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256);
-        var hash = pbkdf2.GetBytes(32);
-
-        var result = new byte[1 + salt.Length + hash.Length];
-        result[0] = 0; // version
-        Buffer.BlockCopy(salt, 0, result, 1, salt.Length);
-        Buffer.BlockCopy(hash, 0, result, 1 + salt.Length, hash.Length);
-
-        return Convert.ToBase64String(result);
-    }
-
-    public static bool VerifyPassword(string stored, string password)
-    {
-        try
-        {
-            var bytes = Convert.FromBase64String(stored);
-            if (bytes.Length < 1 + 16 + 32) return false;
-
-            var salt = new byte[16];
-            Buffer.BlockCopy(bytes, 1, salt, 0, 16);
-            var hash = new byte[32];
-            Buffer.BlockCopy(bytes, 1 + 16, hash, 0, 32);
-
-            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100_000, HashAlgorithmName.SHA256);
-            var checkHash = pbkdf2.GetBytes(32);
-
-            return CryptographicOperations.FixedTimeEquals(hash, checkHash);
-        }
-        catch
-        {
-            return false;
-        }
     }
 }

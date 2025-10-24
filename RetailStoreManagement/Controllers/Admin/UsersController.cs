@@ -9,7 +9,7 @@ namespace RetailStoreManagement.Controllers.Admin;
 
 [ApiController]
 [Route("admin/[controller]")]
-//[Authorize]
+// [Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IBaseService<UserEntity, int> _service;

@@ -1,18 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Data;
 using RetailStoreManagement.Entities;
+using RetailStoreManagement.Interfaces;
 
 namespace RetailStoreManagement.Repositories;
 
-public class UserRepository : Repository<UserEntity, int>
+public class UserRepository : Repository<UserEntity, int>, IUserRepository
 {
     public UserRepository(ApplicationDbContext context) : base(context)
     {
     }
 
-    // Override to query by Id using IQueryable (ensures includes / filters apply consistently)
-    public override async Task<UserEntity> GetByIdAsync(int id)
+    // Query by username using _dbSet directly (no GetQueryable)
+    public async Task<UserEntity?> GetByNameAsync(string username)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.Id == id);
+        return await _dbSet.FirstOrDefaultAsync(u => u.Username == username);
     }
 }
