@@ -20,12 +20,11 @@ export const productApi = {
    */
   getProducts: async (params?: PagedRequest): Promise<ApiResponse<PagedList<ProductEntity[]>>> => {
     try {
-      const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity>>>(
+      const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity[]>>>(
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
         { params },
       );
-      const products = response.data.data.items ?? [];
-      return products;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

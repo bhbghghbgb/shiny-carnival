@@ -1,9 +1,7 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Table, Button, Modal, Form, Input} from 'antd';
 import {ProductForm} from '../components/ProductForm';
 import {Route} from '../../../app/routes/products';
-import type {ProductEntity} from "../product.ts";
-import {productService} from "../api/productService.ts";
 
 export function ProductManagementPage() {
     // Lấy dữ liệu và search params từ route context
@@ -12,19 +10,8 @@ export function ProductManagementPage() {
     const navigate = Route.useNavigate();
 
 
-    // Hiện tại chưa có api dùng mock
-    const [products, setProducts] = useState<ProductEntity[]>([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
-
-    useEffect(() => {
-        // Mock
-        const fetchProducts = async () => {
-            const data = await productService.getProducts() as never[];
-            setProducts(data);
-        };
-        fetchProducts();
-    }, []);
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -87,7 +74,7 @@ export function ProductManagementPage() {
                 />
             </div>
             <Table
-                dataSource={products}
+                dataSource={productsData?.items}
                 columns={columns}
                 rowKey="id"
                 pagination={{
