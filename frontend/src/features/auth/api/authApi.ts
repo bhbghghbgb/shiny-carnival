@@ -1,4 +1,4 @@
-import axiosClient, { ApiResponse, LoginResponse, tokenUtils } from '../../../lib/axios';
+import axiosClient, {type ApiResponse, type LoginResponse, tokenUtils } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
 
 // Types cho Authentication API
@@ -32,13 +32,13 @@ export const authApi = {
       );
 
       // Lưu tokens vào localStorage nếu đăng nhập thành công
-      if (!response.isError && response.data) {
-        tokenUtils.setToken(response.data.token);
+      if (!response.data.isError && response.data.data) {
+        tokenUtils.setToken(response.data.data.token);
         // Note: Refresh token sẽ được implement khi backend hỗ trợ
-        // tokenUtils.setRefreshToken(response.data.refreshToken);
+        // tokenUtils.setRefreshToken(response.data.data.refreshToken);
       }
 
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -60,11 +60,11 @@ export const authApi = {
       );
 
       // Cập nhật token mới nếu refresh thành công
-      if (!response.isError && response.data) {
-        tokenUtils.setToken(response.data.token);
+      if (!response.data.isError && response.data.data) {
+        tokenUtils.setToken(response.data.data.token);
       }
 
-      return response;
+      return response.data;
     } catch (error: any) {
       // Nếu refresh token thất bại, xóa tất cả tokens
       tokenUtils.clearAllTokens();

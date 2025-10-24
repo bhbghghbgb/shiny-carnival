@@ -1,6 +1,5 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
+import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-import { PagedRequest, PagedList } from '../products/api/productApi';
 
 // Types cho Customer API
 export interface CustomerEntity {
@@ -32,7 +31,7 @@ export const customerApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMERS,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -51,7 +50,7 @@ export const customerApi = {
       const response = await axiosClient.get<ApiResponse<CustomerEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -71,7 +70,7 @@ export const customerApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMERS,
         customerData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -91,7 +90,7 @@ export const customerApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMER_BY_ID(id),
         customerData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -110,7 +109,7 @@ export const customerApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -130,10 +129,13 @@ export const customerApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMERS,
         { params: { search: phone, pageSize: 10 } },
       );
-      
+
       return {
-        ...response,
-        data: response.data?.items || []
+          isError: false,
+          message: "",
+          timestamp: "",
+          ...response,
+        data: response.data?.data?.items || []
       };
     } catch (error: any) {
       throw {
@@ -154,10 +156,13 @@ export const customerApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CUSTOMERS,
         { params: { search: email, pageSize: 10 } },
       );
-      
+
       return {
-        ...response,
-        data: response.data?.items || []
+          isError: false,
+          message: "",
+          timestamp: "",
+          ...response,
+        data: response.data?.data?.items || []
       };
     } catch (error: any) {
       throw {

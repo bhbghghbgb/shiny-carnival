@@ -1,4 +1,4 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
+import axiosClient, {type ApiResponse} from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
 
 // Types cho Report API
@@ -33,7 +33,7 @@ export const reportApi = {
         API_CONFIG.ENDPOINTS.ADMIN.REVENUE_REPORT,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

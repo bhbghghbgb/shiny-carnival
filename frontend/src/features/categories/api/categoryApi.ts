@@ -1,12 +1,8 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
+import axiosClient, {type ApiResponse, type PagedList, type PagedRequest} from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-import { PagedRequest, PagedList } from '../products/api/productApi';
+import type { CategoryEntity } from "../type/categories";
 
-// Types cho Category API
-export interface CategoryEntity {
-  id: number;
-  categoryName: string;
-}
+
 
 export interface CreateCategoryRequest {
   categoryName: string;
@@ -19,13 +15,13 @@ export const categoryApi = {
   /**
    * Lấy danh sách danh mục với phân trang
    */
-  getCategories: async (params?: PagedRequest): Promise<ApiResponse<PagedList<CategoryEntity>>> => {
+  getCategories: async (params?: PagedRequest): Promise<ApiResponse<PagedList<CategoryEntity[]>>> => {
     try {
-      const response = await axiosClient.get<ApiResponse<PagedList<CategoryEntity>>>(
+      const response = await axiosClient.get<ApiResponse<PagedList<CategoryEntity[]>>>(
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORIES,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -47,8 +43,11 @@ export const categoryApi = {
       );
       
       return {
-        ...response,
-        data: response.data?.items || []
+          isError: false,
+          message: "",
+          timestamp: "",
+          ...response,
+        data: response.data?.data?.items || []
       };
     } catch (error: any) {
       throw {
@@ -68,7 +67,7 @@ export const categoryApi = {
       const response = await axiosClient.get<ApiResponse<CategoryEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORY_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -88,7 +87,7 @@ export const categoryApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORIES,
         categoryData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -108,7 +107,7 @@ export const categoryApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORY_BY_ID(id),
         categoryData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -127,7 +126,7 @@ export const categoryApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORY_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

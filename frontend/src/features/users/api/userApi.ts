@@ -1,6 +1,5 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
-import { API_CONFIG, UserRole } from '../../../config/api';
-import { PagedRequest, PagedList } from '../products/api/productApi';
+import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
+import { API_CONFIG, type UserRole } from '../../../config/api';
 
 // Types cho User API
 export interface UserEntity {
@@ -34,7 +33,7 @@ export const userApi = {
         API_CONFIG.ENDPOINTS.ADMIN.USERS,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -53,7 +52,7 @@ export const userApi = {
       const response = await axiosClient.get<ApiResponse<UserEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.USER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -73,7 +72,7 @@ export const userApi = {
         API_CONFIG.ENDPOINTS.ADMIN.USERS,
         userData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -93,7 +92,7 @@ export const userApi = {
         API_CONFIG.ENDPOINTS.ADMIN.USER_BY_ID(id),
         userData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -112,7 +111,7 @@ export const userApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.USER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -138,12 +137,15 @@ export const userApi = {
           }
         }
       );
-      
+
       // Filter staff users ở client side nếu backend chưa hỗ trợ
-      const staffUsers = response.data?.items.filter(user => user.role === API_CONFIG.USER_ROLES.STAFF) || [];
-      
+      const staffUsers = response.data?.data?.items.filter(user => user.role === API_CONFIG.USER_ROLES.STAFF) || [];
+
       return {
-        ...response,
+          isError: false,
+          message: "",
+          timestamp: "",
+          ...response,
         data: staffUsers
       };
     } catch (error: any) {
@@ -165,10 +167,10 @@ export const userApi = {
         API_CONFIG.ENDPOINTS.ADMIN.USERS,
         { params: { search: username, pageSize: 1 } }
       );
-      
-      const users = response.data?.items || [];
+
+      const users = response.data?.data?.items || [];
       return users.some(user => user.username.toLowerCase() === username.toLowerCase());
-    } catch (error) {
+    } catch (error: any) {
       // Nếu có lỗi, giả sử username không tồn tại
       return false;
     }

@@ -1,4 +1,4 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
+import axiosClient, {type ApiResponse} from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
 
 // Types cho Inventory API
@@ -24,7 +24,7 @@ export const inventoryApi = {
       const response = await axiosClient.get<ApiResponse<InventoryEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_BY_PRODUCT(productId)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -44,7 +44,7 @@ export const inventoryApi = {
         API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_BY_PRODUCT(productId),
         updateData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

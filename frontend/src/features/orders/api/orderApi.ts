@@ -1,6 +1,5 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
-import { API_CONFIG, OrderStatus } from '../../../config/api';
-import { PagedRequest, PagedList } from '../products/api/productApi';
+import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
+import { API_CONFIG, type OrderStatus } from '../../../config/api';
 
 // Types cho Order API
 export interface OrderEntity {
@@ -72,7 +71,7 @@ export const orderApi = {
         API_CONFIG.ENDPOINTS.ADMIN.ORDERS,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -91,7 +90,7 @@ export const orderApi = {
       const response = await axiosClient.get<ApiResponse<OrderDetailsDto>>(
         API_CONFIG.ENDPOINTS.ADMIN.ORDER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -111,7 +110,7 @@ export const orderApi = {
         API_CONFIG.ENDPOINTS.ADMIN.ORDERS,
         orderData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -131,7 +130,7 @@ export const orderApi = {
         API_CONFIG.ENDPOINTS.ADMIN.ORDER_STATUS(id),
         statusData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -153,7 +152,7 @@ export const orderApi = {
           responseType: 'blob'
         }
       );
-      return response as unknown as Blob;
+      return response.data as Blob;
     } catch (error: any) {
       throw {
         isError: true,
@@ -173,7 +172,7 @@ export const orderApi = {
         API_CONFIG.ENDPOINTS.ADMIN.ORDER_ITEMS(orderId),
         itemData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -193,7 +192,7 @@ export const orderApi = {
         API_CONFIG.ENDPOINTS.ADMIN.ORDER_ITEM_BY_ID(orderId, itemId),
         itemData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -212,7 +211,7 @@ export const orderApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.ORDER_ITEM_BY_ID(orderId, itemId)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

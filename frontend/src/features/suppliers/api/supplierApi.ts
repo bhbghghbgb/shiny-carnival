@@ -1,6 +1,5 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
+import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-import { PagedRequest, PagedList } from '../products/api/productApi';
 
 // Types cho Supplier API
 export interface SupplierEntity {
@@ -31,7 +30,7 @@ export const supplierApi = {
         API_CONFIG.ENDPOINTS.ADMIN.SUPPLIERS,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -51,10 +50,13 @@ export const supplierApi = {
         API_CONFIG.ENDPOINTS.ADMIN.SUPPLIERS,
         { params: { pageSize: 1000 } },
       );
-      
+
       return {
-        ...response,
-        data: response.data?.items || []
+          isError: false,
+          message: "",
+          timestamp: "",
+          ...response,
+        data: response.data?.data?.items || []
       };
     } catch (error: any) {
       throw {
@@ -74,7 +76,7 @@ export const supplierApi = {
       const response = await axiosClient.get<ApiResponse<SupplierEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.SUPPLIER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -94,7 +96,7 @@ export const supplierApi = {
         API_CONFIG.ENDPOINTS.ADMIN.SUPPLIERS,
         supplierData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -114,7 +116,7 @@ export const supplierApi = {
         API_CONFIG.ENDPOINTS.ADMIN.SUPPLIER_BY_ID(id),
         supplierData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -133,7 +135,7 @@ export const supplierApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.SUPPLIER_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

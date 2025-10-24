@@ -1,6 +1,5 @@
-import axiosClient, { ApiResponse } from '../../../lib/axios';
-import { API_CONFIG, DiscountType, PromotionStatus } from '../../../config/api';
-import { PagedRequest, PagedList } from '../products/api/productApi';
+import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
+import { API_CONFIG, type DiscountType,type  PromotionStatus } from '../../../config/api';
 
 // Types cho Promotion API
 export interface PromotionEntity {
@@ -46,7 +45,7 @@ export const promotionApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PROMOTIONS,
         { params },
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -65,7 +64,7 @@ export const promotionApi = {
       const response = await axiosClient.get<ApiResponse<PromotionEntity>>(
         API_CONFIG.ENDPOINTS.ADMIN.PROMOTION_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -85,7 +84,7 @@ export const promotionApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PROMOTIONS,
         promotionData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -105,7 +104,7 @@ export const promotionApi = {
         API_CONFIG.ENDPOINTS.ADMIN.PROMOTION_BY_ID(id),
         promotionData
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -124,7 +123,7 @@ export const promotionApi = {
       const response = await axiosClient.delete<ApiResponse<boolean>>(
         API_CONFIG.ENDPOINTS.ADMIN.PROMOTION_BY_ID(id)
       );
-      return response;
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,
@@ -149,10 +148,13 @@ export const promotionApi = {
           }
         }
       );
-      
+
       return {
-        ...response,
-        data: response.data?.items || []
+          isError: false,
+          message: "",
+          timestamp: "",
+          ...response,
+        data: response.data?.data?.items || []
       };
     } catch (error: any) {
       throw {
@@ -181,7 +183,7 @@ export const promotionApi = {
         }
       );
 
-      const promotions = response.data?.items || [];
+      const promotions = response.data?.data?.items || [];
       if (promotions.length === 0) {
         throw new Error('Mã khuyến mãi không tồn tại hoặc đã hết hạn');
       }
