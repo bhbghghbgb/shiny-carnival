@@ -1,5 +1,4 @@
 import React from 'react';
-import ProductList from '../features/products/pages/ProductList';
 import { Typography } from 'antd';
 
 const { Title, Text } = Typography;
@@ -19,7 +18,6 @@ const HomePage: React.FC = () => {
         <Text type="secondary">This is where the main content will go.</Text>
       </div>
 
-      <ProductList />
     </main>
   );
 };
