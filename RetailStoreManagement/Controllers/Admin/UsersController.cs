@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
@@ -36,7 +35,10 @@ public class UsersController : ControllerBase
     {
         var result = await _service.GetByIdAsync(id);
         if (result.IsError || result.Data == null)
+        {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "User not found"));
+        }
+
         return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 
@@ -45,7 +47,10 @@ public class UsersController : ControllerBase
     {
         var result = await _service.GetPagedAsync(request);
         if (result.IsError || result.Data == null)
+        {
             return BadRequest(ApiResponse<IPagedList<UserResponse>>.Fail(result.Message ?? "No users found"));
+        }
+
         var paged = new PagedList<UserResponse>(
             result.Data.Items.Select(ToResponse),
             result.Data.TotalCount,
@@ -71,7 +76,10 @@ public class UsersController : ControllerBase
 
         var result = await _service.CreateAsync(entity);
         if (result.IsError || result.Data == null)
+        {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "Create failed"));
+        }
+
         return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 
@@ -79,7 +87,9 @@ public class UsersController : ControllerBase
     public async Task<ActionResult<ApiResponse<UserResponse>>> Update(int id, [FromBody] UserUpdateRequest req)
     {
         if (!ModelState.IsValid)
+        {
             return BadRequest(ApiResponse<UserResponse>.Fail("Invalid request"));
+        }
 
         var entity = new UserEntity
         {
@@ -90,7 +100,10 @@ public class UsersController : ControllerBase
 
         var result = await _service.UpdateAsync(id, entity);
         if (result.IsError || result.Data == null)
+        {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "Update failed"));
+        }
+
         return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 
@@ -99,7 +112,22 @@ public class UsersController : ControllerBase
     {
         var result = await _service.DeleteAsync(id);
         if (result.IsError)
+        {
             return BadRequest(result);
+        }
+
         return result;
+    }
+
+    [HttpGet("by-username/{username}")]
+    public async Task<ActionResult<ApiResponse<UserResponse>>> GetByUsername(string username)
+    {
+        var result = await _service.GetByNameAsync(username);
+        if (result.IsError || result.Data == null)
+        {
+            return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "User not found"));
+        }
+        
+        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 }

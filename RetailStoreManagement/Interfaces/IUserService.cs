@@ -1,6 +1,5 @@
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
-using System.Threading.Tasks;
 
 namespace RetailStoreManagement.Interfaces;
 
