@@ -80,11 +80,10 @@ public class ProductController : ControllerBase
     {
         var result = await _productService.GetByIdAsync(id);
 
-        if (!result.IsSuccess)
+        // Nếu service trả về Data = null => không tìm thấy
+        if (result.Data == null)
         {
-            // 404 Not Found
-            var errorResponse = ApiResponse<object>.Fail("Sản phẩm không tồn tại hoặc đã bị xóa.");
-            return new ObjectResult(errorResponse) { StatusCode = 404 };
+            return new ObjectResult(ApiResponse<object>.Fail("Sản phẩm không tồn tại hoặc đã bị xóa.")) { StatusCode = 404 };
         }
 
         return Ok(result);
@@ -104,15 +103,15 @@ public class ProductController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            var invalidResponse = ApiResponse<object>.Fail("Dữ liệu cập nhật không hợp lệ.");
-            return new ObjectResult(invalidResponse) { StatusCode = 400 };
+            return new ObjectResult(ApiResponse<object>.Fail("Dữ liệu cập nhật không hợp lệ.")) { StatusCode = 400 };
         }
 
         var result = await _productService.UpdateAsync(id, product);
-        if (!result.IsSuccess)
+
+        // Nếu service trả về Data = null => không tìm thấy để cập nhật
+        if (result.Data == null)
         {
-            var notFoundResponse = ApiResponse<object>.Fail("Không tìm thấy sản phẩm để cập nhật.");
-            return new ObjectResult(notFoundResponse) { StatusCode = 404 };
+            return new ObjectResult(ApiResponse<object>.Fail("Không tìm thấy sản phẩm để cập nhật.")) { StatusCode = 404 };
         }
 
         return Ok(result); // 200 OK
@@ -131,10 +130,10 @@ public class ProductController : ControllerBase
     {
         var result = await _productService.DeleteAsync(id);
 
-        if (!result.IsSuccess)
+        // Delete trả về Data = true khi xóa thành công. Nếu false => không tìm thấy
+        if (!result.Data)
         {
-            var notFoundResponse = ApiResponse<object>.Fail("Không tìm thấy sản phẩm để xóa.");
-            return new ObjectResult(notFoundResponse) { StatusCode = 404 };
+            return new ObjectResult(ApiResponse<object>.Fail("Không tìm thấy sản phẩm để xóa.")) { StatusCode = 404 };
         }
 
         return Ok(result); // 200 OK
