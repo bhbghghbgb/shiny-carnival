@@ -76,6 +76,11 @@ public class UserService : BaseService<UserEntity, int>
 
     public override async Task<ApiResponse<bool>> DeleteAsync(int id)
     {
+        var existing = await _repo.GetByIdAsync(id);
+        if (existing == null)
+        {
+            return ApiResponse<bool>.Fail("User not found");
+        }
         await _repo.SoftDeleteAsync(id);
         return ApiResponse<bool>.Success(true, "Deleted successfully");
     }
