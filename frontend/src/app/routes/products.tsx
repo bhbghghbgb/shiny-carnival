@@ -1,6 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { ProductManagementPage } from '../../features/products/pages/ProductManagementPage';
+import { productApi } from '../../features/products/api/productApi';
+import { PendingComponent } from '../../components/feedback/PendingComponent';
+import { ErrorComponent } from '../../components/feedback/ErrorComponent';
+import {ProductManagementMockPage} from "../../features/products/pages/ProductManagementMockPage.tsx";
 
 // Schema để xác thực search params cho trang sản phẩm
 const productSearchSchema = z.object({
@@ -13,16 +17,14 @@ const productSearchSchema = z.object({
 // Suy ra kiểu từ schema để sử dụng trong loader
 type TProductSearch = z.infer<typeof productSearchSchema>;
 
-import { productApi } from '../../features/products/api/productApi';
 
-import { PendingComponent } from '../../components/feedback/PendingComponent';
-import { ErrorComponent } from '../../components/feedback/ErrorComponent';
 
 export const Route = createFileRoute('/products')({
-  validateSearch: productSearchSchema,
-  loaderDeps: ({ search }: { search: TProductSearch }) => search,
-  loader: ({ deps }: { deps: TProductSearch }) => productApi.getProducts(deps),
-  component: ProductManagementPage,
+  // validateSearch: productSearchSchema,
+  // loaderDeps: ({ search }: { search: TProductSearch }) => search,
+  // loader: ({ deps }: { deps: TProductSearch }) => productApi.getProducts(deps),
+  //   Todo: Sử dụng component ProductManagementPage khi có API
+  component: ProductManagementMockPage,
   pendingComponent: PendingComponent,
   errorComponent: ErrorComponent,
 });
