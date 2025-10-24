@@ -1,5 +1,5 @@
 import React from 'react';
-import ProductList from '../components/layout/ProductList';
+import ProductList from '../features/products/pages/ProductList';
 import { Typography } from 'antd';
 
 const { Title, Text } = Typography;

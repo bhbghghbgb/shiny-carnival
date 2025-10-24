@@ -1,11 +1,24 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col, Typography } from 'antd';
-import ProductCard from './ProductCard';
-import { products } from '../../_mocks/products';
+import ProductCard from '../components/ProductCard';
+import type {ProductEntity} from "../product.ts";
+import { productService } from '../api/productService';
 
 const { Title } = Typography;
 
 const ProductList: React.FC = () => {
+  const [products, setProducts] = useState<ProductEntity[]>([]);
+
+    useEffect(() => {
+        // Mock
+        const fetchProducts = async () => {
+            const data = await productService.getProducts() as ProductEntity[];
+            setProducts(data);
+            console.log("Products: " + data);
+        };
+        fetchProducts();
+    }, []);
   return (
     <section style={{ marginTop: 24 }}>
       <Title level={3} style={{ marginBottom: 24 }}>

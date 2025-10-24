@@ -1,22 +1,11 @@
 import React from 'react';
 import { Card, Typography } from 'antd';
+import type {ProductEntity} from "../product.ts";
 
 const { Title, Text } = Typography;
 
-type ProductProps = {
-  product: {
-    id: number;
-    categoryId: number;
-    supplierId: number;
-    productName: string;
-    barcode: string;
-    price: number;
-    unit: string;
-    createdAt: string;
-  };
-};
 
-const ProductCard: React.FC<ProductProps> = ({ product }) => {
+const ProductCard: React.FC<{ product: ProductEntity }> = ({ product }) => {
   return (
     <Card
       hoverable
