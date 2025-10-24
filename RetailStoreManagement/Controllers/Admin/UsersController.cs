@@ -56,11 +56,19 @@ public class UsersController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ApiResponse<UserEntity>.Fail("Invalid request"));
 
+        // Fetch the existing user entity to preserve the role if not provided
+        var existingResponse = await _service.GetByIdAsync(id);
+        if (!existingResponse.Success || existingResponse.Data == null)
+        {
+            return NotFound(ApiResponse<UserEntity>.Fail("User not found"));
+        }
+        var existingEntity = existingResponse.Data;
+
         var entity = new UserEntity
         {
             Password = req.Password ?? string.Empty,
             FullName = req.FullName,
-            Role = req.Role ?? default
+            Role = req.Role ?? existingEntity.Role
         };
 
         return await _service.UpdateAsync(id, entity);
