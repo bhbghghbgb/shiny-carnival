@@ -1,38 +1,7 @@
-import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
-import { API_CONFIG, type DiscountType,type  PromotionStatus } from '../../../config/api';
-
-// Types cho Promotion API
-export interface PromotionEntity {
-  id: number;
-  promoCode: string;
-  description: string;
-  discountType: DiscountType;
-  discountValue: number;
-  startDate: string;
-  endDate: string;
-  minOrderAmount: number;
-  usageLimit: number;
-  usedCount: number;
-  status: PromotionStatus;
-}
-
-export interface CreatePromotionRequest {
-  promoCode: string;
-  description: string;
-  discountType: DiscountType;
-  discountValue: number;
-  startDate: string;
-  endDate: string;
-  minOrderAmount: number;
-  usageLimit: number;
-  status: PromotionStatus;
-}
-
-export interface UpdatePromotionRequest extends PromotionEntity {}
-
-export interface PromotionFilterParams extends PagedRequest {
-  status?: PromotionStatus;
-}
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
+import { API_CONFIG } from '../../../config/api';
+import type { PromotionEntity } from '../types/entity.ts';
+import type { CreatePromotionRequest, UpdatePromotionRequest, PromotionFilterParams } from '../types/api.ts';
 
 // Promotion API functions
 export const promotionApi = {

@@ -1,23 +1,7 @@
-import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-
-// Types cho Supplier API
-export interface SupplierEntity {
-  id: number;
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-}
-
-export interface CreateSupplierRequest {
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-}
-
-export interface UpdateSupplierRequest extends SupplierEntity {}
+import type { SupplierEntity } from '../types/entity.ts';
+import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api.ts';
 
 // Supplier API functions
 export const supplierApi = {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'antd';
 import { productService } from '../api/productService';
 import { ProductForm } from '../components/ProductForm';
-import type {ProductEntity} from "../product.ts";
+import type {ProductEntity} from "../types/entity.ts";
 
 export function ProductManagementMockPage() {
     const [products, setProducts] = useState<ProductEntity[]>([]);
