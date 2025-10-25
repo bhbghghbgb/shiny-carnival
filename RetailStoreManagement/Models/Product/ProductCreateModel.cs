@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using RetailStoreManagement.Enums;
 
-namespace RetailStoreManagement.Models;
+namespace RetailStoreManagement.Models.Product;
 
 public class ProductCreateModel
 {
@@ -21,5 +22,5 @@ public class ProductCreateModel
     public decimal Price { get; set; }
 
     [MaxLength(20)]
-    public string Unit { get; set; } = "pcs";
+    public ProductUnit Unit { get; set; } = ProductUnit.Pcs;
 }

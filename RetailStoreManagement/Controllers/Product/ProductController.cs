@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
-using RetailStoreManagement.Models;
+using RetailStoreManagement.Models.Product;
 
 namespace RetailStoreManagement.Controllers;
 
@@ -22,36 +22,26 @@ public class ProductController : ControllerBase
     }
 
     // ========================================================================
-    // 1. Lấy danh sách sản phẩm (phân trang, tìm kiếm, sắp xếp)
+    // 1. Lấy danh sách sản phẩm (phân trang)
     // ========================================================================
-    /// <summary>
-    /// Lấy danh sách sản phẩm với hỗ trợ phân trang, tìm kiếm và sắp xếp.
-    /// </summary>
-    /// <param name="request">Thông tin phân trang (Page, PageSize, SortBy, SortDesc, Search)</param>
-    /// <returns>Danh sách sản phẩm dạng phân trang</returns>
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<IPagedList<ProductEntity>>), 200)]
+    [ProducesResponseType(typeof(ApiResponse<IPagedList<ProductResponseModel>>), 200)]
     public async Task<IActionResult> GetPaged([FromQuery] PagedRequest request)
     {
         var result = await _productService.GetPagedAsync(request);
-        return Ok(result); // 200 OK – ApiResponse.Success()
+        return Ok(result);
     }
 
     // ========================================================================
     // 2. Tạo mới sản phẩm
     // ========================================================================
-    /// <summary>
-    /// Thêm mới sản phẩm (chỉ Admin được phép thao tác).
-    /// </summary>
     [HttpPost]
-    [ProducesResponseType(typeof(ApiResponse<ProductEntity>), 200)]
+    [ProducesResponseType(typeof(ApiResponse<ProductResponseModel>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 400)]
-    [ProducesResponseType(typeof(ApiResponse<object>), 403)]
-    [HttpPost]
     public async Task<IActionResult> Create([FromBody] ProductCreateModel model)
     {
         if (!ModelState.IsValid)
-            return BadRequest(ApiResponse<string>.Fail("Invalid input data."));
+            return BadRequest(ApiResponse<object>.Fail("Dữ liệu không hợp lệ."));
 
         var entity = new ProductEntity
         {
@@ -68,106 +58,82 @@ public class ProductController : ControllerBase
     }
 
     // ========================================================================
-    // 3. Lấy chi tiết sản phẩm theo ID
+    // 3. Lấy chi tiết sản phẩm
     // ========================================================================
-    /// <summary>
-    /// Lấy chi tiết một sản phẩm theo ID.
-    /// </summary>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(ApiResponse<ProductEntity>), 200)]
+    [ProducesResponseType(typeof(ApiResponse<ProductResponseModel>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 404)]
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _productService.GetByIdAsync(id);
-
-        // Nếu service trả về Data = null => không tìm thấy
         if (result.Data == null)
-        {
-            return new ObjectResult(ApiResponse<object>.Fail("Sản phẩm không tồn tại hoặc đã bị xóa.")) { StatusCode = 404 };
-        }
+            return NotFound(ApiResponse<object>.Fail("Sản phẩm không tồn tại hoặc đã bị xóa."));
 
         return Ok(result);
     }
 
-// ========================================================================
+    // ========================================================================
     // 4. Cập nhật thông tin sản phẩm
     // ========================================================================
-    /// <summary>
-    /// Cập nhật thông tin sản phẩm (chỉ Admin được phép thao tác).
-    /// </summary>
     [HttpPut("{id:int}")]
-    [ProducesResponseType(typeof(ApiResponse<ProductEntity>), 200)]
-    [ProducesResponseType(typeof(ApiResponse<object>), 400)]
-    [ProducesResponseType(typeof(ApiResponse<object>), 404)]
-    public async Task<IActionResult> Update(int id, [FromBody] ProductEntity product)
+    public async Task<IActionResult> Update(int id, [FromBody] ProductUpdateModel model)
     {
         if (!ModelState.IsValid)
+            return BadRequest(ApiResponse<object>.Fail("Dữ liệu cập nhật không hợp lệ."));
+
+        var entity = new ProductEntity
         {
-            return new ObjectResult(ApiResponse<object>.Fail("Dữ liệu cập nhật không hợp lệ.")) { StatusCode = 400 };
-        }
+            ProductName = model.ProductName,
+            CategoryId = model.CategoryId,
+            SupplierId = model.SupplierId,
+            Barcode = model.Barcode,
+            Price = model.Price,
+            Unit = model.Unit
+        };
 
-        var result = await _productService.UpdateAsync(id, product);
+        var result = await _productService.UpdateAsync(id, entity);
 
-        // Nếu service trả về Data = null => không tìm thấy để cập nhật
         if (result.Data == null)
-        {
-            return new ObjectResult(ApiResponse<object>.Fail("Không tìm thấy sản phẩm để cập nhật.")) { StatusCode = 404 };
-        }
+            return NotFound(ApiResponse<object>.Fail("Không tìm thấy sản phẩm để cập nhật."));
 
-        return Ok(result); // 200 OK
+        return Ok(result);
     }
+
 
     // ========================================================================
     // 5. Xóa mềm sản phẩm
     // ========================================================================
-    /// <summary>
-    /// Xóa mềm sản phẩm (chỉ Admin được phép thao tác).
-    /// </summary>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), 200)]
     [ProducesResponseType(typeof(ApiResponse<object>), 404)]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _productService.DeleteAsync(id);
-
-        // Delete trả về Data = true khi xóa thành công. Nếu false => không tìm thấy
         if (!result.Data)
-        {
-            return new ObjectResult(ApiResponse<object>.Fail("Không tìm thấy sản phẩm để xóa.")) { StatusCode = 404 };
-        }
+            return NotFound(ApiResponse<object>.Fail("Không tìm thấy sản phẩm để xóa."));
 
-        return Ok(result); // 200 OK
+        return Ok(result);
     }
 
     // ========================================================================
-    // 6. Tìm kiếm sản phẩm theo tên hoặc mã vạch
+    // 6. Tìm kiếm theo tên hoặc mã vạch
     // ========================================================================
-    /// <summary>
-    /// Tìm kiếm sản phẩm theo tên hoặc mã vạch.
-    /// </summary>
     [HttpGet("search")]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<ProductEntity>>), 200)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<ProductResponseModel>>), 200)]
     public async Task<IActionResult> Search([FromQuery] string keyword)
     {
         var result = await _productService.SearchAsync(keyword);
-        return Ok(result); // 200 OK
+        return Ok(result);
     }
 
     // ========================================================================
-    // 7. Lọc sản phẩm theo danh mục và nhà cung cấp
+    // 7. Lọc theo danh mục và nhà cung cấp
     // ========================================================================
-    /// <summary>
-    /// Lọc sản phẩm theo danh mục và/hoặc nhà cung cấp.
-    /// </summary>
     [HttpGet("filter")]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<ProductEntity>>), 200)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<ProductResponseModel>>), 200)]
     public async Task<IActionResult> Filter([FromQuery] int? categoryId, [FromQuery] int? supplierId)
     {
         var result = await _productService.FilterAsync(categoryId, supplierId);
-        return Ok(result); // 200 OK
+        return Ok(result);
     }
-
-
-
-    
 }

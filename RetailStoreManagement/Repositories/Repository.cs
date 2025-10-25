@@ -8,7 +8,7 @@ using RetailStoreManagement.Interfaces;
 
 namespace RetailStoreManagement.Repositories;
 
-public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
+public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> 
     where TEntity : BaseEntity<TKey>
 {
     protected readonly ApplicationDbContext _context;
@@ -20,10 +20,9 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
         _dbSet = context.Set<TEntity>();
     }
 
-    // ✅ Lấy theo ID, sử dụng global query filter để bỏ qua bản ghi đã xóa
     public virtual async Task<TEntity?> GetByIdAsync(TKey id)
     {
-        return await _dbSet.FirstOrDefaultAsync(e => e.Id.Equals(id));
+        return await _dbSet.FindAsync(id);
     }
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
@@ -35,11 +34,13 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
     {
         var query = _dbSet.AsQueryable();
 
-        // Search nếu có
-        if (!string.IsNullOrWhiteSpace(request.Search))
+        // Apply search if provided
+        if (!string.IsNullOrEmpty(request.Search))
+        {
             query = ApplySearch(query, request.Search);
+        }
 
-        // Sorting nếu có
+        // Apply sorting
         query = ApplySorting(query, request.SortBy, request.SortDesc);
 
         var totalCount = await query.CountAsync();
@@ -51,7 +52,10 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
         return new PagedList<TEntity>(items, totalCount, request.Page, request.PageSize);
     }
 
-    public virtual IQueryable<TEntity> GetQueryable() => _dbSet.AsQueryable();
+    public virtual IQueryable<TEntity> GetQueryable()
+    {
+        return _dbSet.AsQueryable();
+    }
 
     public virtual async Task<TEntity> AddAsync(TEntity entity)
     {
@@ -69,7 +73,7 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
 
     public virtual async Task DeleteAsync(TKey id)
     {
-        var entity = await _dbSet.FirstOrDefaultAsync(e => e.Id.Equals(id));
+        var entity = await GetByIdAsync(id);
         if (entity != null)
         {
             _dbSet.Remove(entity);
@@ -79,25 +83,22 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
 
     public virtual async Task SoftDeleteAsync(TKey id)
     {
-        var entity = await _dbSet.FirstOrDefaultAsync(e => e.Id.Equals(id));
+        var entity = await GetByIdAsync(id);
         if (entity != null)
         {
             entity.DeletedAt = DateTime.UtcNow;
-            entity.UpdatedAt = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await UpdateAsync(entity);
         }
     }
 
     protected virtual IQueryable<TEntity> ApplySearch(IQueryable<TEntity> query, string search)
     {
-        return query; // override trong subclass
+        // Override this in derived classes for entity-specific search
+        return query;
     }
 
     protected virtual IQueryable<TEntity> ApplySorting(IQueryable<TEntity> query, string sortBy, bool sortDesc)
     {
-        if (string.IsNullOrWhiteSpace(sortBy))
-            return query;
-
         var property = typeof(TEntity).GetProperty(sortBy, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
         if (property != null)
         {
@@ -106,7 +107,7 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
             var orderByExp = Expression.Lambda(propertyAccess, parameter);
 
             string methodName = sortDesc ? "OrderByDescending" : "OrderBy";
-            Type[] types = { typeof(TEntity), property.PropertyType };
+            Type[] types = new Type[] { typeof(TEntity), property.PropertyType };
             var resultExp = Expression.Call(typeof(Queryable), methodName, types, query.Expression, Expression.Quote(orderByExp));
             query = query.Provider.CreateQuery<TEntity>(resultExp);
         }
