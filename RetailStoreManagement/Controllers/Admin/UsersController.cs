@@ -119,15 +119,14 @@ public class UsersController : ControllerBase
         return result;
     }
 
-    [HttpGet("by-username/{username}")]
-    public async Task<ActionResult<ApiResponse<UserResponse>>> GetByUsername(string username)
+    [HttpGet("by-name/{fullname}")]
+    public async Task<ActionResult<ApiResponse<UserResponse>>> GetByName(string fullname)
     {
-        var result = await _service.GetByNameAsync(username);
+        var result = await _service.GetByNameAsync(fullname);
         if (result.IsError || result.Data == null)
         {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "User not found"));
         }
-        
         return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
     }
 }

@@ -12,8 +12,8 @@ public class UserRepository : Repository<UserEntity, int>, IUserRepository
     }
 
     // Query by username using _dbSet directly (no GetQueryable)
-    public async Task<UserEntity?> GetByNameAsync(string username)
+    public async Task<UserEntity?> GetByNameAsync(string fullname)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.Username == username);
+        return await _dbSet.FirstOrDefaultAsync(u => u.FullName == fullname);
     }
 }
