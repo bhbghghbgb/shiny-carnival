@@ -103,3 +103,4 @@ frontend/.env.development
 frontend/.env.production
 frontend/.pnp.cjs
 frontend/.pnp.loader.mjs
+.lingma/rules/rule.md
