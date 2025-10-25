@@ -1,6 +1,6 @@
-import axiosClient, { type ApiResponse, type LoginResponse, tokenUtils } from '../../../lib/axios';
+import axiosClient, { type ApiResponse, tokenUtils } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-import type { LoginRequest } from "../types/api.ts";
+import type {LoginRequest, LoginResponse} from "../types/api.ts";
 
 // Auth API functions
 export const authApi = {
