@@ -31,19 +31,18 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApiResponse<UserResponse>>> Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
         var result = await _service.GetByIdAsync(id);
         if (result.IsError || result.Data == null)
         {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "User not found"));
         }
-
-        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
+        return Ok(ApiResponse<UserResponse>.Success(ToResponse(result.Data)));
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IPagedList<UserResponse>>>> GetPaged([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetPaged([FromQuery] PagedRequest request)
     {
         var result = await _service.GetPagedAsync(request);
         if (result.IsError || result.Data == null)
@@ -57,11 +56,11 @@ public class UsersController : ControllerBase
             result.Data.Page,
             result.Data.PageSize
         );
-        return ApiResponse<IPagedList<UserResponse>>.Success(paged);
+        return Ok(ApiResponse<IPagedList<UserResponse>>.Success(paged));
     }
 
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<UserResponse>>> Create([FromBody] UserCreateRequest req)
+    public async Task<IActionResult> Create([FromBody] UserCreateRequest req)
     {
         if (!ModelState.IsValid)
             return BadRequest(ApiResponse<UserResponse>.Fail("Invalid request"));
@@ -79,12 +78,11 @@ public class UsersController : ControllerBase
         {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "Create failed"));
         }
-
-        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
+        return Ok(ApiResponse<UserResponse>.Success(ToResponse(result.Data)));
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ApiResponse<UserResponse>>> Update(int id, [FromBody] UserUpdateRequest req)
+    public async Task<IActionResult> Update(int id, [FromBody] UserUpdateRequest req)
     {
         if (!ModelState.IsValid)
         {
@@ -103,30 +101,28 @@ public class UsersController : ControllerBase
         {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "Update failed"));
         }
-
-        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
+        return Ok(ApiResponse<UserResponse>.Success(ToResponse(result.Data)));
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<ApiResponse<bool>>> Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         var result = await _service.DeleteAsync(id);
         if (result.IsError)
         {
             return BadRequest(result);
         }
-
-        return result;
+        return Ok(result);
     }
 
     [HttpGet("by-name/{fullname}")]
-    public async Task<ActionResult<ApiResponse<UserResponse>>> GetByName(string fullname)
+    public async Task<IActionResult> GetByName(string fullname)
     {
         var result = await _service.GetByNameAsync(fullname);
         if (result.IsError || result.Data == null)
         {
             return BadRequest(ApiResponse<UserResponse>.Fail(result.Message ?? "User not found"));
         }
-        return ApiResponse<UserResponse>.Success(ToResponse(result.Data));
+        return Ok(ApiResponse<UserResponse>.Success(ToResponse(result.Data)));
     }
 }
