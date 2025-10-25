@@ -105,3 +105,4 @@ frontend/.pnp.cjs
 frontend/.pnp.loader.mjs
 .augment
 frontend/todo.txt
+frontend/src/app/routeTree.gen.ts
