@@ -10,11 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ManagementSuppliersRouteImport } from './routes/management/suppliers'
+import { Route as ManagementCustomersRouteImport } from './routes/management/customers'
+import { Route as ManagementCategoriesRouteImport } from './routes/management/categories'
 
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,31 +31,81 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ManagementSuppliersRoute = ManagementSuppliersRouteImport.update({
+  id: '/management/suppliers',
+  path: '/management/suppliers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagementCustomersRoute = ManagementCustomersRouteImport.update({
+  id: '/management/customers',
+  path: '/management/customers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagementCategoriesRoute = ManagementCategoriesRouteImport.update({
+  id: '/management/categories',
+  path: '/management/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
+  '/management/categories': typeof ManagementCategoriesRoute
+  '/management/customers': typeof ManagementCustomersRoute
+  '/management/suppliers': typeof ManagementSuppliersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
+  '/management/categories': typeof ManagementCategoriesRoute
+  '/management/customers': typeof ManagementCustomersRoute
+  '/management/suppliers': typeof ManagementSuppliersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/orders': typeof OrdersRoute
   '/products': typeof ProductsRoute
+  '/management/categories': typeof ManagementCategoriesRoute
+  '/management/customers': typeof ManagementCustomersRoute
+  '/management/suppliers': typeof ManagementSuppliersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/products'
+  fullPaths:
+    | '/'
+    | '/orders'
+    | '/products'
+    | '/management/categories'
+    | '/management/customers'
+    | '/management/suppliers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/products'
-  id: '__root__' | '/' | '/products'
+  to:
+    | '/'
+    | '/orders'
+    | '/products'
+    | '/management/categories'
+    | '/management/customers'
+    | '/management/suppliers'
+  id:
+    | '__root__'
+    | '/'
+    | '/orders'
+    | '/products'
+    | '/management/categories'
+    | '/management/customers'
+    | '/management/suppliers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OrdersRoute: typeof OrdersRoute
   ProductsRoute: typeof ProductsRoute
+  ManagementCategoriesRoute: typeof ManagementCategoriesRoute
+  ManagementCustomersRoute: typeof ManagementCustomersRoute
+  ManagementSuppliersRoute: typeof ManagementSuppliersRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +117,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,12 +131,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/management/suppliers': {
+      id: '/management/suppliers'
+      path: '/management/suppliers'
+      fullPath: '/management/suppliers'
+      preLoaderRoute: typeof ManagementSuppliersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/management/customers': {
+      id: '/management/customers'
+      path: '/management/customers'
+      fullPath: '/management/customers'
+      preLoaderRoute: typeof ManagementCustomersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/management/categories': {
+      id: '/management/categories'
+      path: '/management/categories'
+      fullPath: '/management/categories'
+      preLoaderRoute: typeof ManagementCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OrdersRoute: OrdersRoute,
   ProductsRoute: ProductsRoute,
+  ManagementCategoriesRoute: ManagementCategoriesRoute,
+  ManagementCustomersRoute: ManagementCustomersRoute,
+  ManagementSuppliersRoute: ManagementSuppliersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
