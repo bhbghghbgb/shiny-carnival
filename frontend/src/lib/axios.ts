@@ -12,13 +12,11 @@ export interface ApiResponse<T = never> {
 
 
 export interface PagedRequest {
-    page?: number;
-    pageSize?: number;
+    page: number; //page index
+    pageSize: number;
     search?: string;
     sortBy?: string;
     sortDesc?: boolean;
-    categoryId?: number;
-    supplierId?: number;
 }
 
 export interface PagedList<T> {

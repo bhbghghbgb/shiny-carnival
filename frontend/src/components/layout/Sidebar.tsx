@@ -7,6 +7,7 @@ import {
   PieChartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import {Link} from "@tanstack/react-router";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -19,7 +20,7 @@ const items: MenuItem[] = [
     label: 'Management',
     icon: <AppstoreOutlined />,
     children: [
-      { key: '5', label: 'Customers' },
+      { key: '5', label: <Link to={"/users"}>Users</Link> },
       { key: '6', label: 'Suppliers' },
       { key: '7', label: 'Categories' },
     ],
