@@ -30,6 +30,8 @@ builder.Services.AddScoped(typeof(IBaseService<,>), typeof(BaseService<,>));
 
 // Register specific services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
