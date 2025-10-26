@@ -99,3 +99,7 @@ http-client.private.env.json
 *.vsix
 
 .idea
+frontend/.env.development
+frontend/.env.production
+frontend/.pnp.cjs
+frontend/.pnp.loader.mjs
