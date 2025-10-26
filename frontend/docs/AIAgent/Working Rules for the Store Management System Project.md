@@ -46,7 +46,7 @@ Agents must always remember and apply the following project information:
 
 - **API Calls:** Axios (with pre-configured instance, interceptors).
 
-- **Routing:** `react-router-dom` with File-Based Routing.
+- **Routing:** `@tanstack/react-router` with File-Based Routing.
 
 ### 2.3. Backend Structure and API
 
