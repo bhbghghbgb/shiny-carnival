@@ -1,64 +1,7 @@
-import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
 import { API_CONFIG, type OrderStatus } from '../../../config/api';
-
-// Types cho Order API
-export interface OrderEntity {
-  id: number;
-  customerId: number;
-  userId: number;
-  promoId?: number;
-  orderDate: string;
-  status: OrderStatus;
-  totalAmount: number;
-  discountAmount: number;
-}
-
-export interface OrderItemEntity {
-  orderItemId: number;
-  orderId: number;
-  productId: number;
-  productName: string;
-  quantity: number;
-  price: number;
-  subtotal: number;
-}
-
-export interface OrderDetailsDto extends OrderEntity {
-  customerName: string;
-  userName: string;
-  promoCode?: string;
-  orderItems: OrderItemEntity[];
-}
-
-export interface CreateOrderRequest {
-  customerId: number;
-  promoCode?: string;
-  orderItems: {
-    productId: number;
-    quantity: number;
-  }[];
-}
-
-export interface UpdateOrderStatusRequest {
-  status: OrderStatus;
-}
-
-export interface AddOrderItemRequest {
-  productId: number;
-  quantity: number;
-}
-
-export interface UpdateOrderItemRequest {
-  quantity: number;
-}
-
-export interface OrderFilterParams extends PagedRequest {
-  status?: OrderStatus;
-  customerId?: number;
-  userId?: number;
-  startDate?: string;
-  endDate?: string;
-}
+import type { OrderEntity, OrderItemEntity, OrderDetailsDto } from '../types/entity.ts';
+import type { CreateOrderRequest, UpdateOrderStatusRequest, AddOrderItemRequest, UpdateOrderItemRequest, OrderFilterParams } from '../types/api.ts';
 
 // Order API functions
 export const orderApi = {

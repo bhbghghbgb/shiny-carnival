@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import type {LoginResponse} from "../features/auth/types/api.ts";
 
 // Định nghĩa types cho API response theo tài liệu đặc tả
 export interface ApiResponse<T = never> {
@@ -9,16 +10,6 @@ export interface ApiResponse<T = never> {
   timestamp: string;
 }
 
-// Định nghĩa interface cho login response
-export interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    username: string;
-    fullName: string;
-    role: number; // 0: Admin, 1: Staff
-  };
-}
 
 export interface PagedRequest {
     page?: number;

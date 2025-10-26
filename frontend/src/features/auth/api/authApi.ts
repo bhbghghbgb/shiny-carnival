@@ -1,23 +1,6 @@
-import axiosClient, {type ApiResponse, type LoginResponse, tokenUtils } from '../../../lib/axios';
+import axiosClient, { type ApiResponse, tokenUtils } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-
-// Types cho Authentication API
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
-
-export interface UserEntity {
-  id: number;
-  username: string;
-  fullName: string;
-  role: number; // 0: Admin, 1: Staff
-  createdAt: string;
-}
+import type {LoginRequest, LoginResponse} from "../types/api.ts";
 
 // Auth API functions
 export const authApi = {
