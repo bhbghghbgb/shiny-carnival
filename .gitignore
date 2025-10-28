@@ -103,3 +103,9 @@ frontend/.env.development
 frontend/.env.production
 frontend/.pnp.cjs
 frontend/.pnp.loader.mjs
+.lingma/rules/rule.md
+frontend/src/app/routeTree.gen.ts
+.augment
+frontend/todo.txt
+frontend/src/app/routeTree.gen.ts
+.lingma/rules/rule.md

@@ -1,23 +1,16 @@
-import axiosClient, {type ApiResponse, type PagedList, type PagedRequest} from '../../../lib/axios';
+import axiosClient, { type ApiResponse, type PagedList, type PagedRequest } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-import type { CategoryEntity } from "../type/categories";
-
-
-
-export interface CreateCategoryRequest {
-  categoryName: string;
-}
-
-export interface UpdateCategoryRequest extends CategoryEntity {}
+import type { CategoryEntity } from "../types/entity.ts";
+import type { CreateCategoryRequest, UpdateCategoryRequest } from "../types/api.ts";
 
 // Category API functions
 export const categoryApi = {
   /**
    * Lấy danh sách danh mục với phân trang
    */
-  getCategories: async (params?: PagedRequest): Promise<ApiResponse<PagedList<CategoryEntity[]>>> => {
+  getCategories: async (params?: PagedRequest): Promise<ApiResponse<PagedList<CategoryEntity>>> => {
     try {
-      const response = await axiosClient.get<ApiResponse<PagedList<CategoryEntity[]>>>(
+      const response = await axiosClient.get<ApiResponse<PagedList<CategoryEntity>>>(
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORIES,
         { params },
       );
@@ -41,12 +34,12 @@ export const categoryApi = {
         API_CONFIG.ENDPOINTS.ADMIN.CATEGORIES,
         { params: { pageSize: 1000 } },
       );
-      
+
       return {
-          isError: false,
-          message: "",
-          timestamp: "",
-          ...response,
+        isError: false,
+        message: "",
+        timestamp: "",
+        ...response,
         data: response.data?.data?.items || []
       };
     } catch (error: any) {

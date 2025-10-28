@@ -1,26 +1,16 @@
 import axiosClient, {type ApiResponse, type PagedList, type PagedRequest} from '../../../lib/axios';
 import {API_CONFIG} from '../../../config/api';
-import type { ProductEntity } from "../product";
-
-export interface CreateProductRequest {
-  categoryId: number;
-  supplierId: number;
-  productName: string;
-  barcode: string;
-  price: number;
-  unit: string;
-}
-
-export type UpdateProductRequest = ProductEntity
+import type { ProductEntity } from "../types/entity.ts";
+import type {CreateProductRequest, UpdateProductRequest} from "../types/api.ts";
 
 // Product API functions
 export const productApi = {
   /**
    * Lấy danh sách sản phẩm với phân trang và lọc
    */
-  getProducts: async (params?: PagedRequest): Promise<ApiResponse<PagedList<ProductEntity[]>>> => {
+  getProducts: async (params?: PagedRequest): Promise<ApiResponse<PagedList<ProductEntity>>> => {
     try {
-      const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity[]>>>(
+      const response = await axiosClient.get<ApiResponse<PagedList<ProductEntity>>>(
         API_CONFIG.ENDPOINTS.ADMIN.PRODUCTS,
         { params },
       );

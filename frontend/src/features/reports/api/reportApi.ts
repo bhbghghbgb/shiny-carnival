@@ -1,26 +1,7 @@
-import axiosClient, {type ApiResponse} from '../../../lib/axios';
+import axiosClient, { type ApiResponse } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-
-// Types cho Report API
-export interface RevenueReportDto {
-  summary: {
-    overallRevenue: number;
-    overallOrders: number;
-    overallDiscount: number;
-  };
-  details: {
-    period: string; // '2025-10-26', '2025-W43', '2025-10'
-    totalRevenue: number;
-    totalOrders: number;
-    totalDiscount: number;
-  }[];
-}
-
-export interface RevenueReportParams {
-  startDate: string; // YYYY-MM-DD
-  endDate: string; // YYYY-MM-DD
-  groupBy?: 'day' | 'week' | 'month'; // Default: 'day'
-}
+import type { RevenueReportDto } from '../types/entity.ts';
+import type { RevenueReportParams } from '../types/api.ts';
 
 // Report API functions (Admin only)
 export const reportApi = {

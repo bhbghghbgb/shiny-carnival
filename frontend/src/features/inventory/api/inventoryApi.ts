@@ -1,18 +1,7 @@
-import axiosClient, {type ApiResponse} from '../../../lib/axios';
+import axiosClient, { type ApiResponse } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
-
-// Types cho Inventory API
-export interface InventoryEntity {
-  inventoryId: number;
-  productId: number;
-  quantity: number;
-  updatedAt: string;
-}
-
-export interface UpdateInventoryRequest {
-  quantityChange: number;
-  reason: string;
-}
+import type { InventoryEntity } from "../types/inventoryEntity.ts";
+import type { UpdateInventoryRequest } from "../types/api.ts";
 
 // Inventory API functions
 export const inventoryApi = {

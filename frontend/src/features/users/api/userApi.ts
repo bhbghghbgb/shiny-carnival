@@ -1,26 +1,7 @@
-import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
-import { API_CONFIG, type UserRole } from '../../../config/api';
-
-// Types cho User API
-export interface UserEntity {
-  id: number;
-  username: string;
-  password?: string; // Optional cho update, không trả về trong response
-  fullName: string;
-  role: UserRole;
-  createdAt: string;
-}
-
-export interface CreateUserRequest {
-  username: string;
-  password: string;
-  fullName: string;
-  role: UserRole;
-}
-
-export interface UpdateUserRequest extends UserEntity {
-  password?: string; // Gửi chuỗi rỗng nếu không muốn đổi mật khẩu
-}
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
+import { API_CONFIG } from '../../../config/api';
+import type { UserEntity } from '../types/entity.ts';
+import type { CreateUserRequest, UpdateUserRequest } from '../types/api.ts';
 
 // User API functions (Admin only)
 export const userApi = {

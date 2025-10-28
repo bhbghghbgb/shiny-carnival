@@ -191,10 +191,10 @@ Component giao diện của trang được đặt ở nơi phù hợp theo kiế
 1.  **Tạo Component:** Tạo file `src/features/products/pages/ProductDetailsPage.tsx` chứa UI và logic để hiển thị chi tiết sản phẩm.
 2.  **Tạo Định nghĩa Route:** Tạo file `src/app/routes/products/$productId.tsx` với nội dung:
     ```tsx
-    import { createLazyFileRoute } from '@tanstack/react-router';
+    import { createFileRoute } from '@tanstack/react-router';
     import { ProductDetailsPage } from '../../../features/products/pages/ProductDetailsPage';
 
-    export const Route = createLazyFileRoute('/products/$productId')({
+    export const Route = createFileRoute('/products/$productId')({
       component: ProductDetailsPage,
     });
     ```

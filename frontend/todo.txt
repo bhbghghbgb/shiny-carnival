@@ -1,4 +1,0 @@
-- Chuẩn hóa api, có một base api cho các api của từng module
-
-- Chuẩn hóa zustand, có một base hook cho từng hook trong từng module
-
