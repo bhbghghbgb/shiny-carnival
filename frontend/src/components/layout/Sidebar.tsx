@@ -12,9 +12,9 @@ import {Link} from "@tanstack/react-router";
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
-  { key: '1', icon: <PieChartOutlined />, label: 'Dashboard' },
-  { key: '2', icon: <DesktopOutlined />, label: 'Products' },
-  { key: '3', icon: <ContainerOutlined />, label: 'Orders' },
+  { key: '1', icon: <PieChartOutlined />, label: <Link to={"/"}>Dashboard</Link>},
+  { key: '2', icon: <DesktopOutlined />, label: <Link to={"/admin/products"}>Products</Link> },
+  { key: '3', icon: <ContainerOutlined />, label: <Link to={"/Orders"}>Orders</Link> },
   {
     key: 'sub1',
     label: 'Management',
