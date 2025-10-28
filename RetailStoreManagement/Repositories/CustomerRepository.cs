@@ -3,7 +3,7 @@ using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Data;
 
-namespace RetailStoreManagement.Repositories.CustomerRepository;
+namespace RetailStoreManagement.Repositories;
 
 public class CustomerRepository : Repository<CustomerEntity, int>, ICustomerRepository
 {

@@ -1,3 +1,4 @@
+using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,7 +8,7 @@ using RetailStoreManagement.Data;
 using RetailStoreManagement.Filters;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Repositories;
-using RetailStoreManagement.Repositories.CustomerRepository;
+using RetailStoreManagement.Repositories;
 using RetailStoreManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,7 @@ builder.Services.AddScoped(typeof(IBaseService<,>), typeof(BaseService<,>));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
