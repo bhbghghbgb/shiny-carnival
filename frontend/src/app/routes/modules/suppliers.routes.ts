@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { type ModuleRoutes, baseSearchSchema } from '../type/types';
 import { createAdminRoutes } from '../utils/routeHelpers';
-import { SupplierManagementPage } from '../../../features/suppliers/pages/SupplierManagementPage';
+import  SupplierManagementPage  from '../../../features/suppliers/pages/SupplierManagementPage';
 
 // Extended search schema for suppliers
 const supplierSearchSchema = baseSearchSchema.extend({
