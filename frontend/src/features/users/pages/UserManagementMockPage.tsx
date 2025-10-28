@@ -5,11 +5,19 @@ import { UserSearchFilter } from '../components/UserSearchFilter'
 import { UserTable } from '../components/UserTable'
 import { UserModals } from '../components/UserModals'
 import { useUserManagement } from '../hooks/useUserManagementMock'
+import { getRouteApi } from '@tanstack/react-router';
+
+const routeApi = getRouteApi('/admin/users');
 
 export function UserManagementMockPage() {
+    const { users } = routeApi.useLoaderData();
+    const params = routeApi.useParams();
+
+    console.log('Users:', users);
+    console.log('Route params:', params);
+
     const {
         // Data
-        users,
         totalUsers,
         adminCount,
         staffCount,

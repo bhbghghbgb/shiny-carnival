@@ -1,4 +1,4 @@
-import { type ModuleRoutes } from '../type/types';
+import { type LegacyModuleRoutes } from '../type/types';
 import { createRouteConfig } from '../utils/routeHelpers';
 import { LoginPage } from '../../../features/auth/pages/LoginPage';
 import { RegisterPage } from '../../../features/auth/pages/RegisterPage';
@@ -8,7 +8,7 @@ import { ProfilePage } from '../../../features/auth/pages/ProfilePage';
 import { PendingComponent } from '../../../components/feedback/PendingComponent';
 
 // Auth module routes configuration
-export const authRoutes: ModuleRoutes = {
+export const authRoutes: LegacyModuleRoutes = {
   moduleName: 'auth',
   basePath: '/auth',
   routes: [

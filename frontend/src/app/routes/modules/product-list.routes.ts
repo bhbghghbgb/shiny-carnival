@@ -1,5 +1,5 @@
-import {type ModuleRoutes} from '../type/types';
-import {createRouteConfig} from '../utils/routeHelpers';
+import { type LegacyModuleRoutes } from '../type/types';
+import { createRouteConfig } from '../utils/routeHelpers';
 import ProductList from '../../../features/products/pages/ProductList';
 import { z } from 'zod';
 // Schema để xác thực search params cho trang sản phẩm
@@ -14,7 +14,7 @@ const productSearchSchema = z.object({
 type TProductSearch = z.infer<typeof productSearchSchema>;
 
 // Product list route for public view
-export const productListRoutes: ModuleRoutes = {
+export const productListRoutes: LegacyModuleRoutes = {
     moduleName: 'productList',
     basePath: '/products',
     routes: [
