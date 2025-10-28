@@ -8,6 +8,7 @@ using RetailStoreManagement.Data;
 using RetailStoreManagement.Filters;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Repositories;
+using RetailStoreManagement.Repositories;
 using RetailStoreManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    options.UseMySQL(connectionString);
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -30,6 +31,9 @@ builder.Services.AddScoped(typeof(IBaseService<,>), typeof(BaseService<,>));
 
 // Register specific services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
