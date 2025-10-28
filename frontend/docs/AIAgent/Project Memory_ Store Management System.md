@@ -3,7 +3,7 @@
 - **Project Name:** Store Management System.
 - **Objective:** To build an internal web application to manage core business operations of a retail store, including products, inventory, orders, customers, and promotions.
 - **Architecture:** The system follows a client-server model, comprising a React frontend and a backend providing a RESTful API.
-- **Database:** Uses a relational database management system (PostgreSQL).
+- **Database:** Uses a relational database management system (MySQL).
 ## 2. Frontend Technology and Structure
 - **Language:** TypeScript.
 - **Main Library:** React.
@@ -11,7 +11,7 @@
 - **UI Components:** Uses the Ant Design (AntD) library.
 - **State Management:** Uses Zustand for global and local state management per feature.
 - **Data Grids:** Uses TanStack Table (headless UI) to display data in a table format.
-- **Form Management:** Uses React Hook Form.
+- **Form Management:** Uses Ant Design Form components with built-in validation and controls.
 - **API Calls:** Uses Axios, with a pre-configured instance (interceptors for token and error handling).
 - **Routing:** Uses TanStack's Code-Based Routing.
 ## 3. Backend and API Structure

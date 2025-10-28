@@ -6,32 +6,42 @@
 
 ### 2. Quản lý Trạng thái (State Management)
 
-Hệ thống ERP có trạng thái ứng dụng phức tạp, cần được quản lý một cách khoa học để tránh lỗi và dễ dàng bảo trì.
+Hệ thống Store Management có trạng thái ứng dụng phức tạp, cần được quản lý một cách khoa học để tránh lỗi và dễ dàng bảo trì.
 
-*   **Zustand / Recoil:** Các lựa chọn hiện đại hơn, nhẹ nhàng. Chúng sử dụng hooks để quản lý trạng thái, phù hợp cho các dự án muốn giảm sự phức tạp ban đầu.
+*   **Zustand:** Một lựa chọn hiện đại, nhẹ nhàng. Sử dụng hooks để quản lý trạng thái, phù hợp cho các dự án muốn giảm sự phức tạp ban đầu.
 
 ### 3. Hiển thị Dữ liệu dạng Bảng/Lưới (Data Grids)
 
-Các ứng dụng ERP luôn phải làm việc với một lượng lớn dữ liệu dạng bảng. Một thư viện Data Grid mạnh mẽ là không thể thiếu.
+Các ứng dụng quản lý cửa hàng luôn phải làm việc với một lượng lớn dữ liệu dạng bảng. Một thư viện Data Grid mạnh mẽ là không thể thiếu.
 
-*   **TanStack Table (trước đây là React Table):** Là một thư viện "headless", nghĩa là nó chỉ cung cấp logic và trạng thái, còn phần giao diện (HTML/CSS) hoàn toàn do bạn quyết định. Điều này mang lại sự linh hoạt tối đa trong thiết kế.
+*   **Ant Table:** Là một component có sẵn trong Ant Design, được sử dụng để hiển thị dữ liệu dạng bảng với nhiều tính năng như phân trang, sắp xếp, lọc.
 
 ### 4. Quản lý Form
 
-Việc nhập liệu là một phần cốt lõi của ERP, đòi hỏi các form phức tạp với logic xác thực (validation) chặt chẽ.
+Việc nhập liệu là một phần cốt lõi, đòi hỏi các form phức tạp với logic xác thực (validation) chặt chẽ.
 
-*   **React Hook Form:** Rất phổ biến nhờ hiệu năng cao (giảm thiểu số lần render lại), dễ sử dụng và tích hợp tốt với các thư viện validation.
+*   **Ant Design Form:** Sử dụng component Form có sẵn của Ant Design với các control tích hợp, cung cấp khả năng quản lý form mạnh mẽ và validation built-in.
 
 ### 5. Định tuyến (Routing)
 
-*   **File-Based Routing** là một hệ thống cho phép bạn định nghĩa các route trong ứng dụng React của mình một cách tự động dựa trên cách bạn tổ chức các file component trong thư mục `app` (hoặc thư mục bạn chỉ định). Mỗi file hoặc thư mục trong `app` sẽ tương ứng với một route cụ thể, giúp đơn giản hóa quá trình khai báo route.6. Xác thực và Phân quyền (Authentication & Authorization)
+*   **TanStack Router với Code-Based Routing:** Sử dụng hệ thống định tuyến mạnh mẽ của TanStack Router với cơ chế code-based routing, cho phép định nghĩa các route trong ứng dụng React bằng cách cấu hình sử dụng TypeScript.
 
-Bảo mật là yếu tố sống còn của một hệ thống ERP.
+### 6. Xác thực và Phân quyền (Authentication & Authorization)
 
-*   **JWT (JSON Web Tokens):** Nếu bạn tự xây dựng hệ thống xác thực, JWT là một phương pháp phổ biến để truyền thông tin người dùng một cách an toàn giữa client và server.
+Bảo mật là yếu tố quan trọng của một hệ thống quản lý cửa hàng.
 
-### 7. Các Thư viện Hữu ích Khác
+*   **JWT (JSON Web Tokens):** Sử dụng JWT để xác thực người dùng, token được gửi qua header `Authorization: Bearer <token>`.
 
-*   **Axios / React Query (TanStack Query):** `Axios` là một thư viện phổ biến để thực hiện các yêu cầu HTTP. `React Query` nâng cao điều này bằng cách quản lý trạng thái phía server, tự động caching, đồng bộ hóa và làm mới dữ liệu, giúp đơn giản hóa đáng kể việc lấy và cập nhật dữ liệu từ API.
-*   **Thư viện biểu đồ (Charting):** Để trực quan hóa dữ liệu, bạn có thể cần các thư viện như **Recharts**, **Nivo**, hoặc **Chart.js (với react-chartjs-2)**.
-*   **Quốc tế hóa (Internationalization - i18n):** **react-i18next** là lựa chọn hàng đầu để xây dựng các ứng dụng đa ngôn ngữ.
+### 7. Framework và Công nghệ
+
+*   **React 19:** Phiên bản mới nhất của React với React Compiler plugin được kích hoạt.
+*   **TypeScript:** Ngôn ngữ lập trình chính với strict mode được bật.
+*   **Vite:** Công cụ build và phát triển nhanh chóng.
+*   **Yarn 4.10.3:** Package manager được sử dụng.
+
+### 8. Các Thư viện Hữu ích Khác
+
+*   **Axios:** Thư viện phổ biến để thực hiện các yêu cầu HTTP, có cấu hình interceptors cho token và xử lý lỗi.
+*   **Zod:** Thư viện validation mạnh mẽ được sử dụng cho form và API validation.
+*   **Tailwind CSS:** Framework CSS utility-first với Typography plugin.
+*   **TanStack Table:** Thư viện headless UI cho việc xây dựng bảng dữ liệu phức tạp.

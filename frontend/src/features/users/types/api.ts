@@ -8,6 +8,4 @@ export interface CreateUserRequest {
   role: UserRole;
 }
 
-export interface UpdateUserRequest extends UserEntity {
-  password?: string; // Gửi chuỗi rỗng nếu không muốn đổi mật khẩu
-}
+export type UpdateUserRequest = UserEntity;

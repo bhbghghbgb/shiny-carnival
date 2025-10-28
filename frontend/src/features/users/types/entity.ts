@@ -3,8 +3,11 @@ import type { UserRole } from '../../../config/api';
 export interface UserEntity {
   id: number;
   username: string;
-  password?: string; // Optional cho update, không trả về trong response
+  password: string;
   fullName: string;
   role: UserRole;
-  createdAt: string;
+  createdAt: Date;
+  updateAt: Date;
+  deleteAt: Date;
+  isDelete: boolean;
 }
