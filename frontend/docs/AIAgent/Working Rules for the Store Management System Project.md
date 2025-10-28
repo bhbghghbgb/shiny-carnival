@@ -26,7 +26,7 @@ Agents must always remember and apply the following project information:
 
 - **Architecture:** Client-server (Frontend React, Backend RESTful API).
 
-- **Database:** PostgreSQL.
+- **Database:** MySQL.
 
 ### 2.2. Frontend Technology and Structure
 
@@ -42,11 +42,11 @@ Agents must always remember and apply the following project information:
 
 - **Data Grids:** TanStack Table (headless UI).
 
-- **Form Management:** React Hook Form.
+- **Form Management:** Ant Design Form components with built-in validation and controls.
 
 - **API Calls:** Axios (with pre-configured instance, interceptors).
 
-- **Routing:** `@tanstack/react-router` with File-Based Routing.
+- **Routing:** `@tanstack/react-router` with Code-Based Routing.
 
 ### 2.3. Backend Structure and API
 
