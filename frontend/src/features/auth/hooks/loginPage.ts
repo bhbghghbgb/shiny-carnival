@@ -3,7 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import { Form, message } from "antd";
 import { useCallback, useState } from "react";
 import { authApi } from "../api/authApi";
-import { useAuthActions } from "../store/authStore";
 import type { LoginRequest } from "../types/api";
 
 /**
@@ -14,7 +13,7 @@ export const useLoginPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { setAuth } = useAuthActions();
+  // const { setAuth } = useAuthActions();
 
   
   const handleSubmit = useCallback(async (values: LoginRequest) => {
@@ -23,11 +22,11 @@ export const useLoginPage = () => {
       const res = await authApi.login(values);
 
       if (!res.isError && res.data) {
-        // ✅ Gọi action Zustand (không tạo loop)
-        setAuth({
-          user: res.data.user,
-          token: res.data.token,
-        });
+        // // ✅ Gọi action Zustand (không tạo loop)
+        // setAuth({
+        //   user: res.data.user,
+        //   token: res.data.token,
+        // });
 
         message.success("Đăng nhập thành công!");
         navigate({ to: "/" }); // điều hướng về trang chủ
@@ -39,7 +38,8 @@ export const useLoginPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [setAuth, navigate]);
+  },   [navigate]);
+  // [setAuth, navigate]);
 
   return {
     form,
