@@ -1,20 +1,13 @@
 import { z } from 'zod';
 import { baseSearchSchema, type ManagementRouteDefinition } from '../../../type/types';
-import { UserManagementMockPage } from '../../../../../features/users/pages/UserManagementMockPage';
+import { UserManagementPage } from '../../../../../features/users/pages/UserManagementPage.tsx';
 import { users as mockUsers } from '../../../../../_mocks/users';
+import type { UserNoPass }  from '../../../../../features/users/types/entity.ts';
 
 // 1. Định nghĩa Types và API
 
-interface User {
-  id: number;
-  username: string;
-  fullName: string;
-  role: number;
-  createdAt: string;
-}
-
 interface UserLoaderData {
-  users: User[];
+  users: UserNoPass[];
   total: number;
 }
 
@@ -46,7 +39,7 @@ export const userAdminDefinition: ManagementRouteDefinition<
 > = {
   entityName: 'Người dùng',
   path: '/admin/users',
-  component: UserManagementMockPage,
+  component: UserManagementPage,
   searchSchema: userSearchSchema,
   loader: ({ search }) => fetchUsers(search),
 };

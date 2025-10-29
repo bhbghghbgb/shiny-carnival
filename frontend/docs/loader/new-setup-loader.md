@@ -35,7 +35,7 @@
 
 
 3.  **`getRouteApi` là "Cầu nối" (Bridge):**
-    *   Vấn đề không tìm lấy loader gặp phải không phải là `loader` không tồn tại, mà là component `UserManagementMockPage` không biết cách "nói chuyện" với cái route đã được tạo ra ở bước 2, vì chúng nằm ở các tệp khác nhau.
+    *   Vấn đề không tìm lấy loader gặp phải không phải là `loader` không tồn tại, mà là component `UserManagementPage` không biết cách "nói chuyện" với cái route đã được tạo ra ở bước 2, vì chúng nằm ở các tệp khác nhau.
     *   Hàm `getRouteApi('/admin/users')` chính là "cầu nối". Nó nói với TanStack Router: "Hãy tìm cho tôi cái route có đường dẫn là `/admin/users` và đưa cho tôi API của nó".
     *   Khi đã có API này, component có thể gọi `.useLoaderData()` để lấy dữ liệu mà hàm `loader` (được định nghĩa trong "bản thiết kế" ban đầu) đã tải về.
 
