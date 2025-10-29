@@ -1,4 +1,4 @@
-import { createModuleRoutes } from '../../type/types';
+import { createModuleRoutes } from '../../utils/routeHelpers';
 import { generateCRUDRoutes } from '../../utils/routeHelpers';
 import { customerModuleDefinition } from './definition/customers.definition';
 

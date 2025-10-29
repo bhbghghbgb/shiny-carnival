@@ -4,7 +4,6 @@ import { UserManagementMockPage } from '../../../../../features/users/pages/User
 import { users as mockUsers } from '../../../../../_mocks/users';
 
 // 1. Định nghĩa Types và API
-// --------------------------
 
 interface User {
   id: number;
