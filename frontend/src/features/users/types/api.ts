@@ -6,6 +6,7 @@ export interface CreateUserRequest {
   password: string;
   fullName: string;
   role: UserRole;
+  createAt: Date;
 }
 
 export type UpdateUserRequest = UserEntity;
