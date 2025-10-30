@@ -15,7 +15,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<CategoryEntity> Categories { get; set; }
     public DbSet<SupplierEntity> Suppliers { get; set; }
     public DbSet<ProductEntity> Products { get; set; }
-    public DbSet<InventoryEntity> Inventory { get; set; }
+    public DbSet<InventoryEntity> Inventories { get; set; }
+    public DbSet<InventoryHistoryEntity> InventoryHistories { get; set; }
     public DbSet<PromotionEntity> Promotions { get; set; }
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<OrderItemEntity> OrderItems { get; set; }
@@ -42,8 +43,14 @@ public class ApplicationDbContext : DbContext
         ConfigureOrderItemRelationships(modelBuilder);
         ConfigurePaymentRelationships(modelBuilder);
 
+        // Configure unique constraints and indexes
+        ConfigureUniqueConstraintsAndIndexes(modelBuilder);
+
         // Configure soft delete global query filter
         ConfigureSoftDelete(modelBuilder);
+
+        // Seed initial data
+        SeedData(modelBuilder);
     }
 
     private static void ConfigureSoftDelete(ModelBuilder modelBuilder)
@@ -120,6 +127,19 @@ public class ApplicationDbContext : DbContext
     private static void ConfigureInventoryRelationships(ModelBuilder modelBuilder)
     {
         // Already configured in ProductRelationships
+        
+        // Configure InventoryHistory relationships
+        modelBuilder.Entity<InventoryHistoryEntity>()
+            .HasOne(ih => ih.Product)
+            .WithMany()
+            .HasForeignKey(ih => ih.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<InventoryHistoryEntity>()
+            .HasOne(ih => ih.User)
+            .WithMany()
+            .HasForeignKey(ih => ih.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private static void ConfigurePromotionRelationships(ModelBuilder modelBuilder)
@@ -154,6 +174,63 @@ public class ApplicationDbContext : DbContext
     private static void ConfigurePaymentRelationships(ModelBuilder modelBuilder)
     {
         // Already configured in OrderRelationships
+    }
+
+    private static void ConfigureUniqueConstraintsAndIndexes(ModelBuilder modelBuilder)
+    {
+        // Unique constraints
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+
+        modelBuilder.Entity<ProductEntity>()
+            .HasIndex(p => p.Barcode)
+            .IsUnique();
+
+        modelBuilder.Entity<PromotionEntity>()
+            .HasIndex(p => p.PromoCode)
+            .IsUnique();
+
+        // Performance indexes
+        modelBuilder.Entity<OrderEntity>()
+            .HasIndex(o => o.OrderDate);
+
+        modelBuilder.Entity<OrderEntity>()
+            .HasIndex(o => o.Status);
+
+        modelBuilder.Entity<ProductEntity>()
+            .HasIndex(p => p.ProductName);
+
+        modelBuilder.Entity<CustomerEntity>()
+            .HasIndex(c => c.Phone);
+
+        modelBuilder.Entity<InventoryEntity>()
+            .HasIndex(i => i.Quantity);
+    }
+
+    private static void SeedData(ModelBuilder modelBuilder)
+    {
+        // Seed default admin user
+        modelBuilder.Entity<UserEntity>().HasData(
+            new UserEntity
+            {
+                Id = 1,
+                Username = "admin",
+                Password = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                FullName = "System Administrator",
+                Role = Enums.UserRole.Admin,
+                CreatedAt = DateTime.UtcNow
+            }
+        );
+
+        // Seed default categories
+        modelBuilder.Entity<CategoryEntity>().HasData(
+            new CategoryEntity { Id = 1, CategoryName = "Electronics", CreatedAt = DateTime.UtcNow },
+            new CategoryEntity { Id = 2, CategoryName = "Clothing", CreatedAt = DateTime.UtcNow },
+            new CategoryEntity { Id = 3, CategoryName = "Food & Beverages", CreatedAt = DateTime.UtcNow },
+            new CategoryEntity { Id = 4, CategoryName = "Home & Garden", CreatedAt = DateTime.UtcNow },
+            new CategoryEntity { Id = 5, CategoryName = "Books", CreatedAt = DateTime.UtcNow }
+        );
     }
 
     public override int SaveChanges()
