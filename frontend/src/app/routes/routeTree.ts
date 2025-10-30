@@ -1,20 +1,20 @@
 import { createRoute, createRouter } from '@tanstack/react-router';
 import { Route as rootRoute } from './__root';
 import { homeRoutes } from './modules/home.routes';
-import { productsRoutes } from './modules/products.routes';
-import { usersRoutes } from './modules/users.routes';
+import { productsRoutes } from './modules/management/products.routes';
+import { usersRoutes } from './modules/management/users.routes';
 import { authRoutes } from './modules/auth.routes';
-import { categoriesRoutes } from './modules/categories.routes';
-import { customersRoutes } from './modules/customers.routes';
-import { ordersRoutes } from './modules/orders.routes';
-import { inventoryRoutes } from './modules/inventory.routes';
-import { promotionsRoutes } from './modules/promotions.routes';
-import { reportsRoutes } from './modules/reports.routes';
-import { suppliersRoutes } from './modules/suppliers.routes';
+import { categoriesRoutes } from './modules/management/categories.routes';
+import { customersRoutes } from './modules/crud/customers.routes';
+import { ordersRoutes } from './modules/crud/orders.routes';
+import { inventoryRoutes } from './modules/crud/inventory.routes';
+import { promotionsRoutes } from './modules/management/promotions.routes';
+import { reportsRoutes } from './modules/management/reports.routes';
+import { suppliersRoutes } from './modules/management/suppliers.routes';
 import type { ModuleRoutes } from './type/types';
 
 // Mảng chứa tất cả các module routes
-const allModuleRoutes: ModuleRoutes[] = [
+const allModuleRoutes: ModuleRoutes<any>[] = [
   homeRoutes,
   productsRoutes,
   usersRoutes,
@@ -30,7 +30,7 @@ const allModuleRoutes: ModuleRoutes[] = [
 
 // Tạo các route instances từ cấu hình
 const moduleRoutes = allModuleRoutes.flatMap(module =>
-  module.routes.map(config =>
+  module.routes.map((config: { path: any; component: any; searchSchema: any; loader: any; beforeLoad: any; pendingComponent: any; errorComponent: any; }) =>
     createRoute({
       getParentRoute: () => rootRoute,
       path: config.path,
