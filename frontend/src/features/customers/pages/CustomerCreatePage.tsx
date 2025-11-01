@@ -1,12 +1,20 @@
 import { CustomerModal } from '../components/CustomerModal';
 import { useCustomerForm } from '../hook/useCustomerForm';
 import { useNavigate } from '@tanstack/react-router';
+import { message } from 'antd';
+
 
 export const CustomerCreatePage: React.FC = () => {
   const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    message.success('Thêm khách hàng thành công!');
+    navigate({ to: '/customers' });
+  };
+
   const { form, onSubmit } = useCustomerForm({
     editingCustomer: null,
-    onSuccess: () => {}, // Không cần ở đây vì navigate
+    onSuccess: handleSuccess,
   });
 
   return (

@@ -1,15 +1,22 @@
 import { Card, Descriptions, Button } from 'antd';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import type { CustomerEntity } from '../types/entity';
+import { useEffect } from 'react';
 
 export const CustomerDetailPage: React.FC = () => {
   const { state } = useLocation();
   const customer = state?.customer as CustomerEntity | undefined;
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (!customer) {
+      navigate({ to: '/customers' });
+    }
+  }, [customer, navigate]);
+
+  // Nếu customer chưa có, render loading hoặc null
   if (!customer) {
-    navigate({ to: '/customers' });
-    return null;
+    return null; // hoặc <Spin />
   }
 
   return (

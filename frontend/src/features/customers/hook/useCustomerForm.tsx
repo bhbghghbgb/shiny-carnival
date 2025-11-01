@@ -1,4 +1,3 @@
-// src/features/customers/hook/useCustomerForm.ts
 import { useState, useEffect } from 'react';
 import { Form, message } from 'antd';
 import type { CustomerEntity } from '../types/entity';

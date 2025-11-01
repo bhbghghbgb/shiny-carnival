@@ -2,7 +2,7 @@
 import { CustomerHeader } from '../components/CustomerHeader';
 import { CustomerSearch } from '../components/CustomerSearch';
 import { CustomerTable } from '../components/CustomerTable';
-import { useCustomerList } from '../hook/useCustomerList';
+import { useCustomerPage } from '../hook/useCustomerPage';
 import { useNavigate } from '@tanstack/react-router';
 
 export const CustomerListPage: React.FC = () => {
@@ -14,21 +14,11 @@ export const CustomerListPage: React.FC = () => {
     sortOrder,
     handleSearch,
     handleSort,
-    clearFilters,
     handleDelete,
     refresh,
-    setCustomers,
-  } = useCustomerList();
+  } = useCustomerPage();
 
   const navigate = useNavigate();
-
-  const handleSuccess = (customer: any) => {
-    if (customer.id && customers.some(c => c.id === customer.id)) {
-      setCustomers(prev => prev.map(c => c.id === customer.id ? customer : c));
-    } else {
-      setCustomers(prev => [...prev, customer]);
-    }
-  };
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: '100%' }}>

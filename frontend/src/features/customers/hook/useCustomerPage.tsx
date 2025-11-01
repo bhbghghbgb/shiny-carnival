@@ -137,6 +137,11 @@ export const useCustomerPage = () => {
     setSortOrder('descend');
   };
 
+    const refresh = () => {
+      setCustomers(initialCustomers || []);
+      clearFilters();
+    };
+
   // Thống kê
   const totalCustomers = filteredCustomers.length;
 
@@ -164,5 +169,6 @@ export const useCustomerPage = () => {
     handleSearch,
     handleSort,
     clearFilters,
+    refresh
   };
 };
