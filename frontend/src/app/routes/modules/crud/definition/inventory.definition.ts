@@ -60,7 +60,7 @@ export const inventoryModuleDefinition: CrudModuleDefinition<
   { apiClient: any }      // Kiểu router context
 > = {
   entityName: 'kho hàng',
-  basePath: '/admin/inventory',
+  basePath: 'inventory',
   components: {
     list: InventoryListPage,
     detail: InventoryDetailPage,

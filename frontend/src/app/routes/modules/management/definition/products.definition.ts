@@ -48,7 +48,7 @@ export const productAdminDefinition: ManagementRouteDefinition<
   { apiClient: never }     // Kiểu router context (ví dụ)
 > = {
   entityName: 'Sản phẩm',
-  path: '/admin/products',
+  path: 'products',
   component: ProductManagementPage,
   searchSchema: productSearchSchema,
   loader: ({ search }) => fetchProducts(search),
