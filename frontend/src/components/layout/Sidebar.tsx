@@ -1,4 +1,3 @@
-
 import { Menu } from 'antd';
 import {
   AppstoreOutlined,
@@ -8,6 +7,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import {Link} from "@tanstack/react-router";
+import { ENDPOINTS } from '../../app/routes/type/endpoint';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -20,7 +20,7 @@ const items: MenuItem[] = [
     label: 'Management',
     icon: <AppstoreOutlined />,
     children: [
-      { key: '5', label: <Link to={"/users"}>Users</Link> },
+      { key: '5', label: <Link to={ENDPOINTS.ADMIN.USERS}>Users</Link> },
       { key: '6', label: 'Suppliers' },
       { key: '7', label: 'Categories' },
     ],
@@ -47,4 +47,3 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
 };
 
 export default Sidebar;
-
