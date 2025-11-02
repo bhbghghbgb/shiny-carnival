@@ -18,9 +18,10 @@ public class ProductEntity : BaseEntity<int>
     [Column("product_name")]
     public string ProductName { get; set; } = string.Empty;
 
+    [Required]
     [MaxLength(50)]
     [Column("barcode")]
-    public string? Barcode { get; set; }
+    public string Barcode { get; set; } = string.Empty;
 
     [Required]
     [Column("price", TypeName = "decimal(10,2)")]

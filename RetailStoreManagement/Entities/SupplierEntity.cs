@@ -10,9 +10,10 @@ public class SupplierEntity : BaseEntity<int>
     [Column("name")]
     public string Name { get; set; } = string.Empty;
 
+    [Required]
     [MaxLength(20)]
     [Column("phone")]
-    public string? Phone { get; set; }
+    public string Phone { get; set; } = string.Empty;
 
     [MaxLength(100)]
     [Column("email")]

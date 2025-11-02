@@ -5,13 +5,15 @@ namespace RetailStoreManagement.Entities;
 
 public class CustomerEntity : BaseEntity<int>
 {
+    [Required]
     [MaxLength(100)]
     [Column("name")]
     public string Name { get; set; } = string.Empty;
 
+    [Required]
     [MaxLength(20)]
     [Column("phone")]
-    public string? Phone { get; set; }
+    public string Phone { get; set; } = string.Empty;
 
     [MaxLength(100)]
     [Column("email")]

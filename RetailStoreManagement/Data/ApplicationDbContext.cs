@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<OrderItemEntity> OrderItems { get; set; }
     public DbSet<PaymentEntity> Payments { get; set; }
+    public DbSet<InventoryHistoryEntity> InventoryHistories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -68,11 +69,15 @@ public class ApplicationDbContext : DbContext
 
     private static void ConfigureUserRelationships(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<UserEntity>()
-            .HasMany(u => u.Orders)
-            .WithOne(o => o.User)
-            .HasForeignKey(o => o.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<UserEntity>(entity =>
+        {
+            entity.HasIndex(e => e.Username).IsUnique();
+
+            entity.HasMany(u => u.Orders)
+                .WithOne(o => o.User)
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     private static void ConfigureCustomerRelationships(ModelBuilder modelBuilder)
@@ -104,17 +109,20 @@ public class ApplicationDbContext : DbContext
 
     private static void ConfigureProductRelationships(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ProductEntity>()
-            .HasOne(p => p.Inventory)
-            .WithOne(i => i.Product)
-            .HasForeignKey<InventoryEntity>(i => i.ProductId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<ProductEntity>(entity =>
+        {
+            entity.HasIndex(e => e.Barcode).IsUnique();
 
-        modelBuilder.Entity<ProductEntity>()
-            .HasMany(p => p.OrderItems)
-            .WithOne(oi => oi.Product)
-            .HasForeignKey(oi => oi.ProductId)
-            .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(p => p.Inventory)
+                .WithOne(i => i.Product)
+                .HasForeignKey<InventoryEntity>(i => i.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(p => p.OrderItems)
+                .WithOne(oi => oi.Product)
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     private static void ConfigureInventoryRelationships(ModelBuilder modelBuilder)
@@ -124,11 +132,15 @@ public class ApplicationDbContext : DbContext
 
     private static void ConfigurePromotionRelationships(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<PromotionEntity>()
-            .HasMany(p => p.Orders)
-            .WithOne(o => o.Promotion)
-            .HasForeignKey(o => o.PromoId)
-            .OnDelete(DeleteBehavior.SetNull);
+        modelBuilder.Entity<PromotionEntity>(entity =>
+        {
+            entity.HasIndex(e => e.PromoCode).IsUnique();
+
+            entity.HasMany(p => p.Orders)
+                .WithOne(o => o.Promotion)
+                .HasForeignKey(o => o.PromoId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
     }
 
     private static void ConfigureOrderRelationships(ModelBuilder modelBuilder)

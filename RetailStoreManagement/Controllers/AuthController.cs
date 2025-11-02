@@ -19,8 +19,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<ApiResponse<LoginResponse>>> Login(LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        return await _authService.LoginAsync(request);
+        var result = await _authService.LoginAsync(request);
+        return StatusCode(result.StatusCode, result);
     }
 }
