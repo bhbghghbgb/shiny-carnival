@@ -58,7 +58,7 @@ export const orderModuleDefinition: CrudModuleDefinition<
   { apiClient: any }  // Kiểu router context
 > = {
   entityName: 'đơn hàng',
-  basePath: '/orders',
+  basePath: 'orders',
   components: {
     list: OrderListPage,
     detail: OrderDetailPage,
