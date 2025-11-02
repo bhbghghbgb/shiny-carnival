@@ -39,7 +39,7 @@ export const categoryAdminDefinition: ManagementRouteDefinition<
   { apiClient: never }      // Kiểu router context (ví dụ)
 > = {
   entityName: 'Danh mục',
-  path: '/admin/categories',
+  path: 'categories',
   component: CategoryManagementPage,
   searchSchema: categorySearchSchema,
   loader: ({ search }) => fetchCategories(search),

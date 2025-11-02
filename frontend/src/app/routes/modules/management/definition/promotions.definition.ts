@@ -39,7 +39,7 @@ export const promotionAdminDefinition: ManagementRouteDefinition<
   { apiClient: never }       // Kiểu router context (ví dụ)
 > = {
   entityName: 'Khuyến mãi',
-  path: '/admin/promotions',
+  path: 'promotions',
   component: PromotionManagementPage,
   searchSchema: promotionSearchSchema,
   loader: ({ search }) => fetchPromotions(search),

@@ -38,7 +38,7 @@ export const reportAdminDefinition: ManagementRouteDefinition<
   { apiClient: never }    // Kiểu router context (ví dụ)
 > = {
   entityName: 'Báo cáo',
-  path: '/admin/reports',
+  path: 'reports',
   component: ReportManagementPage,
   searchSchema: reportSearchSchema,
   loader: ({ search }) => fetchReports(search),

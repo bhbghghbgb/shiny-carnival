@@ -53,7 +53,7 @@ export const customerModuleDefinition: CrudModuleDefinition<
   { apiClient: any }      // Kiểu router context
 > = {
   entityName: 'Khách hàng',
-  basePath: '/customers',
+  basePath: 'customers',
   components: {
     list: CustomerListPage,
     detail: CustomerDetailPage,

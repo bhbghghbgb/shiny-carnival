@@ -38,7 +38,7 @@ export const supplierAdminDefinition: ManagementRouteDefinition<
   { apiClient: never }      // Kiểu router context (ví dụ)
 > = {
   entityName: 'Nhà cung cấp',
-  path: '/admin/suppliers',
+  path: 'suppliers',
   component: SupplierManagementPage,
   searchSchema: supplierSearchSchema,
   loader: ({ search }) => fetchSuppliers(search),

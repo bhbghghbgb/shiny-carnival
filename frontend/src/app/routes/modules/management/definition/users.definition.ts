@@ -38,7 +38,7 @@ export const userAdminDefinition: ManagementRouteDefinition<
   { apiClient: never }  // Kiểu router context (ví dụ)
 > = {
   entityName: 'Người dùng',
-  path: '/admin/users',
+  path: 'users',
   component: UserManagementPage,
   searchSchema: userSearchSchema,
   loader: ({ search }) => fetchUsers(search),
