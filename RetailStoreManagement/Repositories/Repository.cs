@@ -20,7 +20,7 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
         _dbSet = context.Set<TEntity>();
     }
 
-    public virtual async Task<TEntity> GetByIdAsync(TKey id)
+    public virtual async Task<TEntity?> GetByIdAsync(TKey id)
     {
         return await _dbSet.FindAsync(id);
     }

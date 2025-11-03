@@ -14,6 +14,8 @@ public interface IUnitOfWork : IDisposable
     IRepository<OrderEntity, int> Orders { get; }
     IRepository<OrderItemEntity, int> OrderItems { get; }
     IRepository<PaymentEntity, int> Payments { get; }
+    IRepository<InventoryHistoryEntity, int> InventoryHistories { get; }
+    IRepository<UserRefreshToken, Guid> UserRefreshTokens { get; }
     
     Task<int> SaveChangesAsync();
 }
