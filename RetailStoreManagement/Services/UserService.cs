@@ -29,12 +29,12 @@ public class UserService : IUserService
             // Apply search filter
             if (!string.IsNullOrEmpty(request.Search))
             {
-                query = query.Where(u => u.Username.Contains(request.Search) || 
+                query = query.Where(u => u.Username.Contains(request.Search) ||
                                         u.FullName!.Contains(request.Search));
             }
 
             // Apply sorting
-            query = request.SortDesc 
+            query = request.SortDesc
                 ? query.OrderByDescending(u => EF.Property<object>(u, request.SortBy))
                 : query.OrderBy(u => EF.Property<object>(u, request.SortBy));
 
@@ -81,7 +81,7 @@ public class UserService : IUserService
             // Check if username already exists
             var existingUser = await _unitOfWork.Users.GetQueryable()
                 .FirstOrDefaultAsync(u => u.Username == request.Username);
-            
+
             if (existingUser != null)
             {
                 return ApiResponse<UserResponseDto>.Error("Username already exists", 409);
@@ -115,14 +115,14 @@ public class UserService : IUserService
             // Check if username already exists (excluding current user)
             var existingUser = await _unitOfWork.Users.GetQueryable()
                 .FirstOrDefaultAsync(u => u.Username == request.Username && u.Id != id);
-            
+
             if (existingUser != null)
             {
                 return ApiResponse<UserResponseDto>.Error("Username already exists", 409);
             }
 
             _mapper.Map(request, user);
-            
+
             // Hash password if provided
             if (!string.IsNullOrEmpty(request.Password))
             {
@@ -160,5 +160,23 @@ public class UserService : IUserService
         {
             return ApiResponse<bool>.Error(ex.Message);
         }
+    }
+
+    public async Task<ApiResponse<UserResponseDto>> SetupAdminAsync(CreateUserRequest request)
+    {
+        // Check if an admin user already exists
+        var adminExists = await _unitOfWork.Users.GetQueryable().AnyAsync(u => u.Role == Enums.UserRole.Admin);
+        if (adminExists)
+        {
+            return ApiResponse<UserResponseDto>.Error("An admin account already exists.", 409);
+        }
+
+        // Ensure the request is for creating an admin
+        if (request.Role != (int)Enums.UserRole.Admin)
+        {
+            return ApiResponse<UserResponseDto>.Error("This endpoint is only for creating an admin account.", 400);
+        }
+
+        return await CreateUserAsync(request);
     }
 }

@@ -9,5 +9,6 @@ public interface IUserService
     Task<ApiResponse<UserResponseDto>> GetUserByIdAsync(int id);
     Task<ApiResponse<UserResponseDto>> CreateUserAsync(CreateUserRequest request);
     Task<ApiResponse<UserResponseDto>> UpdateUserAsync(int id, UpdateUserRequest request);
+    Task<ApiResponse<UserResponseDto>> SetupAdminAsync(CreateUserRequest request);
     Task<ApiResponse<bool>> DeleteUserAsync(int id);
 }
