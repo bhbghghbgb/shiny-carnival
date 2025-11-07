@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;

@@ -1,5 +1,6 @@
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Models.Inventory;
+using RetailStoreManagement.Models.Common;
 
 namespace RetailStoreManagement.Interfaces.Services;
 

@@ -9,7 +9,8 @@
 5. [Hướng Dẫn Từng Bước](#5-hướng-dẫn-từng-bước)
 6. [Best Practices](#6-best-practices)
 7. [Common Pitfalls](#7-common-pitfalls)
-8. [Troubleshooting](#8-troubleshooting)
+8. [Migration từ Cách Cũ sang BasePaginationValidator](#8-migration-từ-cách-cũ-sang-basepaginationvalidator)
+9. [Troubleshooting](#9-troubleshooting)
 
 ---
 
@@ -45,6 +46,44 @@ Dự án sử dụng **Traditional Service Pattern** (không phải CQRS/MediatR
 ## 2. Các Thành Phần Chính
 
 ### 2.1. Base Classes
+
+#### BasePaginationValidator (Validators/BasePaginationValidator.cs)
+```csharp
+public abstract class BasePaginationValidator<T> : AbstractValidator<T> where T : PagedRequest
+{
+    protected BasePaginationValidator()
+    {
+        // Validation cho Page
+        RuleFor(x => x.Page)
+            .GreaterThan(0)
+            .WithMessage("Page must be greater than 0");
+
+        // Validation cho PageSize
+        RuleFor(x => x.PageSize)
+            .GreaterThan(0)
+            .WithMessage("PageSize must be greater than 0")
+            .LessThanOrEqualTo(100)
+            .WithMessage("PageSize must not exceed 100");
+
+        // Validation cho SortBy
+        RuleFor(x => x.SortBy)
+            .NotEmpty()
+            .WithMessage("SortBy must not be empty");
+
+        // Validation cho Search (optional)
+        RuleFor(x => x.Search)
+            .MaximumLength(255)
+            .WithMessage("Search term must not exceed 255 characters")
+            .When(x => !string.IsNullOrEmpty(x.Search));
+    }
+}
+```
+
+**Đặc điểm:**
+- **Abstract generic base class** cho tất cả pagination validators
+- **Centralized validation rules** - tránh duplicate code
+- **Consistent validation** - đảm bảo tất cả pagination requests có cùng validation logic
+- **Extensible** - specialized validators chỉ cần kế thừa và thêm rules riêng
 
 #### PagedRequest (Models/Common/PagedRequest.cs)
 ```csharp
@@ -237,51 +276,28 @@ public async Task<ApiResponse<PagedList<ProductListDto>>> GetProductsAsync(Produ
 
 ### 4.3. Validation Layer
 
-#### Base Validator
+#### Base Validator (Sử dụng BasePaginationValidator)
 ```csharp
-public class PagedRequestValidator : AbstractValidator<PagedRequest>
+public class PagedRequestValidator : BasePaginationValidator<PagedRequest>
 {
     public PagedRequestValidator()
     {
-        RuleFor(x => x.Page)
-            .GreaterThan(0)
-            .WithMessage("Page must be greater than 0");
-
-        RuleFor(x => x.PageSize)
-            .GreaterThan(0)
-            .WithMessage("PageSize must be greater than 0")
-            .LessThanOrEqualTo(100)
-            .WithMessage("PageSize must not exceed 100");
-
-        RuleFor(x => x.SortBy)
-            .NotEmpty()
-            .WithMessage("SortBy must not be empty");
+        // Base pagination validation rules inherited from BasePaginationValidator
+        // No additional rules needed for base PagedRequest
     }
 }
 ```
 
-#### Specialized Validator
+#### Specialized Validator (Kế thừa từ BasePaginationValidator)
 ```csharp
-public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRequest>
+public class CategorySearchRequestValidator : BasePaginationValidator<CategorySearchRequest>
 {
     public CategorySearchRequestValidator()
     {
-        // Base validation rules
-        RuleFor(x => x.Page)
-            .GreaterThan(0)
-            .WithMessage("Page must be greater than 0");
+        // Base pagination validation rules inherited from BasePaginationValidator
+        // Page, PageSize, SortBy, Search validation tự động có sẵn
 
-        RuleFor(x => x.PageSize)
-            .GreaterThan(0)
-            .WithMessage("PageSize must be greater than 0")
-            .LessThanOrEqualTo(100)
-            .WithMessage("PageSize must not exceed 100");
-
-        RuleFor(x => x.SortBy)
-            .NotEmpty()
-            .WithMessage("SortBy must not be empty");
-
-        // Specialized validation rules
+        // Chỉ cần thêm specialized validation rules
         RuleFor(x => x.MinProductCount)
             .GreaterThanOrEqualTo(0)
             .WithMessage("MinProductCount must be greater than or equal to 0")
@@ -316,6 +332,45 @@ public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRe
                       x.CreatedAfter.Value <= x.CreatedBefore.Value)
             .WithMessage("CreatedAfter must be less than or equal to CreatedBefore")
             .When(x => x.CreatedAfter.HasValue && x.CreatedBefore.HasValue);
+    }
+}
+```
+
+#### ProductSearchRequestValidator Example
+```csharp
+public class ProductSearchRequestValidator : BasePaginationValidator<ProductSearchRequest>
+{
+    public ProductSearchRequestValidator()
+    {
+        // Base pagination validation rules inherited from BasePaginationValidator
+
+        // Product-specific validation rules
+        RuleFor(x => x.CategoryId)
+            .GreaterThan(0)
+            .WithMessage("CategoryId must be greater than 0")
+            .When(x => x.CategoryId.HasValue);
+
+        RuleFor(x => x.SupplierId)
+            .GreaterThan(0)
+            .WithMessage("SupplierId must be greater than 0")
+            .When(x => x.SupplierId.HasValue);
+
+        RuleFor(x => x.MinPrice)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("MinPrice must be greater than or equal to 0")
+            .When(x => x.MinPrice.HasValue);
+
+        RuleFor(x => x.MaxPrice)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("MaxPrice must be greater than or equal to 0")
+            .When(x => x.MaxPrice.HasValue);
+
+        // Price range validation
+        RuleFor(x => x)
+            .Must(x => !x.MinPrice.HasValue || !x.MaxPrice.HasValue ||
+                      x.MinPrice.Value <= x.MaxPrice.Value)
+            .WithMessage("MinPrice must be less than or equal to MaxPrice")
+            .When(x => x.MinPrice.HasValue && x.MaxPrice.HasValue);
     }
 }
 ```
@@ -359,35 +414,25 @@ public class YourEntitySearchRequest : PagedRequest
 }
 ```
 
-### Bước 2: Tạo Validator
+### Bước 2: Tạo Validator (Kế thừa từ BasePaginationValidator)
 
 ```csharp
 // Validators/YourEntitySearchRequestValidator.cs
 using FluentValidation;
 using RetailStoreManagement.Models.Common;
+using RetailStoreManagement.Validators;
 
 namespace RetailStoreManagement.Validators;
 
-public class YourEntitySearchRequestValidator : AbstractValidator<YourEntitySearchRequest>
+public class YourEntitySearchRequestValidator : BasePaginationValidator<YourEntitySearchRequest>
 {
     public YourEntitySearchRequestValidator()
     {
-        // Copy base validation rules từ PagedRequestValidator
-        RuleFor(x => x.Page)
-            .GreaterThan(0)
-            .WithMessage("Page must be greater than 0");
+        // Base pagination validation rules inherited from BasePaginationValidator
+        // Page, PageSize, SortBy, Search validation tự động có sẵn
+        // Không cần copy lại các rules này!
 
-        RuleFor(x => x.PageSize)
-            .GreaterThan(0)
-            .WithMessage("PageSize must be greater than 0")
-            .LessThanOrEqualTo(100)
-            .WithMessage("PageSize must not exceed 100");
-
-        RuleFor(x => x.SortBy)
-            .NotEmpty()
-            .WithMessage("SortBy must not be empty");
-
-        // Thêm validation rules cho filters riêng
+        // Chỉ cần thêm validation rules cho filters riêng của entity
         RuleFor(x => x.MinAmount)
             .GreaterThanOrEqualTo(0)
             .WithMessage("MinAmount must be greater than or equal to 0")
@@ -407,6 +452,12 @@ public class YourEntitySearchRequestValidator : AbstractValidator<YourEntitySear
     }
 }
 ```
+
+**Lợi ích của cách tiếp cận mới:**
+- ✅ **Không duplicate code** - Base validation rules chỉ định nghĩa một lần
+- ✅ **Consistency** - Tất cả validators có cùng base validation logic
+- ✅ **Maintainability** - Thay đổi base rules chỉ cần sửa ở một nơi
+- ✅ **Clean code** - Specialized validators chỉ focus vào business rules riêng
 
 ### Bước 3: Cập Nhật Service Interface
 
@@ -574,18 +625,35 @@ var pagedItems = allItems.Skip((page - 1) * pageSize).Take(pageSize); // Phân t
 
 ### 6.2. Validation Best Practices
 
-#### ✅ DO: Copy validation rules thay vì kế thừa
+#### ✅ DO: Sử dụng BasePaginationValidator để kế thừa
 ```csharp
-// ✅ ĐÚNG: Copy rules để tránh dependency issues
+// ✅ ĐÚNG: Kế thừa từ BasePaginationValidator
+public class CategorySearchRequestValidator : BasePaginationValidator<CategorySearchRequest>
+{
+    public CategorySearchRequestValidator()
+    {
+        // Base pagination rules inherited automatically
+        // Chỉ cần thêm specialized rules
+        RuleFor(x => x.MinProductCount)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.MinProductCount.HasValue);
+    }
+}
+```
+
+#### ❌ DON'T: Copy paste validation rules
+```csharp
+// ❌ SAI: Duplicate code, khó maintain
 public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRequest>
 {
     public CategorySearchRequestValidator()
     {
-        // Copy base rules
+        // ❌ Duplicate base rules - khó maintain
         RuleFor(x => x.Page).GreaterThan(0);
         RuleFor(x => x.PageSize).GreaterThan(0).LessThanOrEqualTo(100);
+        RuleFor(x => x.SortBy).NotEmpty();
 
-        // Add specialized rules
+        // Specialized rules
         RuleFor(x => x.MinProductCount).GreaterThanOrEqualTo(0).When(x => x.MinProductCount.HasValue);
     }
 }
@@ -728,7 +796,7 @@ var pagedProducts = allProducts.Skip(skip).Take(take);
 var pagedList = await PagedList<ProductDto>.CreateAsync(query, page, pageSize);
 ```
 
-### 7.4. Validation Dependency Issues
+### 7.4. Validation Architecture Issues
 
 **❌ Vấn đề**: Sử dụng Include() với validators
 
@@ -743,20 +811,35 @@ public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRe
 }
 ```
 
-**✅ Giải pháp**: Copy validation rules
+**✅ Giải pháp**: Sử dụng BasePaginationValidator
 
 ```csharp
-// ✅ ĐÚNG: Copy rules thay vì Include
+// ✅ ĐÚNG: Kế thừa từ BasePaginationValidator
+public class CategorySearchRequestValidator : BasePaginationValidator<CategorySearchRequest>
+{
+    public CategorySearchRequestValidator()
+    {
+        // Base validation rules inherited automatically
+        // Chỉ cần thêm specialized rules
+        RuleFor(x => x.MinProductCount)
+            .GreaterThanOrEqualTo(0)
+            .When(x => x.MinProductCount.HasValue);
+    }
+}
+```
+
+**❌ Vấn đề**: Copy-paste validation rules (cách cũ)
+
+```csharp
+// ❌ SAI: Duplicate code, khó maintain
 public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRequest>
 {
     public CategorySearchRequestValidator()
     {
-        // Copy base validation rules
+        // ❌ Duplicate base rules
         RuleFor(x => x.Page).GreaterThan(0);
         RuleFor(x => x.PageSize).GreaterThan(0).LessThanOrEqualTo(100);
         RuleFor(x => x.SortBy).NotEmpty();
-
-        // Add specialized rules
         // ...
     }
 }
@@ -782,7 +865,67 @@ query = request.SortDesc
 
 ---
 
-## 8. Troubleshooting
+## 8. Migration từ Cách Cũ sang BasePaginationValidator
+
+### 8.1. Cách Migration
+
+#### Bước 1: Tạo BasePaginationValidator (đã có sẵn)
+```csharp
+// Validators/BasePaginationValidator.cs - đã được tạo
+public abstract class BasePaginationValidator<T> : AbstractValidator<T> where T : PagedRequest
+{
+    protected BasePaginationValidator()
+    {
+        // Common pagination validation rules
+        RuleFor(x => x.Page).GreaterThan(0).WithMessage("Page must be greater than 0");
+        RuleFor(x => x.PageSize).GreaterThan(0).WithMessage("PageSize must be greater than 0")
+            .LessThanOrEqualTo(100).WithMessage("PageSize must not exceed 100");
+        RuleFor(x => x.SortBy).NotEmpty().WithMessage("SortBy must not be empty");
+        RuleFor(x => x.Search).MaximumLength(255).WithMessage("Search term must not exceed 255 characters")
+            .When(x => !string.IsNullOrEmpty(x.Search));
+    }
+}
+```
+
+#### Bước 2: Cập nhật Existing Validators
+```csharp
+// TRƯỚC: Cách cũ với duplicate code
+public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRequest>
+{
+    public CategorySearchRequestValidator()
+    {
+        // ❌ Duplicate base rules
+        RuleFor(x => x.Page).GreaterThan(0).WithMessage("Page must be greater than 0");
+        RuleFor(x => x.PageSize).GreaterThan(0).WithMessage("PageSize must be greater than 0")
+            .LessThanOrEqualTo(100).WithMessage("PageSize must not exceed 100");
+        RuleFor(x => x.SortBy).NotEmpty().WithMessage("SortBy must not be empty");
+
+        // Specialized rules
+        RuleFor(x => x.MinProductCount).GreaterThanOrEqualTo(0).When(x => x.MinProductCount.HasValue);
+    }
+}
+
+// SAU: Cách mới với inheritance
+public class CategorySearchRequestValidator : BasePaginationValidator<CategorySearchRequest>
+{
+    public CategorySearchRequestValidator()
+    {
+        // ✅ Base rules inherited automatically
+        // Chỉ cần specialized rules
+        RuleFor(x => x.MinProductCount).GreaterThanOrEqualTo(0).When(x => x.MinProductCount.HasValue);
+    }
+}
+```
+
+#### Bước 3: Lợi ích sau Migration
+- ✅ **Giảm 70% code** trong validators
+- ✅ **Consistency** - tất cả validators có cùng base validation
+- ✅ **Maintainability** - thay đổi base rules chỉ cần sửa một nơi
+- ✅ **Clean code** - specialized validators chỉ focus vào business logic
+
+---
+
+## 9. Troubleshooting
 
 ### 8.1. PageSize không hoạt động đúng
 

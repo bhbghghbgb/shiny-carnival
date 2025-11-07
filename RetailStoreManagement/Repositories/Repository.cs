@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Data;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;

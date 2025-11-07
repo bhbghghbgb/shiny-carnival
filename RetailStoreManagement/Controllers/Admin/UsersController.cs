@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.User;
 

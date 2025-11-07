@@ -1,4 +1,5 @@
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Models.Supplier;
 
 namespace RetailStoreManagement.Interfaces.Services;

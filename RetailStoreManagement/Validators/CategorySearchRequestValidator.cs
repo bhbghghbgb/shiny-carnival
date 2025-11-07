@@ -5,29 +5,13 @@ namespace RetailStoreManagement.Validators;
 
 /// <summary>
 /// Validator cho CategorySearchRequest
-/// Kế thừa validation từ PagedRequestValidator và thêm validation cho các filters riêng
+/// Kế thừa validation từ BasePaginationValidator và thêm validation cho các filters riêng
 /// </summary>
-public class CategorySearchRequestValidator : AbstractValidator<CategorySearchRequest>
+public class CategorySearchRequestValidator : BasePaginationValidator<CategorySearchRequest>
 {
     public CategorySearchRequestValidator()
     {
-        // Kế thừa validation từ PagedRequestValidator
-        // Validation cho Page
-        RuleFor(x => x.Page)
-            .GreaterThan(0)
-            .WithMessage("Page must be greater than 0");
-
-        // Validation cho PageSize
-        RuleFor(x => x.PageSize)
-            .GreaterThan(0)
-            .WithMessage("PageSize must be greater than 0")
-            .LessThanOrEqualTo(100)
-            .WithMessage("PageSize must not exceed 100");
-
-        // Validation cho SortBy
-        RuleFor(x => x.SortBy)
-            .NotEmpty()
-            .WithMessage("SortBy must not be empty");
+        // Base pagination validation rules được kế thừa từ BasePaginationValidator
 
         // Validation cho MinProductCount
         RuleFor(x => x.MinProductCount)
