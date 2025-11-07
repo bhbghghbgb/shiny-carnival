@@ -5,6 +5,7 @@ using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Category;
+using RetailStoreManagement.Models.Common;
 
 namespace RetailStoreManagement.Services;
 
@@ -19,32 +20,66 @@ public class CategoryService : ICategoryService
         _mapper = mapper;
     }
 
-    public async Task<ApiResponse<PagedList<CategoryResponseDto>>> GetCategoriesAsync(PagedRequest request)
+    public async Task<ApiResponse<PagedList<CategoryResponseDto>>> GetCategoriesAsync(CategorySearchRequest request)
     {
         try
         {
-            var query = _unitOfWork.Categories.GetQueryable();
+            // Xây dựng query ban đầu với AsNoTracking để tối ưu hiệu năng
+            var query = _unitOfWork.Categories.GetQueryable()
+                .AsNoTracking()
+                .Include(c => c.Products)
+                .AsQueryable();
 
-            // Apply search filter
+            // Áp dụng bộ lọc tìm kiếm theo tên
             if (!string.IsNullOrEmpty(request.Search))
             {
-                query = query.Where(c => c.CategoryName.Contains(request.Search));
+                var searchTerm = request.Search.Trim();
+                query = query.Where(c => c.CategoryName.Contains(searchTerm));
             }
 
-            // Apply sorting
+            // Áp dụng bộ lọc theo số lượng sản phẩm tối thiểu
+            if (request.MinProductCount.HasValue)
+            {
+                query = query.Where(c => c.Products.Count >= request.MinProductCount.Value);
+            }
+
+            // Áp dụng bộ lọc theo số lượng sản phẩm tối đa
+            if (request.MaxProductCount.HasValue)
+            {
+                query = query.Where(c => c.Products.Count <= request.MaxProductCount.Value);
+            }
+
+            // Áp dụng bộ lọc theo ngày tạo từ
+            if (request.CreatedAfter.HasValue)
+            {
+                query = query.Where(c => c.CreatedAt >= request.CreatedAfter.Value);
+            }
+
+            // Áp dụng bộ lọc theo ngày tạo đến
+            if (request.CreatedBefore.HasValue)
+            {
+                query = query.Where(c => c.CreatedAt <= request.CreatedBefore.Value);
+            }
+
+            // Áp dụng sắp xếp
             query = request.SortDesc
                 ? query.OrderByDescending(c => EF.Property<object>(c, request.SortBy))
                 : query.OrderBy(c => EF.Property<object>(c, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
-                .Include(c => c.Products)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+            // Ánh xạ sang DTO và giữ IQueryable
+            var categoryDtoQuery = query.Select(c => new CategoryResponseDto
+            {
+                Id = c.Id,
+                CategoryName = c.CategoryName,
+                ProductCount = c.Products.Count()
+            });
 
-            var categoryDtos = _mapper.Map<List<CategoryResponseDto>>(items);
-            var pagedList = new PagedList<CategoryResponseDto>(categoryDtos, request.Page, request.PageSize, totalCount);
+            // Sử dụng PagedList.CreateAsync để phân trang tại database
+            var pagedList = await PagedList<CategoryResponseDto>.CreateAsync(
+                categoryDtoQuery,
+                request.Page,
+                request.PageSize
+            );
 
             return ApiResponse<PagedList<CategoryResponseDto>>.Success(pagedList);
         }

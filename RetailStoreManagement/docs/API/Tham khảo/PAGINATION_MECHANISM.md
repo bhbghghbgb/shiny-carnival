@@ -563,3 +563,78 @@ Cơ chế phân trang của dự án được thiết kế toàn diện, hiệu 
 - **Dễ sử dụng:** Để thêm chức năng phân trang cho một thực thể mới, nhà phát triển chỉ cần tạo một lớp Query kế thừa từ `PaginationRequest` và gọi phương thức `CreateAsync` trong Handler.
 - **An toàn:** Cơ chế xác thực đầu vào và kiểm tra quyền hạn giúp đảm bảo dữ liệu được truy cập một cách an toàn.
 - **Tối ưu:** Áp dụng nhiều kỹ thuật tối ưu hiệu suất như AsNoTracking, ProjectTo, và phân trang tại cơ sở dữ liệu.
+
+## 13. Cơ Chế Validation và Giá Trị Mặc Định
+
+### a. Cơ Chế Validation
+
+Dự án sử dụng thư viện `FluentValidation` kết hợp với `MediatR` pipeline để xác thực các tham số phân trang.
+
+**Vị trí thực hiện Validation:**
+- **Middleware/Behavior Layer**: [`Application/Common/Behaviours/ValidationBehaviour.cs:7`](Application/Common/Behaviours/ValidationBehaviour.cs:7)
+    - Thực hiện validation trước khi xử lý request.
+- **Dependency Injection**: [`Application/DependencyInjection.cs:15`](Application/DependencyInjection.cs:15)
+    - Đăng ký các validator và thêm `ValidationBehaviour` vào MediatR pipeline.
+- **Lớp cơ sở `PaginationRequest`**: [`Application/Common/Models/PaginationRequest.cs:24`](Application/Common/Models/PaginationRequest.cs:24)
+    - Cung cấp validator chung `PaginationRequestValidator<T>` cho tất cả các lớp kế thừa.
+
+**Quy tắc Validation:**
+- **`PageIndex`**: Phải khác null, không rỗng và lớn hơn 0.
+- **`PageSize`**: Phải khác null, không rỗng và lớn hơn 0.
+- Các tham số khác như `SearchTerm`, `SortField`, `SortOrder` có thể có validation riêng trong các validator cụ thể.
+
+**Code minh họa Validation (từ `ValidationBehaviour.cs`):**
+```csharp
+public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+{
+    if (_validators.Any())
+    {
+        var context = new ValidationContext<TRequest>(request);
+
+        var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+
+        var errors = validationResults
+        .Where(validationResult => !validationResult.IsValid)
+        .SelectMany(validationResult => validationResult.Errors)
+        .Select(validationFailure => new ValidationFailure(
+            validationFailure.PropertyName,
+            validationFailure.ErrorMessage))
+        .ToList();
+
+        if (errors.Count > 0)
+            throw new Exceptions.ValidationException(errors);
+    }
+    return await next();
+}
+```
+
+### b. Cơ Chế Giá Trị Mặc Định
+
+Hệ thống áp dụng các giá trị mặc định cho các tham số phân trang khi chúng không được cung cấp hoặc không hợp lệ.
+
+**Giá trị mặc định của từng tham số:**
+- **`PageIndex`**: Mặc định là `1`.
+    - Vị trí: [`Application/Common/Models/PaginationRequest.cs:13`](Application/Common/Models/PaginationRequest.cs:13) (trong constructor) và [`Application/Common/Models/PaginatedResponse.cs:18`](Application/Common/Models/PaginatedResponse.cs:18) (trong `CreateAsync`).
+- **`PageSize`**: Mặc định là `10`.
+    - Vị trí: [`Application/Common/Models/PaginationRequest.cs:14`](Application/Common/Models/PaginationRequest.cs:14) (trong constructor) và [`Application/Common/Models/PaginatedResponse.cs:18`](Application/Common/Models/PaginatedResponse.cs:18) (trong `CreateAsync`).
+- **`SortOrder`**: Mặc định là `"desc"` (giảm dần).
+    - Vị trí: [`Application/Common/Models/PaginationRequest.cs:18`](Application/Common/Models/PaginationRequest.cs:18) (trong constructor, sử dụng `AppConst.SORT_DESC`).
+- **`SearchTerm`**: Mặc định là `null`.
+- **`SortField`**: Mặc định là `null`.
+
+**Hành vi khi không truyền tham số phân trang:**
+- Hệ thống **không** trả về toàn bộ dữ liệu trong bảng.
+- Thay vào đó, hệ thống sẽ áp dụng các giá trị mặc định (`PageIndex = 1`, `PageSize = 10`) và thực hiện phân trang dựa trên các giá trị này.
+- Logic xử lý trong `PaginatedResponse<T>.CreateAsync` cũng đảm bảo rằng nếu `pageNumber` hoặc `pageSize` được truyền vào là <= 0, chúng sẽ được điều chỉnh về 1.
+
+**Code minh họa Giá trị mặc định (từ `PaginatedResponse.cs`):**
+```csharp
+public static async Task<PaginatedResponse<T>> CreateAsync(IQueryable<T> source, int pageNumber = 1, int pageSize = 10)
+{
+    if (pageNumber <= 0) pageNumber = 1;
+    if (pageSize <= 0) pageSize = 1;
+
+    int count = await source.CountAsync();
+    var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+    return new PaginatedResponse<T>(items, count, pageNumber, pageSize);
+}
