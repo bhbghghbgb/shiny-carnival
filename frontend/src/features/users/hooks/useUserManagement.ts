@@ -1,12 +1,23 @@
 import { useState, useEffect } from 'react'
 import { Form, message } from 'antd'
 import type { UserEntity } from '../types/entity'
-import {getRouteApi} from "@tanstack/react-router";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
+import { ENDPOINTS } from '../../../app/routes/type/endpoint';
+import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition';
 
-const routeApi = getRouteApi('/admin/users');
+const routeApi = getRouteApi(ENDPOINTS.ADMIN.USERS);
 
 export const useUserManagement = () => {
     const { users: initialUsers } = routeApi.useLoaderData()
+    const navigate = useNavigate({ from: ENDPOINTS.ADMIN.USERS })
+
+    // ✅ Sử dụng useSearch thay vì useState cho search/filter/sort dùng cho call api sau này
+    const search = routeApi.useSearch()
+    const searchText = search.search || ''
+    const roleFilter = search.role
+    const sortField = search.sortField || 'createdAt'
+    const sortOrder = search.sortOrder || 'descend'
+
     const [users, setUsers] = useState(initialUsers)
     const [filteredUsers, setFilteredUsers] = useState<UserEntity[]>([])
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -14,12 +25,6 @@ export const useUserManagement = () => {
     const [editingUser, setEditingUser] = useState<UserEntity | null>(null)
     const [deletingUser, setDeletingUser] = useState<UserEntity | null>(null)
     const [form] = Form.useForm()
-
-    // Search, Filter, Sort states
-    const [searchText, setSearchText] = useState('')
-    const [roleFilter, setRoleFilter] = useState<number | undefined>(undefined)
-    const [sortField, setSortField] = useState<string>('createdAt')
-    const [sortOrder, setSortOrder] = useState<'ascend' | 'descend'>('descend')
 
     // Reset form when editingUser changes
     useEffect(() => {
@@ -155,25 +160,36 @@ export const useUserManagement = () => {
         setDeletingUser(null)
     }
 
-    // Search, Filter, Sort handlers
+    // Search, Filter, Sort handlers - ✅ Sử dụng navigate để update URL
     const handleSearch = (value: string) => {
-        setSearchText(value)
+        navigate({
+            search: (prev: UserSearch) => ({ ...prev, search: value || undefined })
+        })
     }
 
     const handleRoleFilter = (value: number | undefined) => {
-        setRoleFilter(value)
+        navigate({
+            search: (prev: UserSearch) => ({ ...prev, role: value })
+        })
     }
 
     const handleSort = (field: string, order: 'ascend' | 'descend') => {
-        setSortField(field)
-        setSortOrder(order)
+        navigate({
+            search: (prev: UserSearch) => ({ ...prev, sortField: field, sortOrder: order })
+        })
     }
 
     const clearFilters = () => {
-        setSearchText('')
-        setRoleFilter(undefined)
-        setSortField('createdAt')
-        setSortOrder('descend')
+        navigate({
+            search: {
+                page: 1,
+                pageSize: 10,
+                search: undefined,
+                role: undefined,
+                sortField: 'createdAt',
+                sortOrder: 'descend',
+            }
+        })
     }
 
     // Statistics

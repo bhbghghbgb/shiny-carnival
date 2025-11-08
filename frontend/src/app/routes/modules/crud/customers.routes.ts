@@ -1,4 +1,4 @@
-import { generateCRUDRoutes } from '../../utils/routeHelpers';
+import { generateCRUDRoutesConfigs } from '../../utils/routeHelpers';
 import { customerModuleDefinition } from './definition/customers.definition';
 import type { ModuleRoutes } from '../../type/types';
 
@@ -10,7 +10,7 @@ export const customersRoutes: any = {};
 const generatedModule: ModuleRoutes<any> = {
   moduleName: 'customers',
   basePath: '/customers',
-  routes: generateCRUDRoutes(customerModuleDefinition),
+  routes: generateCRUDRoutesConfigs(customerModuleDefinition),
 };
 
 // Gán các thuộc tính từ config đã tạo vào object tạm thời

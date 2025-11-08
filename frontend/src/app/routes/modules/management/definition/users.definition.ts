@@ -12,7 +12,9 @@ interface UserLoaderData {
 }
 
 const userSearchSchema = baseSearchSchema.extend({
-  role: z.string().optional(),
+  role: z.number().optional(), // ✅ Đổi từ string sang number để match với UserEntity.role
+  sortField: z.string().catch('createdAt'), // ✅ Default: 'createdAt'
+  sortOrder: z.enum(['ascend', 'descend']).catch('descend'), // ✅ Default: 'descend'
   // status: z.enum(['active', 'inactive', 'pending']).optional(),
   // department: z.string().optional(),
 });

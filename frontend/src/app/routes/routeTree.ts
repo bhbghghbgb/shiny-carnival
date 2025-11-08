@@ -64,7 +64,6 @@ function buildRoutesFromConfig(
 
 // --- Logic chính ---
 
-// 1. Gom nhóm các module routes như kế hoạch ban đầu
 const standaloneModuleRoutes: ModuleRoutes<any>[] = [
   homeRoutes,
   authRoutes,
@@ -82,7 +81,6 @@ const adminModuleRoutes: ModuleRoutes<any>[] = [
   suppliersRoutes,
 ];
 
-// 2. Sử dụng hàm đệ quy để tạo các route instances
 const standaloneRoutes = buildRoutesFromConfig(
   standaloneModuleRoutes.flatMap(m => m.routes as HierarchicalModuleRouteConfig[]),
   rootRoute,

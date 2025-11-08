@@ -1,4 +1,4 @@
-import { generateManagementRoute } from '../../utils/routeHelpers';
+import { generateManagementRouteConfigs } from '../../utils/routeHelpers';
 import { supplierAdminDefinition } from './definition/suppliers.definition';
 import type { ModuleRoutes } from '../../type/types';
 
@@ -10,7 +10,7 @@ export const suppliersRoutes: object = {};
 const generatedModule: ModuleRoutes<any> = {
   moduleName: 'suppliers',
   basePath: '/suppliers',
-  routes: generateManagementRoute(supplierAdminDefinition),
+  routes: generateManagementRouteConfigs(supplierAdminDefinition),
 };
 
 // Gán các thuộc tính từ config đã tạo vào object tạm thời
