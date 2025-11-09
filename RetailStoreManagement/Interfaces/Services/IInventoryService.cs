@@ -6,7 +6,7 @@ namespace RetailStoreManagement.Interfaces.Services;
 
 public interface IInventoryService
 {
-    Task<ApiResponse<PagedList<InventoryResponseDto>>> GetInventoryAsync(PagedRequest request);
+    Task<ApiResponse<PagedList<InventoryResponseDto>>> GetInventoryAsync(InventorySearchRequest request);
     Task<ApiResponse<InventoryResponseDto>> GetInventoryByProductIdAsync(int productId);
     Task<ApiResponse<InventoryResponseDto>> UpdateInventoryAsync(int productId, UpdateInventoryRequest request, int userId);
     Task<ApiResponse<List<LowStockAlertDto>>> GetLowStockAlertsAsync();

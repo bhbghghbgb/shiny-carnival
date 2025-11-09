@@ -20,7 +20,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCustomers([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetCustomers([FromQuery] CustomerSearchRequest request)
     {
         var result = await _customerService.GetCustomersAsync(request);
         return StatusCode(result.StatusCode, result);

@@ -13,6 +13,11 @@ public class ProductSearchRequestValidator : BasePaginationValidator<ProductSear
     {
         // Base pagination validation rules được kế thừa từ BasePaginationValidator
 
+        // Validation cho SortBy - chỉ cho phép các property hợp lệ của ProductEntity
+        RuleFor(x => x.SortBy)
+            .Must(sortBy => IsValidSortProperty(sortBy))
+            .WithMessage("SortBy must be one of: Id, ProductName, Barcode, Price, Unit, CategoryId, SupplierId, CreatedAt, UpdatedAt, DeletedAt");
+
         // Validation cho CategoryId
         RuleFor(x => x.CategoryId)
             .GreaterThan(0)
@@ -43,5 +48,14 @@ public class ProductSearchRequestValidator : BasePaginationValidator<ProductSear
                       x.MinPrice.Value <= x.MaxPrice.Value)
             .WithMessage("MinPrice must be less than or equal to MaxPrice")
             .When(x => x.MinPrice.HasValue && x.MaxPrice.HasValue);
+    }
+
+    /// <summary>
+    /// Kiểm tra xem property có hợp lệ để sort không
+    /// </summary>
+    private static bool IsValidSortProperty(string sortBy)
+    {
+        var validProperties = new[] { "Id", "ProductName", "Barcode", "Price", "Unit", "CategoryId", "SupplierId", "CreatedAt", "UpdatedAt", "DeletedAt" };
+        return validProperties.Contains(sortBy, StringComparer.OrdinalIgnoreCase);
     }
 }

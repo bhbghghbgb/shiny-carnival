@@ -21,7 +21,7 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task<ApiResponse<PagedList<UserResponseDto>>> GetUsersAsync(PagedRequest request)
+    public async Task<ApiResponse<PagedList<UserResponseDto>>> GetUsersAsync(UserSearchRequest request)
     {
         try
         {
@@ -34,19 +34,29 @@ public class UserService : IUserService
                                         u.FullName!.Contains(request.Search));
             }
 
+            // Apply role filter
+            if (request.Role.HasValue)
+            {
+                query = query.Where(u => (int)u.Role == request.Role.Value);
+            }
+
             // Apply sorting
             query = request.SortDesc
                 ? query.OrderByDescending(u => EF.Property<object>(u, request.SortBy))
                 : query.OrderBy(u => EF.Property<object>(u, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+            // Project to DTO and keep IQueryable
+            var dtoQuery = query.Select(u => new UserResponseDto
+            {
+                Id = u.Id,
+                Username = u.Username,
+                FullName = u.FullName ?? string.Empty,
+                Role = (int)u.Role,
+                CreatedAt = u.CreatedAt
+            });
 
-            var userDtos = _mapper.Map<List<UserResponseDto>>(items);
-            var pagedList = new PagedList<UserResponseDto>(userDtos, request.Page, request.PageSize, totalCount);
+            // Use PagedList.CreateAsync for database-level pagination
+            var pagedList = await PagedList<UserResponseDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<UserResponseDto>>.Success(pagedList);
         }

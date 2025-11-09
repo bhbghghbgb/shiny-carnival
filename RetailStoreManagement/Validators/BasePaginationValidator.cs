@@ -4,25 +4,16 @@ using RetailStoreManagement.Models.Common;
 namespace RetailStoreManagement.Validators;
 
 /// <summary>
-/// Base validator cho tất cả các request có phân trang
-/// Chứa các validation rules chung cho Page, PageSize, Search, SortBy, SortDesc
+/// Base validator cho tất cả các request có phân trang đầy đủ
+/// Kế thừa từ BasePagedRequestValidator và thêm validation cho Search, SortBy, SortDesc
+/// Sử dụng cho các request kế thừa từ PagedRequest
 /// </summary>
 /// <typeparam name="T">Type của request model kế thừa từ PagedRequest</typeparam>
-public abstract class BasePaginationValidator<T> : AbstractValidator<T> where T : PagedRequest
+public abstract class BasePaginationValidator<T> : BasePagedRequestValidator<T> where T : PagedRequest
 {
     protected BasePaginationValidator()
     {
-        // Validation cho Page
-        RuleFor(x => x.Page)
-            .GreaterThan(0)
-            .WithMessage("Page must be greater than 0");
-
-        // Validation cho PageSize
-        RuleFor(x => x.PageSize)
-            .GreaterThan(0)
-            .WithMessage("PageSize must be greater than 0")
-            .LessThanOrEqualTo(100)
-            .WithMessage("PageSize must not exceed 100");
+        // Base validation (Page, PageSize) được kế thừa từ BasePagedRequestValidator
 
         // Validation cho SortBy
         RuleFor(x => x.SortBy)

@@ -21,7 +21,7 @@ public class InventoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetInventory([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetInventory([FromQuery] InventorySearchRequest request)
     {
         var result = await _inventoryService.GetInventoryAsync(request);
         return StatusCode(result.StatusCode, result);

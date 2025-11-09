@@ -21,7 +21,7 @@ public class CustomerService : ICustomerService
         _mapper = mapper;
     }
 
-    public async Task<ApiResponse<PagedList<CustomerListDto>>> GetCustomersAsync(PagedRequest request)
+    public async Task<ApiResponse<PagedList<CustomerListDto>>> GetCustomersAsync(CustomerSearchRequest request)
     {
         try
         {
@@ -40,15 +40,22 @@ public class CustomerService : ICustomerService
                 ? query.OrderByDescending(c => EF.Property<object>(c, request.SortBy))
                 : query.OrderBy(c => EF.Property<object>(c, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
+            // Project to DTO and keep IQueryable
+            var dtoQuery = query
                 .Include(c => c.Orders)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+                .Select(c => new CustomerListDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Phone = c.Phone,
+                    Email = c.Email,
+                    LastOrderDate = c.Orders.OrderByDescending(o => o.OrderDate).FirstOrDefault() != null
+                        ? c.Orders.OrderByDescending(o => o.OrderDate).First().OrderDate
+                        : (DateTime?)null
+                });
 
-            var customerDtos = _mapper.Map<List<CustomerListDto>>(items);
-            var pagedList = new PagedList<CustomerListDto>(customerDtos, request.Page, request.PageSize, totalCount);
+            // Use PagedList.CreateAsync for database-level pagination
+            var pagedList = await PagedList<CustomerListDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<CustomerListDto>>.Success(pagedList);
         }

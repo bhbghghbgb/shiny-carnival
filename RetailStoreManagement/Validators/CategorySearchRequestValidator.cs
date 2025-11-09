@@ -13,6 +13,11 @@ public class CategorySearchRequestValidator : BasePaginationValidator<CategorySe
     {
         // Base pagination validation rules được kế thừa từ BasePaginationValidator
 
+        // Validation cho SortBy - chỉ cho phép các property hợp lệ của CategoryEntity
+        RuleFor(x => x.SortBy)
+            .Must(sortBy => IsValidSortProperty(sortBy))
+            .WithMessage("SortBy must be one of: Id, CategoryName, CreatedAt, UpdatedAt, DeletedAt");
+
         // Validation cho MinProductCount
         RuleFor(x => x.MinProductCount)
             .GreaterThanOrEqualTo(0)
@@ -50,5 +55,14 @@ public class CategorySearchRequestValidator : BasePaginationValidator<CategorySe
                       x.CreatedAfter.Value <= x.CreatedBefore.Value)
             .WithMessage("CreatedAfter must be less than or equal to CreatedBefore")
             .When(x => x.CreatedAfter.HasValue && x.CreatedBefore.HasValue);
+    }
+
+    /// <summary>
+    /// Kiểm tra xem property có hợp lệ để sort không
+    /// </summary>
+    private static bool IsValidSortProperty(string sortBy)
+    {
+        var validProperties = new[] { "Id", "CategoryName", "CreatedAt", "UpdatedAt", "DeletedAt" };
+        return validProperties.Contains(sortBy, StringComparer.OrdinalIgnoreCase);
     }
 }

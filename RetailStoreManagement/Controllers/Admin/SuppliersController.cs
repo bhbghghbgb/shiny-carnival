@@ -20,7 +20,7 @@ public class SuppliersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetSuppliers([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetSuppliers([FromQuery] SupplierSearchRequest request)
     {
         var result = await _supplierService.GetSuppliersAsync(request);
         return StatusCode(result.StatusCode, result);
