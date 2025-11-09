@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
@@ -20,7 +21,7 @@ public class PromotionService : IPromotionService
         _mapper = mapper;
     }
 
-    public async Task<ApiResponse<PagedList<PromotionListDto>>> GetPromotionsAsync(PagedRequest request)
+    public async Task<ApiResponse<PagedList<PromotionListDto>>> GetPromotionsAsync(PromotionSearchRequest request)
     {
         try
         {
@@ -34,18 +35,27 @@ public class PromotionService : IPromotionService
             }
 
             // Apply sorting
-            query = request.SortDesc 
+            query = request.SortDesc
                 ? query.OrderByDescending(p => EF.Property<object>(p, request.SortBy))
                 : query.OrderBy(p => EF.Property<object>(p, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+            // Project to DTO and keep IQueryable
+            var dtoQuery = query.Select(p => new PromotionListDto
+            {
+                Id = p.Id,
+                PromoCode = p.PromoCode,
+                Description = p.Description,
+                DiscountType = p.DiscountType.ToString().ToLower(),
+                DiscountValue = p.DiscountValue,
+                StartDate = p.StartDate.ToDateTime(TimeOnly.MinValue),
+                EndDate = p.EndDate.ToDateTime(TimeOnly.MaxValue),
+                Status = p.Status.ToString().ToLower(),
+                UsedCount = p.UsedCount,
+                RemainingUsage = p.UsageLimit - p.UsedCount
+            });
 
-            var promotionDtos = _mapper.Map<List<PromotionListDto>>(items);
-            var pagedList = new PagedList<PromotionListDto>(promotionDtos, request.Page, request.PageSize, totalCount);
+            // Use PagedList.CreateAsync for database-level pagination
+            var pagedList = await PagedList<PromotionListDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<PromotionListDto>>.Success(pagedList);
         }

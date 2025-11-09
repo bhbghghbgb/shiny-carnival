@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
@@ -19,7 +20,7 @@ public class SupplierService : ISupplierService
         _mapper = mapper;
     }
 
-    public async Task<ApiResponse<PagedList<SupplierResponseDto>>> GetSuppliersAsync(PagedRequest request)
+    public async Task<ApiResponse<PagedList<SupplierResponseDto>>> GetSuppliersAsync(SupplierSearchRequest request)
     {
         try
         {
@@ -38,15 +39,21 @@ public class SupplierService : ISupplierService
                 ? query.OrderByDescending(s => EF.Property<object>(s, request.SortBy))
                 : query.OrderBy(s => EF.Property<object>(s, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
+            // Project to DTO and keep IQueryable
+            var dtoQuery = query
                 .Include(s => s.Products)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+                .Select(s => new SupplierResponseDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    Phone = s.Phone,
+                    Email = s.Email,
+                    Address = s.Address,
+                    ProductCount = s.Products.Count
+                });
 
-            var supplierDtos = _mapper.Map<List<SupplierResponseDto>>(items);
-            var pagedList = new PagedList<SupplierResponseDto>(supplierDtos, request.Page, request.PageSize, totalCount);
+            // Use PagedList.CreateAsync for database-level pagination
+            var pagedList = await PagedList<SupplierResponseDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<SupplierResponseDto>>.Success(pagedList);
         }

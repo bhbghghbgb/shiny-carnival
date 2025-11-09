@@ -61,17 +61,25 @@ public class ProductService : IProductService
                 ? query.OrderByDescending(p => EF.Property<object>(p, request.SortBy))
                 : query.OrderBy(p => EF.Property<object>(p, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
+            // Include related entities and project to DTO
+            var dtoQuery = query
                 .Include(p => p.Category)
                 .Include(p => p.Supplier)
                 .Include(p => p.Inventory)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+                .Select(p => new ProductListDto
+                {
+                    Id = p.Id,
+                    ProductName = p.ProductName,
+                    Barcode = p.Barcode ?? string.Empty,
+                    Price = p.Price,
+                    Unit = p.Unit ?? string.Empty,
+                    CategoryName = p.Category != null ? p.Category.CategoryName : string.Empty,
+                    SupplierName = p.Supplier != null ? p.Supplier.Name : string.Empty,
+                    InventoryQuantity = p.Inventory != null ? p.Inventory.Quantity : 0
+                });
 
-            var productDtos = _mapper.Map<List<ProductListDto>>(items);
-            var pagedList = new PagedList<ProductListDto>(productDtos, request.Page, request.PageSize, totalCount);
+            // Use the new CreateAsync method for pagination
+            var pagedList = await PagedList<ProductListDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<ProductListDto>>.Success(pagedList);
         }

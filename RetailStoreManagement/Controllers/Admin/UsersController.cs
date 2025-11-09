@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.User;
 
@@ -19,7 +20,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUsers([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetUsers([FromQuery] UserSearchRequest request)
     {
         var result = await _userService.GetUsersAsync(request);
         return StatusCode(result.StatusCode, result);

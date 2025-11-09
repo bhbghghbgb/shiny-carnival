@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Promotion;
 
@@ -19,7 +20,7 @@ public class PromotionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPromotions([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetPromotions([FromQuery] PromotionSearchRequest request)
     {
         var result = await _promotionService.GetPromotionsAsync(request);
         return StatusCode(result.StatusCode, result);

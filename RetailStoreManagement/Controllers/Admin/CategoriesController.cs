@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Category;
+using RetailStoreManagement.Models.Common;
 
 namespace RetailStoreManagement.Controllers.Admin;
 
@@ -19,7 +20,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCategories([FromQuery] PagedRequest request)
+    public async Task<IActionResult> GetCategories([FromQuery] CategorySearchRequest request)
     {
         var result = await _categoryService.GetCategoriesAsync(request);
         return StatusCode(result.StatusCode, result);

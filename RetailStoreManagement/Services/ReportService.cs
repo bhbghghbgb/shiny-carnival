@@ -91,8 +91,23 @@ public class ReportService : IReportService
     {
         try
         {
-            var topProducts = await GetTopProductsAsync(request.StartDate, request.EndDate, 10);
-            var topCustomers = await GetTopCustomersAsync(request.StartDate, request.EndDate, 10);
+            var topProductsRequest = new TopProductsSearchRequest
+            {
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Page = 1,
+                PageSize = 10
+            };
+            var topProducts = await GetTopProductsAsync(topProductsRequest);
+
+            var topCustomersRequest = new TopCustomersSearchRequest
+            {
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Page = 1,
+                PageSize = 10
+            };
+            var topCustomers = await GetTopCustomersAsync(topCustomersRequest);
 
             var categoryBreakdown = await _unitOfWork.OrderItems.GetQueryable()
                 .Include(oi => oi.Order)
@@ -114,8 +129,8 @@ public class ReportService : IReportService
 
             var report = new SalesReportDto
             {
-                TopProducts = topProducts.Data ?? new List<TopProductDto>(),
-                TopCustomers = topCustomers.Data ?? new List<TopCustomerDto>(),
+                TopProducts = topProducts.Data?.Items?.ToList() ?? new List<TopProductDto>(),
+                TopCustomers = topCustomers.Data?.Items?.ToList() ?? new List<TopCustomerDto>(),
                 CategoryBreakdown = categoryBreakdown
             };
 
@@ -127,16 +142,16 @@ public class ReportService : IReportService
         }
     }
 
-    public async Task<ApiResponse<List<TopProductDto>>> GetTopProductsAsync(DateTime startDate, DateTime endDate, int limit = 10)
+    public async Task<ApiResponse<PagedList<TopProductDto>>> GetTopProductsAsync(TopProductsSearchRequest request)
     {
         try
         {
-            var topProducts = await _unitOfWork.OrderItems.GetQueryable()
+            var query = _unitOfWork.OrderItems.GetQueryable()
                 .Include(oi => oi.Order)
                 .Include(oi => oi.Product)
                 .Where(oi => oi.Order.Status == OrderStatus.Paid &&
-                             oi.Order.OrderDate >= startDate &&
-                             oi.Order.OrderDate <= endDate)
+                             oi.Order.OrderDate >= request.StartDate &&
+                             oi.Order.OrderDate <= request.EndDate)
                 .GroupBy(oi => new { oi.ProductId, oi.Product.ProductName })
                 .Select(g => new TopProductDto
                 {
@@ -146,27 +161,27 @@ public class ReportService : IReportService
                     TotalRevenue = g.Sum(oi => oi.Subtotal),
                     OrderCount = g.Select(oi => oi.OrderId).Distinct().Count()
                 })
-                .OrderByDescending(p => p.TotalRevenue)
-                .Take(limit)
-                .ToListAsync();
+                .OrderByDescending(p => p.TotalRevenue);
 
-            return ApiResponse<List<TopProductDto>>.Success(topProducts);
+            var pagedResult = await PagedList<TopProductDto>.CreateAsync(query, request.Page, request.PageSize);
+            
+            return ApiResponse<PagedList<TopProductDto>>.Success(pagedResult);
         }
         catch (Exception ex)
         {
-            return ApiResponse<List<TopProductDto>>.Error(ex.Message);
+            return ApiResponse<PagedList<TopProductDto>>.Error(ex.Message);
         }
     }
 
-    public async Task<ApiResponse<List<TopCustomerDto>>> GetTopCustomersAsync(DateTime startDate, DateTime endDate, int limit = 10)
+    public async Task<ApiResponse<PagedList<TopCustomerDto>>> GetTopCustomersAsync(TopCustomersSearchRequest request)
     {
         try
         {
-            var topCustomers = await _unitOfWork.Orders.GetQueryable()
+            var query = _unitOfWork.Orders.GetQueryable()
                 .Include(o => o.Customer)
                 .Where(o => o.Status == OrderStatus.Paid &&
-                             o.OrderDate >= startDate &&
-                             o.OrderDate <= endDate &&
+                             o.OrderDate >= request.StartDate &&
+                             o.OrderDate <= request.EndDate &&
                              o.Customer != null)
                 .GroupBy(o => new { o.CustomerId, o.Customer!.Name })
                 .Select(g => new TopCustomerDto
@@ -177,15 +192,15 @@ public class ReportService : IReportService
                     TotalSpent = g.Sum(o => o.TotalAmount - o.DiscountAmount),
                     LastOrderDate = g.Max(o => o.OrderDate)
                 })
-                .OrderByDescending(c => c.TotalSpent)
-                .Take(limit)
-                .ToListAsync();
+                .OrderByDescending(c => c.TotalSpent);
 
-            return ApiResponse<List<TopCustomerDto>>.Success(topCustomers);
+            var pagedResult = await PagedList<TopCustomerDto>.CreateAsync(query, request.Page, request.PageSize);
+            
+            return ApiResponse<PagedList<TopCustomerDto>>.Success(pagedResult);
         }
         catch (Exception ex)
         {
-            return ApiResponse<List<TopCustomerDto>>.Error(ex.Message);
+            return ApiResponse<PagedList<TopCustomerDto>>.Error(ex.Message);
         }
     }
 }
