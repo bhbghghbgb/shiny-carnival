@@ -1,7 +1,12 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using ProductApp.Services;
-using ProductApp.ViewModels;
-using ProductApp.Views;
+using Microsoft.UI.Xaml;
+using ProductApp.Core.Services;
+using ProductApp.Core.ViewModels;
+using ProductApp.Data;
+using ProductApp.Data.Repositories;
+using Refit;
+using System.Text.Json;
 
 namespace ProductApp;
 
@@ -10,60 +15,86 @@ public sealed partial class App : Application
     private Window? _window;
     private IHost? _host;
 
-    public App()
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        InitializeComponent();
-    }
-
-    protected async override void OnLaunched(LaunchActivatedEventArgs args)
-    {
-        var appBuilder = this.CreateBuilder(args)
-            .Configure(hostBuilder =>
+        var builder = this.CreateBuilder(args)
+            .Configure(host => 
             {
-                hostBuilder
-                    .UseLogging(configure: (context, logBuilder) =>
-                    {
-                        logBuilder.SetMinimumLevel(LogLevel.Information);
-                    })
-                    .UseConfiguration(configure: configBuilder =>
-                    {
-                        configBuilder.EmbeddedSource<App>();
-                    })
-                    .ConfigureServices((context, services) =>
-                    {
-                        // Register ViewModels and Services
-                        services.AddTransient<LoginViewModel>();
-                        services.AddTransient<HomeViewModel>();
-                        services.AddTransient<ProductDetailViewModel>();
-                        services.AddTransient<CartViewModel>();
-
-                        services.AddTransient<IAuthService, AuthService>();
-                        services.AddTransient<IProductsService, ProductsService>();
-                        services.AddTransient<ICartRepository, CartRepository>();
-
-                        // Register Refit Clients (Interfaces will be created in Task 2)
-                        // services.AddRefitClient<IAuthApi>()...
-                        // services.AddRefitClient<IProductsApi>()...
-
-                    })
-                    .UseNavigation(RegisterRoutes);
+                host
+                .UseNavigation(RegisterRoutes)
+                .ConfigureServices(ConfigureServices)
+                .UseToolkitNavigation();
             });
 
-        _host = appBuilder.Build();
-        _window = _host.Services.GetRequiredService<Window>();
+        _window = builder.Window;
+        _host = builder.Build();
         _window.Activate();
+    }
+
+    private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
+    {
+        // Database
+        services.AddDbContext<AppDbContext>();
+        services.AddTransient<ICartRepository, CartRepository>();
+        
+        // API Clients
+        services.AddRefitClient<IAuthApi>(new RefitSettings
+        {
+            ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        })
+        .ConfigureHttpClient(client => 
+        {
+            client.BaseAddress = new Uri("http://10.0.2.2:5000"); // Android emulator
+        });
+
+        services.AddRefitClient<IProductApi>(new RefitSettings
+        {
+            ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        })
+        .ConfigureHttpClient(client => 
+        {
+            client.BaseAddress = new Uri("http://10.0.2.2:5000");
+        });
+
+        services.AddRefitClient<IOrderApi>(new RefitSettings
+        {
+            ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            })
+        })
+        .ConfigureHttpClient(client => 
+        {
+            client.BaseAddress = new Uri("http://10.0.2.2:5000");
+        });
+
+        // Services
+        services.AddTransient<IAuthService, AuthService>();
+        services.AddTransient<IProductService, ProductService>();
+        services.AddTransient<IOrderService, OrderService>();
+        
+        // ViewModels
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<HomeViewModel>();
+        services.AddTransient<ProductDetailViewModel>();
+        services.AddTransient<CartViewModel>();
+        services.AddTransient<OrderConfirmationViewModel>();
     }
 
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
-        // Routes will be registered in Task 4
-        /*
         views.Register(
-            new ViewMap(ViewModel: typeof(LoginViewModel)),
             new ViewMap<LoginPage, LoginViewModel>(),
             new ViewMap<HomePage, HomeViewModel>(),
             new ViewMap<ProductDetailPage, ProductDetailViewModel>(),
-            new ViewMap<CartPage, CartViewModel>()
+            new ViewMap<CartPage, CartViewModel>(),
+            new ViewMap<OrderConfirmationPage, OrderConfirmationViewModel>()
         );
 
         routes.Register(
@@ -71,8 +102,8 @@ public sealed partial class App : Application
             new RouteMap("Login", View: views.FindByViewModel<LoginViewModel>()),
             new RouteMap("Home", View: views.FindByViewModel<HomeViewModel>()),
             new RouteMap("ProductDetail", View: views.FindByViewModel<ProductDetailViewModel>()),
-            new RouteMap("Cart", View: views.FindByViewModel<CartViewModel>())
+            new RouteMap("Cart", View: views.FindByViewModel<CartViewModel>()),
+            new RouteMap("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationViewModel>())
         );
-        */
     }
 }
