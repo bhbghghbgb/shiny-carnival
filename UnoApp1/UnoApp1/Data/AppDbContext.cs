@@ -9,15 +9,17 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string databasePath = Path.Combine(FileSystem.AppDataDirectory, "UnoApp1.db3");
-        
+        string databasePath = Path.Combine(
+            ApplicationData.Current.LocalFolder.Path,
+            "UnoApp1.db");
+
         // Create directory if it doesn't exist
         var directory = Path.GetDirectoryName(databasePath);
         if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
         {
             Directory.CreateDirectory(directory);
         }
-        
+
         optionsBuilder.UseSqlite($"Data Source={databasePath}");
     }
 

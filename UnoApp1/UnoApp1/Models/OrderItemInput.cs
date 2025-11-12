@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ProductApp.Models;
+namespace UnoApp1.Models;
 
 public class OrderItemInput
 {
