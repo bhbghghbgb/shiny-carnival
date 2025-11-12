@@ -1,79 +1,56 @@
-/// ProductApp/App.xaml.cs
-using Microsoft.Extensions.Logging;
-using ProductApp.Services;
-using ProductApp.ViewModels;
-using ProductApp.Views;
+/// ProductApp/Models/ProductDto.cs
+using System.Text.Json.Serialization;
 
-namespace ProductApp;
+namespace ProductApp.Models;
 
-public sealed partial class App : Application
+public class ProductDto
 {
-    private Window? _window;
-    private IHost? _host;
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
 
-    public App()
-    {
-        InitializeComponent();
-    }
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
 
-    protected async override void OnLaunched(LaunchActivatedEventArgs args)
-    {
-        var appBuilder = this.CreateBuilder(args)
-            .Configure(hostBuilder =>
-            {
-                hostBuilder
-                    .UseLogging(configure: (context, logBuilder) =>
-                    {
-                        logBuilder.SetMinimumLevel(LogLevel.Information);
-                    })
-                    .UseConfiguration(configure: configBuilder =>
-                    {
-                        configBuilder.EmbeddedSource<App>();
-                    })
-                    .ConfigureServices((context, services) =>
-                    {
-                        // Register ViewModels and Services
-                        services.AddTransient<LoginViewModel>();
-                        services.AddTransient<HomeViewModel>();
-                        services.AddTransient<ProductDetailViewModel>();
-                        services.AddTransient<CartViewModel>();
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = string.Empty;
 
-                        services.AddTransient<IAuthService, AuthService>();
-                        services.AddTransient<IProductsService, ProductsService>();
-                        services.AddTransient<ICartRepository, CartRepository>();
+    [JsonPropertyName("price")]
+    public decimal Price { get; set; }
 
-                        // Register Refit Clients (Interfaces will be created in Task 2)
-                        // services.AddRefitClient<IAuthApi>()...
-                        // services.AddRefitClient<IProductsApi>()...
+    [JsonPropertyName("category")]
+    public string Category { get; set; } = string.Empty;
+}
 
-                    })
-                    .UseNavigation(RegisterRoutes);
-            });
+/// ProductApp/Models/LoginRequestDto.cs
+using System.Text.Json.Serialization;
 
-        _host = appBuilder.Build();
-        _window = _host.Services.GetRequiredService<Window>();
-        _window.Activate();
-    }
+namespace ProductApp.Models;
 
-    private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
-    {
-        // Routes will be registered in Task 4
-        /*
-        views.Register(
-            new ViewMap(ViewModel: typeof(LoginViewModel)),
-            new ViewMap<LoginPage, LoginViewModel>(),
-            new ViewMap<HomePage, HomeViewModel>(),
-            new ViewMap<ProductDetailPage, ProductDetailViewModel>(),
-            new ViewMap<CartPage, CartViewModel>()
-        );
+public class LoginRequestDto
+{
+    [JsonPropertyName("username")]
+    public string Username { get; set; } = string.Empty;
 
-        routes.Register(
-            new RouteMap("", View: views.FindByViewModel<LoginViewModel>()),
-            new RouteMap("Login", View: views.FindByViewModel<LoginViewModel>()),
-            new RouteMap("Home", View: views.FindByViewModel<HomeViewModel>()),
-            new RouteMap("ProductDetail", View: views.FindByViewModel<ProductDetailViewModel>()),
-            new RouteMap("Cart", View: views.FindByViewModel<CartViewModel>())
-        );
-        */
-    }
+    [JsonPropertyName("password")]
+    public string Password { get; set; } = string.Empty;
+}
+
+/// ProductApp/Models/OrderRequestDto.cs
+using System.Text.Json.Serialization;
+
+namespace ProductApp.Models;
+
+public class OrderRequestDto
+{
+    [JsonPropertyName("items")]
+    public List<OrderItemDto> Items { get; set; } = new();
+}
+
+public class OrderItemDto
+{
+    [JsonPropertyName("productId")]
+    public int ProductId { get; set; }
+
+    [JsonPropertyName("quantity")]
+    public int Quantity { get; set; }
 }
