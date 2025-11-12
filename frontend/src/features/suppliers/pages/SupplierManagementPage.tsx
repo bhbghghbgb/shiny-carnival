@@ -1,20 +1,133 @@
-import React from 'react';
-import { getRouteApi } from '@tanstack/react-router';
+import React, {useState} from 'react';
+import {getRouteApi} from '@tanstack/react-router';
+import {useSupplierManagement} from "../hooks/useSupplierManagement.ts";
+import {SupplierHeader} from "../components/SupplierHeader.tsx";
+import {SupplierStatistics} from "../components/SupplierStatistics.tsx";
+import {message} from "antd";
+import {SupplierSearchFilter} from "../components/SupplierSearchFilter.tsx";
+import {SupplierTable} from "../components/SupplierTable.tsx";
+import {SupplierModals} from "../components/SupplierModals.tsx";
+
 
 const routeApi = getRouteApi('/admin/suppliers');
 
 export const SupplierManagementPage: React.FC = () => {
-  const { suppliers } = routeApi.useLoaderData();
-  const params = routeApi.useParams();
+    const {
+        addSupplier,
+        editSupplier,
+        deleteSupplier,
+        selected,
+        setSelected,
+        modalVisible,
+        setModalVisible,
+        isEditing,
+        setIsEditing,
+    } = useSupplierManagement();
 
-  console.log('Suppliers:', suppliers);
- console.log('Route params:', params);
+    const [searchText, setSearchText] = useState("");
+    const [sortField, setSortField] = useState("name");
+    const [sortOrder, setSortOrder] = useState<"ascend" | "descend">("ascend");
+    const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined);
 
-  return (
-    <div>
-      <h1>Supplier Management</h1>
-      <p>This is a placeholder for the supplier management page.</p>
-      <p>It will contain a table for listing suppliers and a form for creating/editing them.</p>
-    </div>
-  );
-};
+    const {suppliers} = routeApi.useLoaderData();
+    const params = routeApi.useParams();
+
+    console.log('Suppliers:', suppliers);
+    console.log('Route params:', params);
+
+    // ✅ Lọc dữ liệu theo search + filter
+    const filteredSuppliers = suppliers
+        .filter((s: { name: string; }) => s.name.toLowerCase().includes(searchText.toLowerCase()))
+        .filter((s: { address: string; }) =>
+            regionFilter ? s.address?.toLowerCase().includes(regionFilter.toLowerCase()) : true
+        )
+        .sort((a: { [x: string]: { toString: () => any; }; }, b: { [x: string]: { toString: () => string; }; }) =>
+            sortOrder === "ascend"
+                ? a[sortField as keyof typeof a]?.toString().localeCompare(
+                    b[sortField as keyof typeof b]?.toString()
+                )
+                : b[sortField as keyof typeof b]?.toString().localeCompare(
+                    a[sortField as keyof typeof a]?.toString()
+                )
+        );
+
+    const handleAdd = () => {
+        setIsEditing(false);
+        setSelected(null);
+        setModalVisible(true);
+    };
+    const handleSubmit = (data: any) => {
+        try {
+            if (isEditing && selected) {
+                editSupplier({...selected, ...data});
+                message.success("Cập nhật nhà cung cấp thành công!");
+            } else {
+                addSupplier(data);
+                message.success("Thêm nhà cung cấp mới thành công!");
+            }
+
+            // ✅ Đóng modal sau khi lưu
+            setModalVisible(false);
+            setSelected(null);
+        } catch (error) {
+            console.error(error);
+            message.error("Đã xảy ra lỗi, vui lòng thử lại!");
+        }
+    };
+
+    return (
+        <div style={{padding: 24}}>
+            <SupplierHeader onAddSupplier={handleAdd}/>
+
+            <div style={{marginTop: 16}}>
+                <SupplierStatistics
+                    totalSuppliers={suppliers.length}
+                    filteredCount={filteredSuppliers.length} // ✅ thêm dòng này
+                    activeSuppliers={suppliers.length}
+                    productCount={120}
+                />
+            </div>
+
+            <div style={{marginTop: 16}}>
+                <SupplierSearchFilter
+                    searchText={searchText}
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    regionFilter={regionFilter}
+                    onSearchChange={setSearchText}
+                    onRegionFilterChange={setRegionFilter}
+                    onSortChange={(f, o) => {
+                        setSortField(f);
+                        setSortOrder(o);
+                    }}
+                    onClearFilters={() => {
+                        setSearchText("");
+                        setRegionFilter(undefined);
+                        setSortField("name");
+                        setSortOrder("ascend");
+                    }}
+                />
+            </div>
+
+            <div style={{marginTop: 16}}>
+                <SupplierTable
+                    suppliers={filteredSuppliers}
+                    onEdit={(s) => {
+                        setIsEditing(true);
+                        setSelected(s);
+                        setModalVisible(true);
+                    }}
+                    onDelete={deleteSupplier}
+                />
+            </div>
+
+            <SupplierModals
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onSubmit={handleSubmit}
+                initialValues={selected}
+                isEditing={isEditing}
+            />
+        </div>
+    );
+}
