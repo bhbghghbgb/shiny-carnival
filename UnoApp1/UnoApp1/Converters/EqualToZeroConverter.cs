@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-namespace ProductApp.Converters;
+namespace UnoApp1.Converters;
 
 public class EqualToZeroConverter : IValueConverter
 {

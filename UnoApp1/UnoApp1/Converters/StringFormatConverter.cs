@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Data;
 
-namespace ProductApp.Converters;
+namespace UnoApp1.Converters;
 
 public class StringFormatConverter : IValueConverter
 {
