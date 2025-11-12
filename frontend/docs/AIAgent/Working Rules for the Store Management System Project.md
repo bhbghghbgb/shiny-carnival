@@ -40,7 +40,7 @@ Agents must always remember and apply the following project information:
 
 - **State Management:** Zustand (global and local per feature).
 
-- **Data Grids:** TanStack Table (headless UI).
+- **Data Grids:** Ant Table (headless UI).
 
 - **Form Management:** Ant Design Form components with built-in validation and controls.
 

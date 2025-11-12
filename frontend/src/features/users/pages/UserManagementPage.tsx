@@ -4,7 +4,8 @@ import { UserStatistics } from '../components/UserStatistics'
 import { UserSearchFilter } from '../components/UserSearchFilter'
 import { UserTable } from '../components/UserTable'
 import { UserModals } from '../components/UserModals'
-import { useUserManagementPage } from '../hooks/useUserManagementPage'
+import { useUserManagement } from '../hooks/useUserManagement.ts'
+
 
 export function UserManagementPage() {
     const {
@@ -39,7 +40,7 @@ export function UserManagementPage() {
         handleRoleFilter,
         handleSort,
         clearFilters,
-    } = useUserManagementPage()
+    } = useUserManagement()
 
     return (
         <div

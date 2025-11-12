@@ -45,7 +45,7 @@ public class ApiResponseFilter : IActionFilter, IExceptionFilter
 
     public void OnException(ExceptionContext context)
     {
-        var response = ApiResponse<object>.Fail(context.Exception.Message);
+                var response = ApiResponse<object>.Error(context.Exception.Message);
         context.Result = new ObjectResult(response)
         {
             StatusCode = 500

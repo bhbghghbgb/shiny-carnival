@@ -1,6 +1,15 @@
 import React from 'react';
+import { getRouteApi } from '@tanstack/react-router';
+
+const routeApi = getRouteApi('/admin/reports');
 
 export const ReportManagementPage: React.FC = () => {
+  const { reports } = routeApi.useLoaderData();
+  const params = routeApi.useParams();
+
+  console.log('Reports:', reports);
+ console.log('Route params:', params);
+
   return (
     <div>
       <h1>Report Management</h1>

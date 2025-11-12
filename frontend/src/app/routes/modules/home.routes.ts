@@ -1,10 +1,10 @@
-import { type ModuleRoutes } from '../type/types';
+import type { ModuleRoutes } from '../type/types';
 import HomePage from '../../../pages/HomePage';
 import { PendingComponent } from '../../../components/feedback/PendingComponent';
 import { ErrorComponent } from '../../../components/feedback/ErrorComponent';
 
 // Home module routes configuration
-export const homeRoutes: ModuleRoutes = {
+export const homeRoutes: ModuleRoutes<any> = {
   moduleName: 'home',
   basePath: '/',
   routes: [
@@ -13,6 +13,9 @@ export const homeRoutes: ModuleRoutes = {
       component: HomePage,
       pendingComponent: PendingComponent,
       errorComponent: ErrorComponent,
-    }
+      meta: {
+        requiresAuth: false, // Trang chủ không yêu cầu đăng nhập
+      },
+    },
   ],
 };

@@ -109,5 +109,8 @@ frontend/src/app/routeTree.gen.ts
 .lingma/rules/rule.md
 .augment
 frontend/todo.txt
-.roo/*
+.roo
 AGENTS.md
+frontend/yarn.lock
+frontend/QWEN.md
+docs\

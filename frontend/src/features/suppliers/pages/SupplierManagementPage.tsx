@@ -1,14 +1,7 @@
-import React, { useState } from "react";
-import { message } from "antd";
-import { SupplierHeader } from "../components/SupplierHeader";
-import { SupplierSearchFilter } from "../components/SupplierSearchFilter";
-import { SupplierStatistics } from "../components/SupplierStatistics";
-import { SupplierTable } from "../components/SupplierTable";
-import { SupplierModals } from "../components/SupplierModals";
-import { useSupplierManagement } from "../hooks/useSupplierManagement";
+import React from 'react';
+import { getRouteApi } from '@tanstack/react-router';
 
-export default function SupplierManagementPage() {
-  const {
+const {
     suppliers,
     addSupplier,
     editSupplier,
@@ -19,52 +12,62 @@ export default function SupplierManagementPage() {
     setModalVisible,
     isEditing,
     setIsEditing,
-  } = useSupplierManagement();
+} = useSupplierManagement();
 
-  const [searchText, setSearchText] = useState("");
-  const [sortField, setSortField] = useState("name");
-  const [sortOrder, setSortOrder] = useState<"ascend" | "descend">("ascend");
-  const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined);
+const [searchText, setSearchText] = useState("");
+const [sortField, setSortField] = useState("name");
+const [sortOrder, setSortOrder] = useState<"ascend" | "descend">("ascend");
+const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined);
 
-  // ✅ Lọc dữ liệu theo search + filter
-  const filteredSuppliers = suppliers
-    .filter((s) => s.name.toLowerCase().includes(searchText.toLowerCase()))
-    .filter((s) =>
-      regionFilter ? s.address?.toLowerCase().includes(regionFilter.toLowerCase()) : true
-    )
-    .sort((a, b) =>
-      sortOrder === "ascend"
-        ? a[sortField as keyof typeof a]?.toString().localeCompare(
-            b[sortField as keyof typeof b]?.toString()
-          )
-        : b[sortField as keyof typeof b]?.toString().localeCompare(
-            a[sortField as keyof typeof a]?.toString()
-          )
-    );
+const routeApi = getRouteApi('/admin/suppliers');
 
-  const handleAdd = () => {
-    setIsEditing(false);
-    setSelected(null);
-    setModalVisible(true);
-  };
+export const SupplierManagementPage: React.FC = () => {
+  const { suppliers } = routeApi.useLoaderData();
+  const params = routeApi.useParams();
+
+  console.log('Suppliers:', suppliers);
+ console.log('Route params:', params);
+
+    // ✅ Lọc dữ liệu theo search + filter
+    const filteredSuppliers = suppliers
+        .filter((s) => s.name.toLowerCase().includes(searchText.toLowerCase()))
+        .filter((s) =>
+            regionFilter ? s.address?.toLowerCase().includes(regionFilter.toLowerCase()) : true
+        )
+        .sort((a, b) =>
+            sortOrder === "ascend"
+                ? a[sortField as keyof typeof a]?.toString().localeCompare(
+                    b[sortField as keyof typeof b]?.toString()
+                )
+                : b[sortField as keyof typeof b]?.toString().localeCompare(
+                    a[sortField as keyof typeof a]?.toString()
+                )
+        );
+
+    const handleAdd = () => {
+        setIsEditing(false);
+        setSelected(null);
+        setModalVisible(true);
+    };
     const handleSubmit = (data: any) => {
-    try {
-      if (isEditing && selected) {
-        editSupplier({ ...selected, ...data });
-        message.success("Cập nhật nhà cung cấp thành công!");
-      } else {
-        addSupplier(data);
-        message.success("Thêm nhà cung cấp mới thành công!");
-      }
+        try {
+            if (isEditing && selected) {
+                editSupplier({ ...selected, ...data });
+                message.success("Cập nhật nhà cung cấp thành công!");
+            } else {
+                addSupplier(data);
+                message.success("Thêm nhà cung cấp mới thành công!");
+            }
 
-      // ✅ Đóng modal sau khi lưu
-      setModalVisible(false);
-      setSelected(null);
-    } catch (error) {
-      console.error(error);
-      message.error("Đã xảy ra lỗi, vui lòng thử lại!");
-    }
-  };
+            // ✅ Đóng modal sau khi lưu
+            setModalVisible(false);
+            setSelected(null);
+        } catch (error) {
+            console.error(error);
+            message.error("Đã xảy ra lỗi, vui lòng thử lại!");
+        }
+    };
+
   return (
     <div style={{ padding: 24 }}>
       <SupplierHeader onAddSupplier={handleAdd} />

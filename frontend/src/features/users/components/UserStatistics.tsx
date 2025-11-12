@@ -23,7 +23,7 @@ export const UserStatistics = ({
                     }}
                 >
                     <Statistic
-                        title="Tổng người dùng"
+                        title="Tổng người dùng (trên bảng)"
                         value={totalUsers}
                         prefix={<TeamOutlined style={{ color: '#1890ff' }} />}
                         valueStyle={{ color: '#1890ff' }}
@@ -39,7 +39,7 @@ export const UserStatistics = ({
                     }}
                 >
                     <Statistic
-                        title="Quản trị viên"
+                        title="Quản trị viên (trên bảng)"
                         value={adminCount}
                         prefix={<CrownOutlined style={{ color: '#faad14' }} />}
                         valueStyle={{ color: '#faad14' }}
@@ -55,7 +55,7 @@ export const UserStatistics = ({
                     }}
                 >
                     <Statistic
-                        title="Nhân viên"
+                        title="Nhân viên (trên bảng)"
                         value={staffCount}
                         prefix={<UserOutlined style={{ color: '#52c41a' }} />}
                         valueStyle={{ color: '#52c41a' }}

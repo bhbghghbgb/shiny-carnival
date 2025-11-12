@@ -16,7 +16,7 @@ public class BaseService<TEntity, TKey> : IBaseService<TEntity, TKey>
     {
         var entity = await _repository.GetByIdAsync(id);
         if (entity == null)
-            return ApiResponse<TEntity>.Fail("Entity not found");
+                        return ApiResponse<TEntity>.Error("Entity not found");
 
         return ApiResponse<TEntity>.Success(entity);
     }
@@ -37,7 +37,7 @@ public class BaseService<TEntity, TKey> : IBaseService<TEntity, TKey>
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null)
-            return ApiResponse<TEntity>.Fail("Entity not found");
+                        return ApiResponse<TEntity>.Error("Entity not found");
 
         entity.Id = id;
         await _repository.UpdateAsync(entity);
