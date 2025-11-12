@@ -7,33 +7,31 @@ namespace UnoApp1.Core.ViewModels;
 
 public partial class OrderConfirmationViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    private OrderResponseDto? _order;
+    [ObservableProperty] private OrderResponseDto? _order;
 
-    [ObservableProperty]
-    private string _orderNumber = string.Empty;
+    [ObservableProperty] private string _orderNumber = string.Empty;
 
-    [ObservableProperty]
-    private decimal _totalAmount;
+    [ObservableProperty] private decimal _totalAmount;
 
-    public OrderConfirmationViewModel(INavigator navigator) 
+    public OrderConfirmationViewModel(INavigator navigator)
         : base(navigator)
     {
         Title = "Order Confirmation";
     }
 
-    public override Task OnNavigatedToAsync()
+    // Fixed method signature
+    public override async Task OnNavigatedToAsync(object? parameter)
     {
-        if (NavigationData is Dictionary<string, object> data && 
-            data.TryGetValue("Order", out var orderObj) && 
+        await base.OnNavigatedToAsync(parameter);
+
+        if (NavigationData is Dictionary<string, object> data &&
+            data.TryGetValue("Order", out var orderObj) &&
             orderObj is OrderResponseDto order)
         {
             Order = order;
             OrderNumber = $"ORD-{order.Id:D6}";
             TotalAmount = order.FinalAmount;
         }
-
-        return Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -45,8 +43,6 @@ public partial class OrderConfirmationViewModel : ViewModelBase
     [RelayCommand]
     private async Task ViewOrderDetailsAsync()
     {
-        // In a real app, you might navigate to an order details page
-        // For now, just show a message
         System.Diagnostics.Debug.WriteLine($"Viewing order details for {OrderNumber}");
     }
 }

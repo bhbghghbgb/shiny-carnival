@@ -6,22 +6,36 @@ namespace UnoApp1.Core.ViewModels;
 
 public partial class ViewModelBase : ObservableObject
 {
-    [ObservableProperty]
-    private bool _isBusy;
+    [ObservableProperty] private bool _isBusy;
 
-    [ObservableProperty]
-    private string _title = string.Empty;
+    [ObservableProperty] private string _title = string.Empty;
 
-    protected readonly INavigator Navigator;
+    protected INavigator Navigator { get; }
+
+    // Add this property for navigation data
+    protected object? NavigationData { get; private set; }
 
     public ViewModelBase(INavigator navigator)
     {
         Navigator = navigator;
     }
 
-    [RelayCommand]
-    private async Task GoBackAsync()
+    // Add this method to handle navigation
+    public virtual Task OnNavigatedFromAsync(NavigationMode mode)
     {
-        await Navigator.GoBackAsync(this);
+        return Task.CompletedTask;
+    }
+
+    // Add this method to handle navigation with data
+    public virtual Task OnNavigatedToAsync(object? parameter)
+    {
+        NavigationData = parameter;
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task NavigateBackAsync()
+    {
+        await Navigator.NavigateBackAsync(this);
     }
 }

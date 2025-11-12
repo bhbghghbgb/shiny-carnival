@@ -12,34 +12,32 @@ public partial class ProductDetailViewModel : ViewModelBase
 {
     private readonly ICartRepository _cartRepository;
 
-    [ObservableProperty]
-    private ProductListDto? _product;
+    [ObservableProperty] private ProductListDto? _product;
 
-    [ObservableProperty]
-    private int _quantity = 1;
+    [ObservableProperty] private int _quantity = 1;
 
-    [ObservableProperty]
-    private bool _isInCart;
+    [ObservableProperty] private bool _isInCart;
 
-    [ObservableProperty]
-    private int _cartQuantity;
+    [ObservableProperty] private int _cartQuantity;
 
-    public ProductDetailViewModel(INavigator navigator, ICartRepository cartRepository) 
+    public ProductDetailViewModel(INavigator navigator, ICartRepository cartRepository)
         : base(navigator)
     {
         _cartRepository = cartRepository;
     }
 
-    public override async Task OnNavigatedToAsync()
+    // Fixed method signature
+    public override async Task OnNavigatedToAsync(object? parameter)
     {
+        await base.OnNavigatedToAsync(parameter);
         await LoadProductDataAsync();
     }
 
     [RelayCommand]
     private async Task LoadProductDataAsync()
     {
-        if (NavigationData is Dictionary<string, object> data && 
-            data.TryGetValue("Product", out var productObj) && 
+        if (NavigationData is Dictionary<string, object> data &&
+            data.TryGetValue("Product", out var productObj) &&
             productObj is ProductListDto product)
         {
             Product = product;
@@ -48,6 +46,7 @@ public partial class ProductDetailViewModel : ViewModelBase
         }
     }
 
+    // ... rest of your methods remain the same
     [RelayCommand]
     private async Task AddToCartAsync()
     {
@@ -68,8 +67,7 @@ public partial class ProductDetailViewModel : ViewModelBase
 
             await _cartRepository.AddOrUpdateAsync(cartItem);
             await CheckCartStatusAsync();
-            
-            // Show success message or navigate to cart
+
             await Navigator.NavigateViewModelAsync<CartViewModel>(this);
         }
         catch (Exception ex)

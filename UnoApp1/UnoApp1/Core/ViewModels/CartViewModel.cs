@@ -13,19 +13,15 @@ public partial class CartViewModel : ViewModelBase
     private readonly ICartRepository _cartRepository;
     private readonly IOrderService _orderService;
 
-    [ObservableProperty]
-    private List<CartItem> _cartItems = new();
+    [ObservableProperty] private List<CartItem> _cartItems = new();
 
-    [ObservableProperty]
-    private decimal _totalAmount;
+    [ObservableProperty] private decimal _totalAmount;
 
-    [ObservableProperty]
-    private int _totalItems;
+    [ObservableProperty] private int _totalItems;
 
-    [ObservableProperty]
-    private bool _isEmpty = true;
+    [ObservableProperty] private bool _isEmpty = true;
 
-    public CartViewModel(INavigator navigator, ICartRepository cartRepository, IOrderService orderService) 
+    public CartViewModel(INavigator navigator, ICartRepository cartRepository, IOrderService orderService)
         : base(navigator)
     {
         _cartRepository = cartRepository;
@@ -33,8 +29,10 @@ public partial class CartViewModel : ViewModelBase
         Title = "Shopping Cart";
     }
 
-    public override async Task OnNavigatedToAsync()
+    // Fixed method signature
+    public override async Task OnNavigatedToAsync(object? parameter)
     {
+        await base.OnNavigatedToAsync(parameter);
         await LoadCartAsync();
     }
 
@@ -42,7 +40,7 @@ public partial class CartViewModel : ViewModelBase
     private async Task LoadCartAsync()
     {
         IsBusy = true;
-        
+
         try
         {
             CartItems = await _cartRepository.GetAllAsync();
@@ -109,15 +107,15 @@ public partial class CartViewModel : ViewModelBase
             };
 
             var orderResponse = await _orderService.CreateOrderAsync(orderRequest);
-            
+
             if (orderResponse != null)
             {
                 // Clear cart and navigate to confirmation
                 await _cartRepository.ClearAllAsync();
-                
-                var parameters = new Dictionary<string, object> 
-                { 
-                    ["Order"] = orderResponse 
+
+                var parameters = new Dictionary<string, object>
+                {
+                    ["Order"] = orderResponse
                 };
                 await Navigator.NavigateViewModelAsync<OrderConfirmationViewModel>(this, data: parameters);
             }
@@ -140,7 +138,7 @@ public partial class CartViewModel : ViewModelBase
     [RelayCommand]
     private async Task ContinueShoppingAsync()
     {
-        await Navigator.GoBackAsync(this);
+        await Navigator.NavigateBackAsync(this);
     }
 
     private void CalculateTotals()
