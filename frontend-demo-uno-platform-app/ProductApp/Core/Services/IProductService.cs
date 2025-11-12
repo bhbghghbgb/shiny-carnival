@@ -12,22 +12,34 @@ public interface IProductService
 public class ProductService : IProductService
 {
     private readonly IProductApi _productApi;
+    private readonly IFakeDataService _fakeDataService;
+    private readonly AppConfig _config;
 
-    public ProductService(IProductApi productApi)
+    public ProductService(IProductApi productApi, IFakeDataService fakeDataService, AppConfig config)
     {
         _productApi = productApi;
+        _fakeDataService = fakeDataService;
+        _config = config;
     }
 
     public async Task<List<ProductListDto>> GetProductsAsync()
     {
         try
         {
-            return await _productApi.GetProductsAsync();
+            if (_config.UseFakeData)
+            {
+                await Task.Delay(500); // Simulate API delay
+                return _fakeDataService.GetSampleProducts();
+            }
+            else
+            {
+                return await _productApi.GetProductsAsync();
+            }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Failed to get products: {ex.Message}");
-            return GetSampleProducts(); // Fallback to sample data
+            return _fakeDataService.GetSampleProducts(); // Fallback to sample data
         }
     }
 
@@ -36,7 +48,8 @@ public class ProductService : IProductService
         var products = await GetProductsAsync();
         return products.Where(p => 
             p.ProductName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-            p.CategoryName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+            p.CategoryName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+            p.Barcode.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
 
@@ -46,16 +59,5 @@ public class ProductService : IProductService
         return products.Where(p => 
             p.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase))
             .ToList();
-    }
-
-    private List<ProductListDto> GetSampleProducts()
-    {
-        return new List<ProductListDto>
-        {
-            new ProductListDto { Id = 1, ProductName = "Laptop", Price = 999.99m, CategoryName = "Electronics", InventoryQuantity = 10 },
-            new ProductListDto { Id = 2, ProductName = "Mouse", Price = 29.99m, CategoryName = "Electronics", InventoryQuantity = 50 },
-            new ProductListDto { Id = 3, ProductName = "Notebook", Price = 4.99m, CategoryName = "Stationery", InventoryQuantity = 100 },
-            new ProductListDto { Id = 4, ProductName = "Pen", Price = 1.99m, CategoryName = "Stationery", InventoryQuantity = 200 }
-        };
     }
 }

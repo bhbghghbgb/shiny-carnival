@@ -28,16 +28,45 @@ public sealed partial class App : Application
 
         _window = builder.Window;
         _host = builder.Build();
+        
+        // Initialize database
+        InitializeDatabase();
+        
         _window.Activate();
+    }
+
+    private async void InitializeDatabase()
+    {
+        try
+        {
+            using var scope = _host!.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await dbContext.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Database initialization failed: {ex.Message}");
+        }
     }
 
     private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
     {
+        // Configuration
+        services.AddSingleton<AppConfig>(new AppConfig 
+        { 
+            UseFakeData = true, // Set to false when backend is ready
+            BaseApiUrl = "http://10.0.2.2:5000",
+            EnableLogging = true
+        });
+        
+        // Fake Data Service
+        services.AddSingleton<IFakeDataService, FakeDataService>();
+
         // Database
         services.AddDbContext<AppDbContext>();
         services.AddTransient<ICartRepository, CartRepository>();
         
-        // API Clients
+        // API Clients (will use fake data when UseFakeData = true)
         services.AddRefitClient<IAuthApi>(new RefitSettings
         {
             ContentSerializer = new SystemTextJsonContentSerializer(new JsonSerializerOptions
@@ -47,7 +76,7 @@ public sealed partial class App : Application
         })
         .ConfigureHttpClient(client => 
         {
-            client.BaseAddress = new Uri("http://10.0.2.2:5000"); // Android emulator
+            client.BaseAddress = new Uri("http://10.0.2.2:5000");
         });
 
         services.AddRefitClient<IProductApi>(new RefitSettings

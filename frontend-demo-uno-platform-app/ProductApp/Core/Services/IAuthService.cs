@@ -13,21 +13,42 @@ public interface IAuthService
 public class AuthService : IAuthService
 {
     private readonly IAuthApi _authApi;
+    private readonly IFakeDataService _fakeDataService;
+    private readonly AppConfig _config;
     private string? _token;
 
-    public AuthService(IAuthApi authApi)
+    public AuthService(IAuthApi authApi, IFakeDataService fakeDataService, AppConfig config)
     {
         _authApi = authApi;
+        _fakeDataService = fakeDataService;
+        _config = config;
     }
 
     public async Task<bool> LoginAsync(string username, string password)
     {
         try
         {
-            var request = new LoginRequest { Username = username, Password = password };
-            var response = await _authApi.LoginAsync(request);
-            _token = response.Token;
-            return true;
+            if (_config.UseFakeData)
+            {
+                // Simulate API delay
+                await Task.Delay(1000);
+                
+                // For demo, accept any non-empty credentials
+                if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+                {
+                    var fakeResponse = _fakeDataService.GetSampleLoginResponse();
+                    _token = fakeResponse.Token;
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                var request = new LoginRequest { Username = username, Password = password };
+                var response = await _authApi.LoginAsync(request);
+                _token = response.Token;
+                return true;
+            }
         }
         catch (Exception ex)
         {
