@@ -1,7 +1,7 @@
-using ProductApp.Models;
+using UnoApp1.Models;
 using System.Text.Json;
 
-namespace ProductApp.Core.Services;
+namespace UnoApp1.Core.Services;
 
 public interface IFakeDataService
 {

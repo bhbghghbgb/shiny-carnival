@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ProductApp.Data.Entities;
+using UnoApp1.Data.Entities;
 
-namespace ProductApp.Data.Repositories;
+namespace UnoApp1.Data.Repositories;
 
 public class CartRepository : ICartRepository
 {

@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 
-namespace ProductApp.Core.Utilities;
+namespace UnoApp1.Core.Utilities;
 
 public static class ImageHelper
 {

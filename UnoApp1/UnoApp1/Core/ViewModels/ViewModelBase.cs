@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Uno.Extensions.Navigation;
 
-namespace ProductApp.Core.ViewModels;
+namespace UnoApp1.Core.ViewModels;
 
 public partial class ViewModelBase : ObservableObject
 {

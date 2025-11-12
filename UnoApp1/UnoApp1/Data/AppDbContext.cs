@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ProductApp.Data.Entities;
+using UnoApp1.Data.Entities;
 
-namespace ProductApp.Data;
+namespace UnoApp1.Data;
 
 public class AppDbContext : DbContext
 {
@@ -9,7 +9,7 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        string databasePath = Path.Combine(FileSystem.AppDataDirectory, "productapp.db3");
+        string databasePath = Path.Combine(FileSystem.AppDataDirectory, "UnoApp1.db3");
         
         // Create directory if it doesn't exist
         var directory = Path.GetDirectoryName(databasePath);

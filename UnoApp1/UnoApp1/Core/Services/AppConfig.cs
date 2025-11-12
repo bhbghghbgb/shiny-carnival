@@ -1,4 +1,4 @@
-namespace ProductApp.Core.Services;
+namespace UnoApp1.Core.Services;
 
 public class AppConfig
 {

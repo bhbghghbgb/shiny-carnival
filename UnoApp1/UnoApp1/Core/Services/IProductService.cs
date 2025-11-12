@@ -1,6 +1,7 @@
-using ProductApp.Models;
+using UnoApp1.Models;
+using AppConfig = UnoApp1.Core.Services.AppConfig;
 
-namespace ProductApp.Core.Services;
+namespace UnoApp1.Core.Services;
 
 public interface IProductService
 {

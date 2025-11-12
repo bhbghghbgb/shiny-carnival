@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ProductApp.Models;
+using UnoApp1.Models;
 using Uno.Extensions.Navigation;
 
-namespace ProductApp.Core.ViewModels;
+namespace UnoApp1.Core.ViewModels;
 
 public partial class OrderConfirmationViewModel : ViewModelBase
 {

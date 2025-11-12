@@ -1,12 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ProductApp.Core.Services;
-using ProductApp.Data.Entities;
-using ProductApp.Data.Repositories;
-using ProductApp.Models;
+using UnoApp1.Core.Services;
+using UnoApp1.Data.Entities;
+using UnoApp1.Data.Repositories;
+using UnoApp1.Models;
 using Uno.Extensions.Navigation;
 
-namespace ProductApp.Core.ViewModels;
+namespace UnoApp1.Core.ViewModels;
 
 public partial class CartViewModel : ViewModelBase
 {

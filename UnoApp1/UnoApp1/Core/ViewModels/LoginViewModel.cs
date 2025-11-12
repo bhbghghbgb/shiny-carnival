@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ProductApp.Core.Services;
+using UnoApp1.Core.Services;
 using Uno.Extensions.Navigation;
 
-namespace ProductApp.Core.ViewModels;
+namespace UnoApp1.Core.ViewModels;
 
 public partial class LoginViewModel : ViewModelBase
 {
