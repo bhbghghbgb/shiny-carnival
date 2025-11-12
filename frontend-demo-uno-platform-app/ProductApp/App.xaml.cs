@@ -82,6 +82,7 @@ public sealed partial class App : Application
         // ViewModels
         services.AddTransient<LoginViewModel>();
         services.AddTransient<HomeViewModel>();
+        services.AddTransient<ProductListViewModel>();
         services.AddTransient<ProductDetailViewModel>();
         services.AddTransient<CartViewModel>();
         services.AddTransient<OrderConfirmationViewModel>();
