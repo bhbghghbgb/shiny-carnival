@@ -1,40 +1,47 @@
-import React from 'react';
-import { getRouteApi } from '@tanstack/react-router';
+import React, {useState} from 'react';
+import {getRouteApi} from '@tanstack/react-router';
+import {useSupplierManagement} from "../hooks/useSupplierManagement.ts";
+import {SupplierHeader} from "../components/SupplierHeader.tsx";
+import {SupplierStatistics} from "../components/SupplierStatistics.tsx";
+import {message} from "antd";
+import {SupplierSearchFilter} from "../components/SupplierSearchFilter.tsx";
+import {SupplierTable} from "../components/SupplierTable.tsx";
+import {SupplierModals} from "../components/SupplierModals.tsx";
 
-const {
-    suppliers,
-    addSupplier,
-    editSupplier,
-    deleteSupplier,
-    selected,
-    setSelected,
-    modalVisible,
-    setModalVisible,
-    isEditing,
-    setIsEditing,
-} = useSupplierManagement();
-
-const [searchText, setSearchText] = useState("");
-const [sortField, setSortField] = useState("name");
-const [sortOrder, setSortOrder] = useState<"ascend" | "descend">("ascend");
-const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined);
 
 const routeApi = getRouteApi('/admin/suppliers');
 
 export const SupplierManagementPage: React.FC = () => {
-  const { suppliers } = routeApi.useLoaderData();
-  const params = routeApi.useParams();
+    const {
+        addSupplier,
+        editSupplier,
+        deleteSupplier,
+        selected,
+        setSelected,
+        modalVisible,
+        setModalVisible,
+        isEditing,
+        setIsEditing,
+    } = useSupplierManagement();
 
-  console.log('Suppliers:', suppliers);
- console.log('Route params:', params);
+    const [searchText, setSearchText] = useState("");
+    const [sortField, setSortField] = useState("name");
+    const [sortOrder, setSortOrder] = useState<"ascend" | "descend">("ascend");
+    const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined);
+
+    const {suppliers} = routeApi.useLoaderData();
+    const params = routeApi.useParams();
+
+    console.log('Suppliers:', suppliers);
+    console.log('Route params:', params);
 
     // ✅ Lọc dữ liệu theo search + filter
     const filteredSuppliers = suppliers
-        .filter((s) => s.name.toLowerCase().includes(searchText.toLowerCase()))
-        .filter((s) =>
+        .filter((s: { name: string; }) => s.name.toLowerCase().includes(searchText.toLowerCase()))
+        .filter((s: { address: string; }) =>
             regionFilter ? s.address?.toLowerCase().includes(regionFilter.toLowerCase()) : true
         )
-        .sort((a, b) =>
+        .sort((a: { [x: string]: { toString: () => any; }; }, b: { [x: string]: { toString: () => string; }; }) =>
             sortOrder === "ascend"
                 ? a[sortField as keyof typeof a]?.toString().localeCompare(
                     b[sortField as keyof typeof b]?.toString()
@@ -52,7 +59,7 @@ export const SupplierManagementPage: React.FC = () => {
     const handleSubmit = (data: any) => {
         try {
             if (isEditing && selected) {
-                editSupplier({ ...selected, ...data });
+                editSupplier({...selected, ...data});
                 message.success("Cập nhật nhà cung cấp thành công!");
             } else {
                 addSupplier(data);
@@ -68,59 +75,59 @@ export const SupplierManagementPage: React.FC = () => {
         }
     };
 
-  return (
-    <div style={{ padding: 24 }}>
-      <SupplierHeader onAddSupplier={handleAdd} />
+    return (
+        <div style={{padding: 24}}>
+            <SupplierHeader onAddSupplier={handleAdd}/>
 
-      <div style={{ marginTop: 16 }}>
-        <SupplierStatistics
-          totalSuppliers={suppliers.length}
-          filteredCount={filteredSuppliers.length} // ✅ thêm dòng này
-          activeSuppliers={suppliers.length}
-          productCount={120}
-        />
-      </div>
+            <div style={{marginTop: 16}}>
+                <SupplierStatistics
+                    totalSuppliers={suppliers.length}
+                    filteredCount={filteredSuppliers.length} // ✅ thêm dòng này
+                    activeSuppliers={suppliers.length}
+                    productCount={120}
+                />
+            </div>
 
-      <div style={{ marginTop: 16 }}>
-        <SupplierSearchFilter
-          searchText={searchText}
-          sortField={sortField}
-          sortOrder={sortOrder}
-          regionFilter={regionFilter}
-          onSearchChange={setSearchText}
-          onRegionFilterChange={setRegionFilter}
-          onSortChange={(f, o) => {
-            setSortField(f);
-            setSortOrder(o);
-          }}
-          onClearFilters={() => {
-            setSearchText("");
-            setRegionFilter(undefined);
-            setSortField("name");
-            setSortOrder("ascend");
-          }}
-        />
-      </div>
+            <div style={{marginTop: 16}}>
+                <SupplierSearchFilter
+                    searchText={searchText}
+                    sortField={sortField}
+                    sortOrder={sortOrder}
+                    regionFilter={regionFilter}
+                    onSearchChange={setSearchText}
+                    onRegionFilterChange={setRegionFilter}
+                    onSortChange={(f, o) => {
+                        setSortField(f);
+                        setSortOrder(o);
+                    }}
+                    onClearFilters={() => {
+                        setSearchText("");
+                        setRegionFilter(undefined);
+                        setSortField("name");
+                        setSortOrder("ascend");
+                    }}
+                />
+            </div>
 
-      <div style={{ marginTop: 16 }}>
-        <SupplierTable
-          suppliers={filteredSuppliers}
-          onEdit={(s) => {
-            setIsEditing(true);
-            setSelected(s);
-            setModalVisible(true);
-          }}
-          onDelete={deleteSupplier}
-        />
-      </div>
+            <div style={{marginTop: 16}}>
+                <SupplierTable
+                    suppliers={filteredSuppliers}
+                    onEdit={(s) => {
+                        setIsEditing(true);
+                        setSelected(s);
+                        setModalVisible(true);
+                    }}
+                    onDelete={deleteSupplier}
+                />
+            </div>
 
-      <SupplierModals
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSubmit={handleSubmit}
-        initialValues={selected}
-        isEditing={isEditing}
-      />
-    </div>
-  );
+            <SupplierModals
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onSubmit={handleSubmit}
+                initialValues={selected}
+                isEditing={isEditing}
+            />
+        </div>
+    );
 }
