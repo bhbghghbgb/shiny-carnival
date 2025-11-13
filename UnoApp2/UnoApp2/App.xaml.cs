@@ -71,6 +71,7 @@ public partial class App : Application
                 .ConfigureServices((context, services) =>
                 {
                     // TODO: Register your services
+                    services.AddTransient<Page1ViewModel>();
                     //services.AddSingleton<IMyService, MyService>();
                 })
                 .UseNavigation(RegisterRoutes)
@@ -92,6 +93,8 @@ public partial class App : Application
             new ViewMap<MainPage, MainViewModel>(),
             new DataViewMap<SecondPage, SecondViewModel, Entity>()
         );
+        
+        views.Register(new ViewMap<Page1, Page1ViewModel>());
 
         routes.Register(
             new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),

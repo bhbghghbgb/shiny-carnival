@@ -5,12 +5,18 @@
     xmlns:local="using:UnoApp2.Presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
     mc:Ignorable="d"
+
+    xmlns:vm="using:UnoApp2.Presentation"
+    d:DataContext="{d:DesignInstance vm:Page1ViewModel, IsDesignTimeCreatable=True}"
+
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />   <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Column="0" Padding="20" Spacing="10" Background="#F0F0F0">
