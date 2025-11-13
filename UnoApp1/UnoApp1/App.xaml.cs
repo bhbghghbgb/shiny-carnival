@@ -104,7 +104,7 @@ public sealed partial class App : Application
         await InitializeDatabase();
 
         // Navigate to initial view
-        await builder.NavigateAsync<LoginViewModel>();
+        await builder.NavigateAsync<Shell>();
     }
 
     /// <summary>
@@ -200,7 +200,7 @@ public sealed partial class App : Application
         );
 
         routes.Register(
-            new RouteMap("", View: views.FindByViewModel<LoginViewModel>()),
+            new RouteMap("", View: views.FindByViewModel<LoginViewModel>(), IsDefault: true),
             new RouteMap("Login", View: views.FindByViewModel<LoginViewModel>()),
             new RouteMap("Home", View: views.FindByViewModel<HomeViewModel>()),
             new RouteMap("ProductDetail", View: views.FindByViewModel<ProductDetailViewModel>()),

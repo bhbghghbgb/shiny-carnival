@@ -1,4 +1,4 @@
-﻿namespace UnoApp1.Core.Navigation;
+namespace UnoApp1.Core.Navigation;
 
 public static class NavigationParameters
 {

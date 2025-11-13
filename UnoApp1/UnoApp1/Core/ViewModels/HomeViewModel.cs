@@ -1,31 +1,38 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Uno.Extensions.Navigation;
+using UnoApp1.Core.Common;
+using UnoApp1.Core.Services;
 
 namespace UnoApp1.Core.ViewModels;
 
-public partial class HomeViewModel : ViewModelBase
+public partial class HomeViewModel : ObservableObject, ILoadableViewModel, INavigableViewModel
 {
-    [ObservableProperty]
-    private ProductListViewModel _productListViewModel;
+    private readonly INavigationService _navigationService;
 
-    public HomeViewModel(INavigator navigator, ProductListViewModel productListViewModel) 
-        : base(navigator)
+    [ObservableProperty] private ProductListViewModel _productListViewModel;
+
+    [ObservableProperty] private bool _isBusy;
+
+    [ObservableProperty] private string _title = "Retail Store";
+
+    public HomeViewModel(INavigationService navigationService, ProductListViewModel productListViewModel)
     {
+        _navigationService = navigationService;
         _productListViewModel = productListViewModel;
-        Title = "Retail Store";
     }
 
     [RelayCommand]
     private async Task ViewCartAsync()
     {
-        await Navigator.NavigateViewModelAsync<CartViewModel>(this);
+        await _navigationService.NavigateToCartAsync();
     }
 
     [RelayCommand]
     private async Task LogoutAsync()
     {
-        // In a real app, you'd call AuthService.Logout()
-        await Navigator.NavigateViewModelAsync<LoginViewModel>(this);
+        await _navigationService.NavigateToLoginAsync();
     }
+
+    public Task OnNavigatedToAsync(IDictionary<string, object>? parameters = null) => Task.CompletedTask;
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
 }

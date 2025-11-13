@@ -1,17 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UnoApp1.Core.Common;
 using UnoApp1.Core.Services;
 using UnoApp1.Data.Entities;
 using UnoApp1.Data.Repositories;
 using UnoApp1.Models;
-using Uno.Extensions.Navigation;
 
 namespace UnoApp1.Core.ViewModels;
 
-public partial class CartViewModel : ViewModelBase
+public partial class CartViewModel : ObservableObject, ILoadableViewModel, INavigableViewModel
 {
     private readonly ICartRepository _cartRepository;
     private readonly IOrderService _orderService;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty] private List<CartItem> _cartItems = new();
 
@@ -21,20 +22,26 @@ public partial class CartViewModel : ViewModelBase
 
     [ObservableProperty] private bool _isEmpty = true;
 
-    public CartViewModel(INavigator navigator, ICartRepository cartRepository, IOrderService orderService)
-        : base(navigator)
+    [ObservableProperty] private bool _isBusy;
+
+    [ObservableProperty] private string _title = "Shopping Cart";
+
+    public CartViewModel(
+        ICartRepository cartRepository,
+        IOrderService orderService,
+        INavigationService navigationService)
     {
         _cartRepository = cartRepository;
         _orderService = orderService;
-        Title = "Shopping Cart";
+        _navigationService = navigationService;
     }
 
-    // Fixed method signature
-    public override async Task OnNavigatedToAsync(object? parameter)
+    public async Task OnNavigatedToAsync(IDictionary<string, object>? parameters = null)
     {
-        await base.OnNavigatedToAsync(parameter);
         await LoadCartAsync();
     }
+
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
 
     [RelayCommand]
     private async Task LoadCartAsync()
@@ -96,6 +103,7 @@ public partial class CartViewModel : ViewModelBase
 
         try
         {
+            // Create order from cart items
             var orderRequest = new CreateOrderRequest
             {
                 CustomerId = 1, // Default customer for demo
@@ -112,16 +120,10 @@ public partial class CartViewModel : ViewModelBase
             {
                 // Clear cart and navigate to confirmation
                 await _cartRepository.ClearAllAsync();
-
-                var parameters = new Dictionary<string, object>
-                {
-                    ["Order"] = orderResponse
-                };
-                await Navigator.NavigateViewModelAsync<OrderConfirmationViewModel>(this, data: parameters);
+                await _navigationService.NavigateToOrderConfirmationAsync();
             }
             else
             {
-                // Handle order failure
                 System.Diagnostics.Debug.WriteLine("Order creation failed");
             }
         }
@@ -138,7 +140,7 @@ public partial class CartViewModel : ViewModelBase
     [RelayCommand]
     private async Task ContinueShoppingAsync()
     {
-        await Navigator.NavigateBackAsync(this);
+        await _navigationService.NavigateBackAsync();
     }
 
     private void CalculateTotals()

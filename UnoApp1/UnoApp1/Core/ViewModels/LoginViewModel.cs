@@ -1,38 +1,36 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UnoApp1.Core.Common;
 using UnoApp1.Core.Services;
-using Uno.Extensions.Navigation;
 
 namespace UnoApp1.Core.ViewModels;
 
-public partial class LoginViewModel : ViewModelBase
+public partial class LoginViewModel : ObservableObject, ILoadableViewModel, INavigableViewModel
 {
     private readonly IAuthService _authService;
+    private readonly INavigationService _navigationService;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-    private string _username = string.Empty;
+    [ObservableProperty] private string _username = string.Empty;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-    private string _password = string.Empty;
+    [ObservableProperty] private string _password = string.Empty;
 
-    [ObservableProperty]
-    private string _errorMessage = string.Empty;
+    [ObservableProperty] private string _errorMessage = string.Empty;
 
-    [ObservableProperty]
-    private bool _showError;
+    [ObservableProperty] private bool _showError;
 
-    public LoginViewModel(INavigator navigator, IAuthService authService) 
-        : base(navigator)
+    [ObservableProperty] private bool _isBusy;
+
+    [ObservableProperty] private string _title = "Login";
+
+    public LoginViewModel(IAuthService authService, INavigationService navigationService)
     {
         _authService = authService;
-        Title = "Login";
+        _navigationService = navigationService;
     }
 
-    private bool CanLogin => !string.IsNullOrWhiteSpace(Username) && 
-                           !string.IsNullOrWhiteSpace(Password) && 
-                           !IsBusy;
+    private bool CanLogin => !string.IsNullOrWhiteSpace(Username) &&
+                             !string.IsNullOrWhiteSpace(Password) &&
+                             !IsBusy;
 
     [RelayCommand(CanExecute = nameof(CanLogin))]
     private async Task LoginAsync()
@@ -44,10 +42,10 @@ public partial class LoginViewModel : ViewModelBase
         try
         {
             var success = await _authService.LoginAsync(Username, Password);
-            
+
             if (success)
             {
-                await Navigator.NavigateViewModelAsync<HomeViewModel>(this);
+                await _navigationService.NavigateToHomeAsync();
             }
             else
             {
@@ -66,15 +64,6 @@ public partial class LoginViewModel : ViewModelBase
         }
     }
 
-    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        base.OnPropertyChanged(e);
-        
-        if (e.PropertyName == nameof(Username) || 
-            e.PropertyName == nameof(Password) || 
-            e.PropertyName == nameof(IsBusy))
-        {
-            LoginCommand.NotifyCanExecuteChanged();
-        }
-    }
+    public Task OnNavigatedToAsync(IDictionary<string, object>? parameters = null) => Task.CompletedTask;
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
 }

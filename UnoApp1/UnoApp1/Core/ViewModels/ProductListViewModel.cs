@@ -1,49 +1,50 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UnoApp1.Core.Common;
 using UnoApp1.Core.Services;
 using UnoApp1.Models;
-using Uno.Extensions.Navigation;
 
 namespace UnoApp1.Core.ViewModels;
 
-public partial class ProductListViewModel : ViewModelBase
+public partial class ProductListViewModel : ObservableObject, ILoadableViewModel, INavigableViewModel
 {
     private readonly IProductService _productService;
+    private readonly INavigationService _navigationService;
 
-    [ObservableProperty]
-    private List<ProductListDto> _products = new();
+    [ObservableProperty] private List<ProductListDto> _products = new();
 
-    [ObservableProperty]
-    private List<ProductListDto> _filteredProducts = new();
+    [ObservableProperty] private List<ProductListDto> _filteredProducts = new();
 
-    [ObservableProperty]
-    private List<string> _categories = new();
+    [ObservableProperty] private List<string> _categories = new();
 
-    [ObservableProperty]
-    private string _selectedCategory = "All";
+    [ObservableProperty] private string _selectedCategory = "All";
 
-    [ObservableProperty]
-    private string _searchText = string.Empty;
+    [ObservableProperty] private string _searchText = string.Empty;
 
-    [ObservableProperty]
-    private bool _showSearchResults;
+    [ObservableProperty] private bool _showSearchResults;
 
-    public ProductListViewModel(INavigator navigator, IProductService productService) 
-        : base(navigator)
+    [ObservableProperty] private bool _isBusy;
+
+    [ObservableProperty] private string _title = "Products";
+
+    public ProductListViewModel(IProductService productService, INavigationService navigationService)
     {
         _productService = productService;
+        _navigationService = navigationService;
     }
 
-    public override async Task OnNavigatedToAsync()
+    public async Task OnNavigatedToAsync(IDictionary<string, object>? parameters = null)
     {
         await LoadProductsAsync();
     }
+
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
 
     [RelayCommand]
     private async Task LoadProductsAsync()
     {
         IsBusy = true;
-        
+
         try
         {
             Products = await _productService.GetProductsAsync();
@@ -65,8 +66,7 @@ public partial class ProductListViewModel : ViewModelBase
     {
         if (product != null)
         {
-            var parameters = new Dictionary<string, object> { ["Product"] = product };
-            await Navigator.NavigateViewModelAsync<ProductDetailViewModel>(this, data: parameters);
+            await _navigationService.NavigateToProductDetailAsync(product.Id);
         }
     }
 
@@ -99,7 +99,7 @@ public partial class ProductListViewModel : ViewModelBase
             .Distinct()
             .OrderBy(c => c)
             .ToList();
-        
+
         Categories = new List<string> { "All" }.Concat(allCategories).ToList();
     }
 
@@ -107,16 +107,14 @@ public partial class ProductListViewModel : ViewModelBase
     {
         var filtered = Products.AsEnumerable();
 
-        // Apply category filter
         if (!string.IsNullOrEmpty(SelectedCategory) && SelectedCategory != "All")
         {
             filtered = filtered.Where(p => p.CategoryName == SelectedCategory);
         }
 
-        // Apply search filter
         if (!string.IsNullOrWhiteSpace(SearchText))
         {
-            filtered = filtered.Where(p => 
+            filtered = filtered.Where(p =>
                 p.ProductName.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
                 p.CategoryName.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
         }

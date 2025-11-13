@@ -1,10 +1,8 @@
-﻿using Uno.Extensions.Navigation;
-
-namespace UnoApp1.Core.Common;
+﻿namespace UnoApp1.Core.Common;
 
 public interface INavigableViewModel
 {
-    Task OnNavigatedToAsync();
+    Task OnNavigatedToAsync(IDictionary<string, object>? parameters = null);
     Task OnNavigatedFromAsync();
 }
 

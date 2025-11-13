@@ -1,16 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using UnoApp1.Core.Common;
 using UnoApp1.Core.Services;
 using UnoApp1.Data.Entities;
 using UnoApp1.Data.Repositories;
 using UnoApp1.Models;
-using Uno.Extensions.Navigation;
 
 namespace UnoApp1.Core.ViewModels;
 
-public partial class ProductDetailViewModel : ViewModelBase
+public partial class ProductDetailViewModel : ObservableObject, ILoadableViewModel, INavigableViewModel
 {
+    private readonly IProductService _productService;
     private readonly ICartRepository _cartRepository;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty] private ProductListDto? _product;
 
@@ -20,33 +22,56 @@ public partial class ProductDetailViewModel : ViewModelBase
 
     [ObservableProperty] private int _cartQuantity;
 
-    public ProductDetailViewModel(INavigator navigator, ICartRepository cartRepository)
-        : base(navigator)
+    [ObservableProperty] private bool _isBusy;
+
+    [ObservableProperty] private string _title = "Product Details";
+
+    public ProductDetailViewModel(
+        IProductService productService,
+        ICartRepository cartRepository,
+        INavigationService navigationService)
     {
+        _productService = productService;
         _cartRepository = cartRepository;
+        _navigationService = navigationService;
     }
 
-    // Fixed method signature
-    public override async Task OnNavigatedToAsync(object? parameter)
+    public async Task OnNavigatedToAsync(IDictionary<string, object>? parameters = null)
     {
-        await base.OnNavigatedToAsync(parameter);
-        await LoadProductDataAsync();
-    }
-
-    [RelayCommand]
-    private async Task LoadProductDataAsync()
-    {
-        if (NavigationData is Dictionary<string, object> data &&
-            data.TryGetValue("Product", out var productObj) &&
-            productObj is ProductListDto product)
+        if (parameters != null && parameters.TryGetValue("productId", out var productIdObj) &&
+            productIdObj is int productId)
         {
-            Product = product;
-            Title = product.ProductName;
-            await CheckCartStatusAsync();
+            await LoadProductByIdAsync(productId);
         }
     }
 
-    // ... rest of your methods remain the same
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+    private async Task LoadProductByIdAsync(int productId)
+    {
+        IsBusy = true;
+
+        try
+        {
+            var products = await _productService.GetProductsAsync();
+            Product = products.FirstOrDefault(p => p.Id == productId);
+
+            if (Product != null)
+            {
+                Title = Product.ProductName;
+                await CheckCartStatusAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Failed to load product: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     [RelayCommand]
     private async Task AddToCartAsync()
     {
@@ -68,7 +93,7 @@ public partial class ProductDetailViewModel : ViewModelBase
             await _cartRepository.AddOrUpdateAsync(cartItem);
             await CheckCartStatusAsync();
 
-            await Navigator.NavigateViewModelAsync<CartViewModel>(this);
+            await _navigationService.NavigateToCartAsync();
         }
         catch (Exception ex)
         {
@@ -83,7 +108,7 @@ public partial class ProductDetailViewModel : ViewModelBase
     [RelayCommand]
     private async Task ViewCartAsync()
     {
-        await Navigator.NavigateViewModelAsync<CartViewModel>(this);
+        await _navigationService.NavigateToCartAsync();
     }
 
     [RelayCommand]
