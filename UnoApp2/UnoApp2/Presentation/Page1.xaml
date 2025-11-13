@@ -9,7 +9,13 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <StackPanel Padding="20" Spacing="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />   <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" Padding="20" Spacing="10" Background="#F0F0F0">
+            <TextBlock Text="{Binding Title}"
+                       FontWeight="Bold" Margin="0,0,0,10" />
             <Button Content="Filled" Style="{ThemeResource FilledButtonStyle}" />
             <Button Content="Elevated" Style="{ThemeResource ElevatedButtonStyle}" />
             <Button Content="Outlined" Style="{ThemeResource OutlinedButtonStyle}" />
@@ -17,6 +23,20 @@
             <Button Content="Icon" Style="{ThemeResource IconButtonStyle}" />
             <Button Content="FAB" Style="{ThemeResource FabStyle}" />
         </StackPanel>
+
+        <StackPanel Grid.Column="1" Padding="40" Spacing="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+            <TextBlock Text="Current Counter Value:" FontSize="24" />
+            <TextBlock Text="{Binding Counter}"
+                       FontSize="72"
+                       FontWeight="ExtraBold"
+                       HorizontalAlignment="Center" />
+
+            <Button Content="+10 Async"
+                    Command="{Binding IncreaseByTenCommand}"
+                    FontSize="24"
+                    Padding="40,10"
+                    Style="{ThemeResource FilledButtonStyle}" />
+        </StackPanel>
     </Grid>
 </Page>
-
