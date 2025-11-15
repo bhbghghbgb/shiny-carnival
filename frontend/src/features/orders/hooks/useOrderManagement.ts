@@ -1,49 +1,48 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { message } from 'antd'
-import type { OrderEntity } from '../types/entity'
+import { useOrderStore } from '../store/orderStore'
 import type { OrderStatus } from '../../../config/api'
-// import { getRouteApi } from '@tanstack/react-router'
-// import { orderApi } from '../api/orderApi'
-import { orders as mockOrders } from '../../../_mocks/orders'
-import { onOrdersChanged } from '../utils/orderEvents'
-
-// const routeApi = getRouteApi('/admin/orders')
 
 export const useOrderManagement = () => {
-    // Use mock data (for development)
-    const initialOrders = mockOrders as unknown as OrderEntity[]
+    const orders = useOrderStore((state) => state.orders)
+    const loading = useOrderStore((state) => state.loading)
+    const error = useOrderStore((state) => state.error)
+    const searchText = useOrderStore((state) => state.searchText)
+    const statusFilter = useOrderStore((state) => state.statusFilter)
+    const sortField = useOrderStore((state) => state.sortField)
+    const sortOrder = useOrderStore((state) => state.sortOrder)
 
-    // TODO: Uncomment below to use API data from route loader
-    // const { orders: initialOrders } = routeApi.useLoaderData()
+    const fetchOrders = useOrderStore((state) => state.fetchOrders)
+    const deleteOrderFromStore = useOrderStore((state) => state.deleteOrder)
+    const setSearchText = useOrderStore((state) => state.setSearchText)
+    const setStatusFilter = useOrderStore((state) => state.setStatusFilter)
+    const setSort = useOrderStore((state) => state.setSort)
+    const clearFilters = useOrderStore((state) => state.clearFilters)
 
-    const [orders, setOrders] = useState(initialOrders)
-    const [filteredOrders, setFilteredOrders] = useState<OrderEntity[]>([])
+    // Local UI state for modals
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
-    const [deletingOrder, setDeletingOrder] = useState<OrderEntity | null>(null)
-    const [loading, setLoading] = useState(false)
+    const [deletingOrder, setDeletingOrder] = useState<any>(null)
 
-    // Search, Filter, Sort states
-    const [searchText, setSearchText] = useState('')
-    const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>(
-        undefined
-    )
-    const [sortField, setSortField] = useState<string>('orderDate')
-    const [sortOrder, setSortOrder] = useState<'ascend' | 'descend'>('descend')
-
-    // Keep orders in sync with mock changes when using nested routes
-    useEffect(() => {
-        const unsubscribe = onOrdersChanged(() => {
-            // Re-seed from mutable mock
-            setOrders([...mockOrders] as unknown as OrderEntity[])
-        })
-        return unsubscribe
+    const fetchOrdersOnce = useCallback(() => {
+        fetchOrders()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    // Filter and sort orders when search, filter, or sort changes
+    // Fetch orders on mount only
     useEffect(() => {
+        fetchOrdersOnce()
+    }, [fetchOrdersOnce])
+
+    // Show error message if any
+    useEffect(() => {
+        if (error) {
+            message.error(error)
+        }
+    }, [error])
+
+    const filteredOrders = useMemo(() => {
         let filtered = [...orders]
 
-        // Search filter - tìm theo ID hoặc customerId
         if (searchText) {
             const searchLower = searchText.toLowerCase()
             filtered = filtered.filter(
@@ -53,15 +52,13 @@ export const useOrderManagement = () => {
             )
         }
 
-        // Status filter
         if (statusFilter !== undefined) {
             filtered = filtered.filter((order) => order.status === statusFilter)
         }
 
-        // Sort
         filtered.sort((a, b) => {
-            let aValue: any = a[sortField as keyof OrderEntity]
-            let bValue: any = b[sortField as keyof OrderEntity]
+            let aValue: any = (a as any)[sortField]
+            let bValue: any = (b as any)[sortField]
 
             if (sortField === 'orderDate') {
                 aValue = new Date(aValue).getTime()
@@ -70,107 +67,85 @@ export const useOrderManagement = () => {
 
             if (sortOrder === 'ascend') {
                 return aValue > bValue ? 1 : -1
-            } else {
-                return aValue < bValue ? 1 : -1
             }
+
+            return aValue < bValue ? 1 : -1
         })
 
-        setFilteredOrders(filtered)
+        return filtered
     }, [orders, searchText, statusFilter, sortField, sortOrder])
 
-    // Refresh orders from API
-    const refreshOrders = async () => {
-        // Mock version - no API call needed
-        console.log('Refresh orders - using mock data')
-        setOrders([...mockOrders] as unknown as OrderEntity[])
-
-        // TODO: Uncomment below to use real API
-        // try {
-        //     setLoading(true)
-        //     const response = await orderApi.getOrders()
-        //     if (!response.isError && response.data) {
-        //         setOrders(response.data.items)
-        //     }
-        // } catch (error) {
-        //     console.error('Refresh orders error:', error)
-        // } finally {
-        //     setLoading(false)
-        // }
-    }
+    const statistics = useMemo(() => {
+        return {
+            total: filteredOrders.length,
+            pendingCount: filteredOrders.filter((o) => o.status === 'pending')
+                .length,
+            paidCount: filteredOrders.filter((o) => o.status === 'paid').length,
+            canceledCount: filteredOrders.filter((o) => o.status === 'canceled')
+                .length,
+        }
+    }, [filteredOrders])
 
     // Modal handlers
-    const showDeleteModal = (order: OrderEntity) => {
+    const showDeleteModal = useCallback((order: any) => {
         setDeletingOrder(order)
         setIsDeleteModalVisible(true)
-    }
+    }, [])
 
-    const handleDelete = async () => {
+    const handleDelete = useCallback(async () => {
         if (deletingOrder) {
             try {
-                setLoading(true)
-                // TODO: Implement delete API when backend is ready
-                // const response = await orderApi.deleteOrder(deletingOrder.id)
-                // if (!response.isError && response.data) {
+                await deleteOrderFromStore(deletingOrder.id)
                 message.success('Xóa đơn hàng thành công!')
-                setOrders(
-                    orders.filter((o: OrderEntity) => o.id !== deletingOrder.id)
-                )
                 setIsDeleteModalVisible(false)
                 setDeletingOrder(null)
-                // await refreshOrders()
-                // }
             } catch (error: any) {
                 message.error(error.message || 'Không thể xóa đơn hàng')
-                console.error('Delete error:', error)
-            } finally {
-                setLoading(false)
             }
         }
-    }
+    }, [deletingOrder, deleteOrderFromStore])
 
-    const handleDeleteCancel = () => {
+    const handleDeleteCancel = useCallback(() => {
         setIsDeleteModalVisible(false)
         setDeletingOrder(null)
-    }
+    }, [])
 
-    // Search/Filter handlers
-    const handleSearch = (value: string) => {
-        setSearchText(value)
-    }
+    const handleSearch = useCallback(
+        (value: string) => {
+            setSearchText(value)
+        },
+        [setSearchText]
+    )
 
-    const handleStatusFilter = (value: OrderStatus | undefined) => {
-        setStatusFilter(value)
-    }
+    const handleStatus = useCallback(
+        (value: OrderStatus | undefined) => {
+            setStatusFilter(value)
+        },
+        [setStatusFilter]
+    )
 
-    const handleSort = (field: string, order: 'ascend' | 'descend') => {
-        setSortField(field)
-        setSortOrder(order)
-    }
+    const handleSorting = useCallback(
+        (field: string, order: 'ascend' | 'descend') => {
+            setSort(field, order)
+        },
+        [setSort]
+    )
 
-    const clearFilters = () => {
-        setSearchText('')
-        setStatusFilter(undefined)
-        setSortField('orderDate')
-        setSortOrder('descend')
-    }
+    const handleClearFilters = useCallback(() => {
+        clearFilters()
+    }, [clearFilters])
 
-    // Statistics
-    const totalOrders = filteredOrders.length
-    const pendingCount = filteredOrders.filter(
-        (o) => o.status === 'pending'
-    ).length
-    const paidCount = filteredOrders.filter((o) => o.status === 'paid').length
-    const canceledCount = filteredOrders.filter(
-        (o) => o.status === 'canceled'
-    ).length
+    const refreshOrders = useCallback(() => {
+        fetchOrders()
+    }, [fetchOrders])
 
     return {
         // Data
         orders: filteredOrders,
-        totalOrders,
-        pendingCount,
-        paidCount,
-        canceledCount,
+        totalOrders: statistics.total,
+        pendingCount: statistics.pendingCount,
+        paidCount: statistics.paidCount,
+        canceledCount: statistics.canceledCount,
         loading,
 
         // Modal states
@@ -188,9 +163,9 @@ export const useOrderManagement = () => {
         handleDelete,
         handleDeleteCancel,
         handleSearch,
-        handleStatusFilter,
-        handleSort,
-        clearFilters,
+        handleStatusFilter: handleStatus,
+        handleSort: handleSorting,
+        clearFilters: handleClearFilters,
         refreshOrders,
     }
 }

@@ -16,33 +16,9 @@ Tài liệu này mô tả hai lỗi chính đã gặp phải trong module Orders
 
 ### Nguyên nhân gốc rễ
 
-1. Circular export do tồn tại song song hai file:
-    - `src/app/routes/modules/layout/admin.layout.ts`
-    - `src/app/routes/modules/layout/admin.layout.tsx`
-      Trình resolve module chọn nhầm `.ts` (re-export) và dẫn đến vòng lặp, khiến router crash âm thầm, UI không render trang mới.
-
-2. Kiến trúc route CRUD được nested (lồng): `create`, `detail`, `edit` là con của `list`. Khi điều hướng đến route con, nếu route cha (list) không render `<Outlet />`, UI vẫn đứng ở component list.
+Kiến trúc route CRUD được nested (lồng): `create`, `detail`, `edit` là con của `list`. Khi điều hướng đến route con, nếu route cha (list) không render `<Outlet />`, UI vẫn đứng ở component list.
 
 ### Cách khắc phục
-
-- Giữ DUY NHẤT file TSX có component layout và `<Outlet />`:
-    - [x] Xóa file: `frontend/src/app/routes/modules/layout/admin.layout.ts`
-    - [x] Tạo/giữ file: `frontend/src/app/routes/modules/layout/admin.layout.tsx`
-
-- Nội dung `admin.layout.tsx` (rút gọn):
-
-```tsx
-import { createRoute, Outlet } from '@tanstack/react-router'
-import { rootRoute } from '../../__root'
-
-export const adminLayoutRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/admin',
-    component: () => <Outlet />,
-})
-```
-
-- Đảm bảo các route CRUD hoạt động dạng "ngang hàng" dưới `/admin` (không phụ thuộc `<Outlet />` của List), hoặc nếu tiếp tục nested thì List cần tự render `<Outlet />`.
 
 Hiện tại, hệ thống đã cấu hình các route CRUD Orders ở dạng ngang hàng (sibling) thông qua `routeHelpers`:
 
@@ -215,7 +191,7 @@ import { Outlet } from '@tanstack/react-router'
 
 ## File ảnh hưởng chính
 
-- `src/app/routes/modules/layout/admin.layout.tsx`
+- `src/app/routes/modules/layout/admin.layout.ts`
 - `src/app/routes/utils/routeHelpers.ts`
 - `src/_mocks/orders.ts`
 - `src/features/orders/utils/orderEvents.ts`

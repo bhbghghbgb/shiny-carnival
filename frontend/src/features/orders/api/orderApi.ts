@@ -1,5 +1,5 @@
-import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
-import { API_CONFIG, type OrderStatus } from '../../../config/api';
+import axiosClient, { type ApiResponse, type PagedList } from '../../../lib/axios';
+import { API_CONFIG } from '../../../config/api';
 import type { OrderEntity, OrderItemEntity, OrderDetailsDto } from '../types/entity.ts';
 import type { CreateOrderRequest, UpdateOrderStatusRequest, AddOrderItemRequest, UpdateOrderItemRequest, OrderFilterParams } from '../types/api.ts';
 
