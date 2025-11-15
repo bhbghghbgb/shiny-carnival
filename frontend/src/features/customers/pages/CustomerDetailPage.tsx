@@ -2,6 +2,7 @@
 import { Card, Descriptions, Button, Spin } from 'antd';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
+import type { CustomerEntity } from '../types/entity';
 
 export const CustomerDetailPage: React.FC = () => {
   const { state } = useLocation();
