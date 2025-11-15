@@ -2,23 +2,27 @@
 import { CustomerHeader } from '../components/CustomerHeader';
 import { CustomerSearch } from '../components/CustomerSearch';
 import { CustomerTable } from '../components/CustomerTable';
-import { useCustomerPage } from '../hook/useCustomerPage';
+import { useCustomerStore } from '../store/customerStore';
 import { useNavigate } from '@tanstack/react-router';
 
 export const CustomerListPage: React.FC = () => {
   const {
-    customers,
+    filteredCustomers,
     totalCustomers,
     searchText,
     sortField,
     sortOrder,
-    handleSearch,
-    handleSort,
-    handleDelete,
+    setSearchText,
+    setSort,
+    deleteCustomer,
     refresh,
-  } = useCustomerPage();
+  } = useCustomerStore();
 
   const navigate = useNavigate();
+
+  const handleSearch = (value: string) => setSearchText(value);
+  const handleSort = (field: string, order: 'ascend' | 'descend') => setSort(field as any, order);
+  const handleDelete = (customer: any) => deleteCustomer(customer.id);
 
   return (
     <div style={{ padding: 24, background: '#fff', minHeight: '100%' }}>
@@ -29,7 +33,7 @@ export const CustomerListPage: React.FC = () => {
       />
       <CustomerSearch value={searchText} onSearch={handleSearch} />
       <CustomerTable
-        data={customers}
+        data={filteredCustomers}
         total={totalCustomers}
         sortField={sortField}
         sortOrder={sortOrder}

@@ -1,30 +1,39 @@
+// src/features/customers/pages/CustomerCreatePage.tsx
 import { CustomerModal } from '../components/CustomerModal';
-import { useCustomerForm } from '../hook/useCustomerForm';
+import { useCustomerStore } from '../store/customerStore';
 import { useNavigate } from '@tanstack/react-router';
-import { message } from 'antd';
-
+import { useEffect } from 'react';
+import { Form } from 'antd';
 
 export const CustomerCreatePage: React.FC = () => {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { addCustomer, isModalVisible = true } = useCustomerStore();
 
-  const handleSuccess = () => {
-    message.success('Thêm khách hàng thành công!');
-    navigate({ to: '/customers' });
+  useEffect(() => {
+    form.resetFields();
+  }, [form]);
+
+  const onOk = () => {
+    form.validateFields().then((values) => {
+      addCustomer(values);
+      navigate({ to: '/customers' });
+    });
   };
 
-  const { form, onSubmit } = useCustomerForm({
-    editingCustomer: null,
-    onSuccess: handleSuccess,
-  });
+  const onCancel = () => {
+    navigate({ to: '/customers' });
+  };
 
   return (
     <div style={{ padding: 24, background: '#fff' }}>
       <CustomerModal
-        open={true}
+        title="Thêm khách hàng mới"
+        open={isModalVisible}
         editing={null}
         form={form}
-        onOk={onSubmit}
-        onCancel={() => navigate({ to: '/customers' })}
+        onOk={onOk}
+        onCancel={onCancel}
       />
     </div>
   );

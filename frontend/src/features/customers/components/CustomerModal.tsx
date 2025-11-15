@@ -1,8 +1,7 @@
 // src/features/customers/components/CustomerModal.tsx
-import { Modal, Form, Input, Select } from 'antd';
+import { Modal, Form, Input } from 'antd';
 import type { CustomerEntity } from '../types/entity';
 
-const { Option } = Select;
 
 interface Props {
   open: boolean;
