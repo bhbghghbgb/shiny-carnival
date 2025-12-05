@@ -1,33 +1,7 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import type {LoginResponse} from "../features/auth/types/api.ts";
-
-// Định nghĩa types cho API response theo tài liệu đặc tả
-export interface ApiResponse<T = never> {
-  isError: boolean;
-  message: string;
-  data: T | null;
-  timestamp: string;
-}
-
-
-export interface PagedRequest {
-    page: number; //page index
-    pageSize: number;
-    search?: string;
-    sortBy?: string;
-    sortDesc?: boolean;
-}
-
-export interface PagedList<T> {
-    page: number;
-    pageSize: number;
-    totalCount: number;
-    totalPages: number;
-    hasPrevious: boolean;
-    hasNext: boolean;
-    items: T[];
-}
+import type { LoginResponse } from "../features/auth/types/api.ts";
+import type { ApiResponse, PagedRequest, PagedList } from './api/types/api.types';
 
 const TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
