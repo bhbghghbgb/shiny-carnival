@@ -2,108 +2,116 @@
 
 export const API_CONFIG = {
   // Base URL cho API
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
-  
+  BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
+
   // Timeout cho requests (milliseconds)
   TIMEOUT: 10000,
-  
+
   // Các endpoints chính
   ENDPOINTS: {
     // Authentication
     AUTH: {
-      LOGIN: '/auth/login',
-      REFRESH: '/auth/refresh',
-      LOGOUT: '/auth/logout',
+      LOGIN: '/api/Auth/login',
+      REFRESH: '/api/Auth/refresh',
+      LOGOUT: '/api/Auth/logout',
+      SETUP_ADMIN: '/api/Auth/setup-admin',
     },
-    
+
     // Admin endpoints
     ADMIN: {
       // Users
-      USERS: '/admin/users',
-      USER_BY_ID: (id: number) => `/admin/users/${id}`,
-      
+      USERS: '/api/admin/users',
+      USER_BY_ID: (id: number) => `/api/admin/users/${id}`,
+
       // Products
-      PRODUCTS: '/admin/products',
-      PRODUCT_BY_ID: (id: number) => `/admin/products/${id}`,
-      
+      PRODUCTS: '/api/admin/products',
+      PRODUCT_BY_ID: (id: number) => `/api/admin/products/${id}`,
+
       // Categories
-      CATEGORIES: '/admin/categories',
-      CATEGORY_BY_ID: (id: number) => `/admin/categories/${id}`,
-      
+      CATEGORIES: '/api/admin/categories',
+      CATEGORY_BY_ID: (id: number) => `/api/admin/categories/${id}`,
+
       // Suppliers
-      SUPPLIERS: '/admin/suppliers',
-      SUPPLIER_BY_ID: (id: number) => `/admin/suppliers/${id}`,
-      
+      SUPPLIERS: '/api/admin/suppliers',
+      SUPPLIER_BY_ID: (id: number) => `/api/admin/suppliers/${id}`,
+
       // Customers
-      CUSTOMERS: '/admin/customers',
-      CUSTOMER_BY_ID: (id: number) => `/admin/customers/${id}`,
-      
+      CUSTOMERS: '/api/admin/customers',
+      CUSTOMER_BY_ID: (id: number) => `/api/admin/customers/${id}`,
+
       // Orders
-      ORDERS: '/admin/orders',
-      ORDER_BY_ID: (id: number) => `/admin/orders/${id}`,
-      ORDER_STATUS: (id: number) => `/admin/orders/${id}/status`,
-      ORDER_INVOICE: (id: number) => `/admin/orders/${id}/invoice`,
-      
+      ORDERS: '/api/admin/orders',
+      ORDER_BY_ID: (id: number) => `/api/admin/orders/${id}`,
+      ORDER_STATUS: (id: number) => `/api/admin/orders/${id}/status`,
+      ORDER_INVOICE: (id: number) => `/api/admin/orders/${id}/invoice`,
+
       // Order Items
-      ORDER_ITEMS: (orderId: number) => `/admin/orders/${orderId}/items`,
-      ORDER_ITEM_BY_ID: (orderId: number, itemId: number) => `/admin/orders/${orderId}/items/${itemId}`,
-      
+      ORDER_ITEMS: (orderId: number) => `/api/admin/orders/${orderId}/items`,
+      ORDER_ITEM_BY_ID: (orderId: number, itemId: number) => `/api/admin/orders/${orderId}/items/${itemId}`,
+
       // Promotions
-      PROMOTIONS: '/admin/promotions',
-      PROMOTION_BY_ID: (id: number) => `/admin/promotions/${id}`,
-      
+      PROMOTIONS: '/api/admin/promotions',
+      PROMOTION_BY_ID: (id: number) => `/api/admin/promotions/${id}`,
+      PROMOTION_VALIDATE: '/api/admin/promotions/validate',
+
       // Inventory
-      INVENTORY_BY_PRODUCT: (productId: number) => `/admin/inventory/${productId}`,
-      
+      INVENTORY: '/api/admin/inventory',
+      INVENTORY_BY_PRODUCT: (productId: number) => `/api/admin/inventory/${productId}`,
+      INVENTORY_LOW_STOCK: '/api/admin/inventory/low-stock',
+      INVENTORY_HISTORY: (productId: number) => `/api/admin/inventory/${productId}/history`,
+
       // Reports
-      REVENUE_REPORT: '/admin/reports/revenue',
+      REVENUE_REPORT: '/api/admin/reports/revenue',
+      SALES_REPORT: '/api/admin/reports/sales',
+      TOP_PRODUCTS: '/api/admin/reports/top-products',
+      TOP_CUSTOMERS: '/api/admin/reports/top-customers',
     }
   },
-  
+
   // Headers mặc định
   DEFAULT_HEADERS: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  
+
   // Cấu hình pagination mặc định
   PAGINATION: {
     DEFAULT_PAGE: 1,
     DEFAULT_PAGE_SIZE: 20,
     MAX_PAGE_SIZE: 100,
   },
-  
+
   // Cấu hình retry
   RETRY: {
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000, // milliseconds
   },
-  
+
   // User roles
   USER_ROLES: {
     ADMIN: 0,
     STAFF: 1,
   } as const,
-  
+
   // Order status
   ORDER_STATUS: {
     PENDING: 'pending',
     PAID: 'paid',
     CANCELED: 'canceled',
   } as const,
-  
+
   // Promotion status
   PROMOTION_STATUS: {
     ACTIVE: 'active',
     INACTIVE: 'inactive',
   } as const,
-  
+
   // Discount types
   DISCOUNT_TYPES: {
     PERCENT: 'percent',
     FIXED: 'fixed',
   } as const,
-  
+
   // Payment methods
   PAYMENT_METHODS: {
     CASH: 'cash',
@@ -125,7 +133,7 @@ export type PaymentMethod = typeof API_CONFIG.PAYMENT_METHODS[keyof typeof API_C
 export const validateEnvironment = (): void => {
   const requiredEnvVars = ['VITE_API_BASE_URL'];
   const missingVars = requiredEnvVars.filter(varName => !import.meta.env[varName]);
-  
+
   if (missingVars.length > 0) {
     console.warn('Missing environment variables:', missingVars);
     console.warn('Using default API configuration');

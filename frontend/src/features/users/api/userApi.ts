@@ -3,6 +3,21 @@ import { API_CONFIG } from '../../../config/api';
 import type { UserEntity } from '../types/entity.ts';
 import type { CreateUserRequest, UpdateUserRequest } from '../types/api.ts';
 
+/**
+ * Convert camelCase object keys sang PascalCase
+ * Backend API sử dụng PascalCase cho query parameters
+ */
+function toPascalCaseParams(obj: Record<string, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined && value !== null) {
+      const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
+      result[pascalKey] = value;
+    }
+  }
+  return result;
+}
+
 // User API functions (Admin only)
 export const userApi = {
   /**
@@ -10,9 +25,11 @@ export const userApi = {
    */
   getUsers: async (params?: PagedRequest): Promise<ApiResponse<PagedList<UserEntity>>> => {
     try {
+      // Convert params sang PascalCase để khớp với backend
+      const pascalParams = params ? toPascalCaseParams(params) : undefined;
       const response = await axiosClient.get<ApiResponse<PagedList<UserEntity>>>(
         API_CONFIG.ENDPOINTS.ADMIN.USERS,
-        { params },
+        { params: pascalParams },
       );
       return response.data;
     } catch (error: any) {
@@ -108,15 +125,14 @@ export const userApi = {
    */
   getStaffUsers: async (): Promise<ApiResponse<UserEntity[]>> => {
     try {
+      // Convert params sang PascalCase
+      const params = toPascalCaseParams({
+        pageSize: 1000,
+        role: API_CONFIG.USER_ROLES.STAFF
+      });
       const response = await axiosClient.get<ApiResponse<PagedList<UserEntity>>>(
         API_CONFIG.ENDPOINTS.ADMIN.USERS,
-        {
-          params: {
-            pageSize: 1000,
-            // Note: Backend cần hỗ trợ filter theo role
-            // role: API_CONFIG.USER_ROLES.STAFF
-          }
-        }
+        { params }
       );
 
       // Filter staff users ở client side nếu backend chưa hỗ trợ
@@ -144,9 +160,14 @@ export const userApi = {
    */
   checkUsernameExists: async (username: string): Promise<boolean> => {
     try {
+      // Convert params sang PascalCase
+      const params = toPascalCaseParams({ 
+        search: username, 
+        pageSize: 1 
+      });
       const response = await axiosClient.get<ApiResponse<PagedList<UserEntity>>>(
         API_CONFIG.ENDPOINTS.ADMIN.USERS,
-        { params: { search: username, pageSize: 1 } }
+        { params }
       );
 
       const users = response.data?.data?.items || [];

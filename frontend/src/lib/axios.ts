@@ -23,7 +23,7 @@ export const tokenUtils = {
 
 // Tạo Axios instance với cấu hình đầy đủ
 const axiosClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
   timeout: 10000, // 10 giây timeout
   headers: {
     'Content-Type': 'application/json',
@@ -94,10 +94,14 @@ axiosClient.interceptors.response.use(
 
       if (refreshToken) {
         try {
-          // Gọi API refresh token (sẽ implement sau khi có auth module)
+          // Gọi API refresh token
+          const accessToken = tokenUtils.getToken();
           const response = await axios.post<ApiResponse<LoginResponse>>(
-            `${axiosClient.defaults.baseURL}/auth/refresh`,
-            { refreshToken }
+            `${axiosClient.defaults.baseURL}/api/Auth/refresh`,
+            { 
+              accessToken: accessToken || '',
+              refreshToken 
+            }
           );
 
           if (!response.data.isError && response.data.data) {

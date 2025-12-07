@@ -37,9 +37,13 @@ export const authApi = {
    */
   refreshToken: async (refreshToken: string): Promise<ApiResponse<LoginResponse>> => {
     try {
+      const accessToken = tokenUtils.getToken() || '';
       const response = await axiosClient.post<ApiResponse<LoginResponse>>(
         API_CONFIG.ENDPOINTS.AUTH.REFRESH,
-        { refreshToken }
+        { 
+          accessToken,
+          refreshToken 
+        }
       );
 
       // Cập nhật token mới nếu refresh thành công
@@ -65,14 +69,44 @@ export const authApi = {
    */
   logout: async (): Promise<void> => {
     try {
-      // Gọi API logout nếu backend hỗ trợ
-      await axiosClient.post(API_CONFIG.ENDPOINTS.AUTH.LOGOUT);
+      const refreshToken = tokenUtils.getRefreshToken();
+      if (refreshToken) {
+        // Gọi API logout với refresh token
+        await axiosClient.post(API_CONFIG.ENDPOINTS.AUTH.LOGOUT, {
+          refreshToken
+        });
+      }
     } catch (error) {
       // Bỏ qua lỗi từ server khi logout
       console.warn('Logout API failed:', error);
     } finally {
       // Luôn xóa tokens khỏi localStorage
       tokenUtils.clearAllTokens();
+    }
+  },
+
+  /**
+   * Setup Admin đầu tiên (chỉ hoạt động khi chưa có Admin nào)
+   */
+  setupAdmin: async (userData: {
+    username: string;
+    password: string;
+    fullName: string;
+    role: number;
+  }): Promise<ApiResponse<LoginResponse['user']>> => {
+    try {
+      const response = await axiosClient.post<ApiResponse<LoginResponse['user']>>(
+        API_CONFIG.ENDPOINTS.AUTH.SETUP_ADMIN,
+        userData
+      );
+      return response.data;
+    } catch (error: any) {
+      throw {
+        isError: true,
+        message: error.message || 'Không thể tạo tài khoản Admin',
+        data: null,
+        timestamp: new Date().toISOString()
+      };
     }
   },
 
