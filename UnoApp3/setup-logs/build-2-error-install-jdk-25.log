@@ -1,0 +1,13 @@
+Build with surface heuristics started at 18:06:52
+Use build tool: C:\Program Files\dotnet\sdk\10.0.100\MSBuild.dll
+CONSOLE: MSBuild version 18.0.2+b0f34d51f for .NET
+CONSOLE: Build started 12/7/2025 6:06:52 PM.
+CONSOLE: Project "C:\Users\ACER\AppData\Local\Temp\Pucecet.proj" on node 1 (default targets).
+CONSOLE: ControllerTarget:
+CONSOLE:   Run controller from C:\Program Files\JetBrains\JetBrains Rider 2025.2.1\lib\ReSharperHost\JetBrains.Platform.MsBuildTask.v17.dll
+0>------- Started building project: UnoApp3
+0>Microsoft.Android.Sdk.Tooling.targets(22,5): Error XA0030 : Building with JDK version `25.0.1` is not supported. Please install JDK version `21.0`. See https://aka.ms/xamarin/jdk9-errors
+UnoApp3 -> E:\sgu doc\dotnet\shiny-carnival-uno-app\UnoApp3\UnoApp3\bin\Debug\net10.0\UnoApp3.dll
+UnoApp3 -> E:\sgu doc\dotnet\shiny-carnival-uno-app\UnoApp3\UnoApp3\bin\Debug\net10.0-desktop\UnoApp3.dll
+0>------- Finished building project: UnoApp3. Succeeded: False. Errors: 1. Warnings: 0
+Build completed in 00:00:10.876

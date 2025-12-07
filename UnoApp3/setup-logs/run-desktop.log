@@ -1,0 +1,18 @@
+﻿E:/sgu doc/dotnet/shiny-carnival-uno-app/UnoApp3/UnoApp3/bin/Debug/net10.0-desktop/UnoApp3.exe
+12-07 19:51:07.717+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.keyvaluestorageconfiguration.json' does not exist in package
+12-07 19:51:07.759+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.appconfig.json' does not exist in package
+12-07 19:51:07.761+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.localizationconfiguration.json' does not exist in package
+12-07 19:51:07.762+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.localizationsettings.json' does not exist in package
+12-07 19:51:07.763+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.webconfiguration.json' does not exist in package
+12-07 19:51:07.764+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.navigationconfiguration.json' does not exist in package
+12-07 19:51:07.850+08:00 I/Uno.Extensions.Navigation.Navigators.ContentControlNavigator: NavigateAsync - Starting Navigation - Navigator: ContentControlNavigator Request:
+12-07 19:51:07.887+08:00 I/Uno.Extensions.Navigation.Navigators.ContentControlNavigator: CreateControlFromType - Creating control of type FrameView
+12-07 19:51:09.742+08:00 I/Uno.Extensions.Navigation.Navigators.ContentControlNavigator: NavigateAsync - Starting Navigation - Navigator: ContentControlNavigator Request: ./Login
+12-07 19:51:19.694+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: -
+12-07 19:51:24.543+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: Second
+12-07 19:51:25.886+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: -
+12-07 19:51:27.933+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: Second
+12-07 19:51:28.686+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: -
+
+Process finished with exit code 0.
+

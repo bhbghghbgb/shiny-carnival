@@ -1,0 +1,197 @@
+﻿
+ 
+           ╓╣╜"╙╬╖
+         ╓╣`     "╣╗
+       ,@Ñ╜╩╬╗     ╙▒Ñ%,
+     ╓╬╝     ]╣╦   ╓▓  ╙╣╖
+    ╬╝     ,@╜  ╚@╬╜     ▒
+    ╬╗   ,╣╜ ╝@╦╣`     ╓╣╜
+     ╙╬╦ ▒     ╙@╖   ╓╣╜
+        ╙╝@      "╙╣▒
+           ╚h    ,@╝
+             ╙Ñ@Ñ╜
+ 
+
+                                         _                     _
+  _   _   _ __     ___             ___  | |__     ___    ___  | | __
+ | | | | | '_ \   / _ \   _____   / __| | '_ \   / _ \  / __| | |/ /
+ | |_| | | | | | | (_) | |_____| | (__  | | | | |  __/ | (__  |   <
+  \__,_| |_| |_|  \___/           \___| |_| |_|  \___|  \___| |_|\_\
+
+☼ Uno Platform Check v1.33.1.0 ☼
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+This tool will check your Uno Platform development environment.
+If problems are detected, it will offer the option to try and fix them for you, or suggest a way to fix them yourself.
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+» Synchronizing configuration...Loading Manifest from: https://raw.githubusercontent.com/unoplatform/uno.check/1ac413158d43b33a461ccdb8ebad2d654f80893c/manifests/uno.ui.manifest.json
+Required Version: 1.14.0
+Current Version: 1.33.1.0
+ ok
+» Scheduling appointments...SetEnvironmentVariable: DOTNET_ROOT=C:\Program Files\dotnet
+SetEnvironmentVariable: DOTNET_ROOT=C:\Program Files\dotnet
+ ok
+
+> OpenJDK 11.0 Checkup...
+ValidateAndroidSdkLocation: ``, result=False
+ValidateAndroidSdkLocation: ``, result=False
+Looking for Android SDK...
+ValidateAndroidSdkLocation: `C:\Program Files (x86)\Android\android-sdk`, result=True
+ValidateJavaSdkLocation: ``, result=False
+ValidateJavaSdkLocation: ``, result=False
+ValidateJavaSdkLocation: `C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot`, result=True
+ValidateAndroidNdkLocation: ``, result=False
+ValidateAndroidNdkLocation: ``, result=False
+Looking for Android NDK...
+Looking for Android SDK...
+SHELL: C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot\bin\javac.exe -version
+javac 11.0.20.1
+SHELL: C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot\bin\javac.exe -version
+javac 11.0.20.1
+  - 11.0.20.1 (C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot\bin\..)
+SetEnvironmentVariable: JAVA_HOME=C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot
+SetEnvironmentVariable: LATEST_JAVA_HOME=C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot
+
+> Visual Studio 18.0 Checkup...
+System.NullReferenceException: Object reference not set to an instance of an object.
+  at async Task<DiagnosticResult> DotNetCheck.Checkups.VisualStudioWindowsCheckup.Examine(SharedState history) in
+     /_/UnoCheck/Checkups/VisualStudioWindowsCheckup.cs:32
+  at void System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+  at void System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+  at void System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task,
+     ConfigureAwaitOptions options)
+  at TResult System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+  at async Task<int> DotNetCheck.Cli.CheckCommand.ExecuteAsync(CommandContext context, CheckSettings settings) in
+     /_/UnoCheck/CheckCommand.cs:226
+
+> Visual Studio Workloads Checkup...
+System.NullReferenceException: Object reference not set to an instance of an object.
+  at async Task<DiagnosticResult> DotNetCheck.Checkups.VSWinWorkloadsCheckup.Examine(SharedState history) in
+     /_/UnoCheck/Checkups/VSWinWorkloadsCheckup.cs:78
+  at void System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+  at void System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+  at void System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task,
+     ConfigureAwaitOptions options)
+  at TResult System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+  at async Task<int> DotNetCheck.Cli.CheckCommand.ExecuteAsync(CommandContext context, CheckSettings settings) in
+     /_/UnoCheck/CheckCommand.cs:226
+
+> Android SDK Checkup...
+ValidateAndroidSdkLocation: ``, result=False
+ValidateAndroidSdkLocation: ``, result=False
+Looking for Android SDK...
+ValidateAndroidSdkLocation: `C:\Program Files (x86)\Android\android-sdk`, result=True
+ValidateJavaSdkLocation: `C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot`, result=True
+ValidateAndroidNdkLocation: ``, result=False
+ValidateAndroidNdkLocation: ``, result=False
+Looking for Android NDK...
+Looking for Android SDK...
+SetEnvironmentVariable: ANDROID_SDK_ROOT=C:\Program Files (x86)\Android\android-sdk
+SetEnvironmentVariable: ANDROID_HOME=C:\Program Files (x86)\Android\android-sdk
+  - emulator (36.3.10)
+  - build-tools;35.0.1 (35.0.1)
+  - platforms;android-36 (2)
+  - system-images;android-35;google_apis;x86_64 (9)
+  - platform-tools (36.0.0)
+  - cmdline-tools;17.0 (17.0)
+
+> Android Emulator Checkup...
+Running C:\Program Files\Microsoft\jdk-11.0.20.101-hotspot\bin\java.exe com.android.sdklib.tool.AvdManagerCli list avd in C:\Program Files (x86)\Android\android-sdk\cmdline-tools\17.0\lib (with input "<no input>")
+Failed to list avds: Picked up JAVA_TOOL_OPTIONS: -Dcom.android.sdkmanager.toolsdir="C:\Program Files (x86)\Android\android-sdk\cmdline-tools\17.0"
+                           Error: LinkageError occurred while loading main class com.android.sdklib.tool.AvdManagerCli
+                                                                                                                       java.lang.UnsupportedClassVersionError: com/android/sdklib/tool/AvdManagerCli has been compiled by a more recent version of the Java Runtime (class file version 61.0), this version of the Java Runtime only recognizes class file versions up to 55.0
+  - Emulator: Pixel_9 found.
+
+> .NET SDK Checkup...
+SetEnvironmentVariable: DOTNET_ROOT=C:\Program Files\dotnet
+SHELL: C:\Program Files\dotnet\dotnet.exe --list-sdks
+10.0.100 [C:\Program Files\dotnet\sdk]
+  - 10.0.100 - C:\Program Files\dotnet\sdk\10.0.100
+SetEnvironmentVariable: DOTNET_SDK=C:\Program Files\dotnet\sdk\10.0.100
+SetEnvironmentVariable: DOTNET_SDK_VERSION=10.0.100
+
+¬ Skipped: PowerShell Execution Policy (Not required by the current configuration)
+
+¬ Skipped: Windows Python Installation (Not required by the current configuration)
+
+> Windows Long Path Checkup...
+  - Long paths are enabled on Windows!
+
+¬ Skipped: Git (Not required by the current configuration)
+
+> Windows Hyper-V Checkup...
+  - Hyper-V is configured
+
+> dotnet new Uno Project Command Line Templates Checkup...
+
+> Uno SDK Checkup...
+
+> Edge WebView2 Checkup...
+  - Found Edge WebView2 version 143.0.3650.66
+
+> .NET SDK - Workloads (10.0.100) Checkup...
+SHELL: C:\Program Files\dotnet\dotnet.exe workload list --machine-readable
+{"installed":["android","maui"],"updateAvailable":[]}
+SHELL: C:\Program Files\dotnet\dotnet.exe workload update --print-rollback
+{
+  "microsoft.net.sdk.android": "36.1.2/10.0.100",
+  "microsoft.net.sdk.ios": "26.0.10970-net10-rc.2/10.0.100-rc.2",
+  "microsoft.net.sdk.maccatalyst": "26.0.10970-net10-rc.2/10.0.100-rc.2",
+  "microsoft.net.sdk.macos": "26.0.10970-net10-rc.2/10.0.100-rc.2",
+  "microsoft.net.sdk.maui": "10.0.0/10.0.100",
+  "microsoft.net.sdk.tvos": "26.0.10970-net10-rc.2/10.0.100-rc.2",
+  "microsoft.net.workload.mono.toolchain.current": "10.0.100/10.0.100",
+  "microsoft.net.workload.emscripten.current": "10.0.100/10.0.100",
+  "microsoft.net.workload.emscripten.net6": "10.0.100/10.0.100",
+  "microsoft.net.workload.emscripten.net7": "10.0.100/10.0.100",
+  "microsoft.net.workload.emscripten.net8": "10.0.100/10.0.100",
+  "microsoft.net.workload.emscripten.net9": "10.0.100/10.0.100",
+  "microsoft.net.workload.mono.toolchain.net6": "10.0.100/10.0.100",
+  "microsoft.net.workload.mono.toolchain.net7": "10.0.100/10.0.100",
+  "microsoft.net.workload.mono.toolchain.net8": "10.0.100/10.0.100",
+  "microsoft.net.workload.mono.toolchain.net9": "10.0.100/10.0.100"
+}
+  - Available workload: microsoft.net.sdk.android: 36.1.2
+  - Available workload: microsoft.net.sdk.ios: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.sdk.maccatalyst: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.sdk.macos: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.sdk.maui: 10.0.0
+  - Available workload: microsoft.net.sdk.tvos: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.workload.mono.toolchain.current: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.current: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net6: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net7: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net8: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net9: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net6: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net7: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net8: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net9: 10.0.100
+  - microsoft.net.sdk.android (36.1.2/10.0.100) is installed.
+  - Available workload: microsoft.net.sdk.android: 36.1.2
+  - Available workload: microsoft.net.sdk.ios: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.sdk.maccatalyst: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.sdk.macos: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.sdk.maui: 10.0.0
+  - Available workload: microsoft.net.sdk.tvos: 26.0.10970-net10-rc.2
+  - Available workload: microsoft.net.workload.mono.toolchain.current: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.current: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net6: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net7: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net8: 10.0.100
+  - Available workload: microsoft.net.workload.emscripten.net9: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net6: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net7: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net8: 10.0.100
+  - Available workload: microsoft.net.workload.mono.toolchain.net9: 10.0.100
+  - microsoft.net.sdk.maui (10.0.0/10.0.100) is installed.
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Checkup had Error status: vswin
+Checkup had Error status: vswinworkloads
+
+vswin: Object reference not set to an instance of an object.
+vswinworkloads: Object reference not set to an instance of an object.
+! There were one or more problems detected.
+Please review the errors and correct them and run uno-check again.
+
+Press Enter to finish...
