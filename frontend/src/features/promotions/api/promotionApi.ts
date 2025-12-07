@@ -119,10 +119,10 @@ export const promotionApi = {
       );
 
       return {
-          isError: false,
-          message: "",
-          timestamp: "",
-          ...response,
+        isError: false,
+        message: "",
+        timestamp: "",
+        ...response,
         data: response.data?.data?.items || []
       };
     } catch (error: any) {
@@ -158,7 +158,7 @@ export const promotionApi = {
       }
 
       const promotion = promotions[0];
-      
+
       // Kiểm tra các điều kiện
       const now = new Date();
       const startDate = new Date(promotion.startDate);

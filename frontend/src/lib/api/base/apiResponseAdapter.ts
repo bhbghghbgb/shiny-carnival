@@ -1,4 +1,4 @@
-import type { ApiResponse } from '../../types/api.types';
+import type { ApiResponse } from '../types/api.types';
 
 /**
  * Unwrap ApiResponse<T> về T và ném lỗi nếu isError === true hoặc data null.

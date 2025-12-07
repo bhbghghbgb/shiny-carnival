@@ -1,7 +1,7 @@
 /**
  * Users API
  * 
- * Export UserApiService và instance
+ * Export UserApiService và userApiService
  */
 
 export { UserApiService, userApiService } from './UserApiService';

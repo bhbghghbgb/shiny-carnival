@@ -1,14 +1,15 @@
 import { Modal, Space } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { UserForm } from './UserForm'
-import type { UserEntity } from '../types/entity'
+import type { UserNoPass } from '../types/entity'
+import type { FormInstance } from 'antd/es/form'
 
 interface UserModalsProps {
     isModalVisible: boolean
     isDeleteModalVisible: boolean
-    editingUser: UserEntity | null
-    deletingUser: UserEntity | null
-    form: any
+    editingUser: UserNoPass | null
+    deletingUser: UserNoPass | null
+    form: FormInstance
     onModalOk: () => void
     onModalCancel: () => void
     onDeleteOk: () => void

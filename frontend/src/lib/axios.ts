@@ -23,7 +23,7 @@ export const tokenUtils = {
 
 // Tạo Axios instance với cấu hình đầy đủ
 const axiosClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5175',
   timeout: 10000, // 10 giây timeout
   headers: {
     'Content-Type': 'application/json',

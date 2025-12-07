@@ -1,10 +1,10 @@
 import { Form, Input, Select } from 'antd'
-import type { UserEntity } from '../types/entity'
+import type { UserNoPass } from '../types/entity'
 
 interface UserFormProps {
     form: any
     isEdit?: boolean
-    initialValues?: UserEntity
+    initialValues?: UserNoPass
 }
 
 const { Option } = Select

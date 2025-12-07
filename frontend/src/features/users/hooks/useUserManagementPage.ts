@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Form, message } from 'antd'
-import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
 import { ENDPOINTS } from '../../../app/routes/type/endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
+import type { UserNoPass } from '../types/entity'
 
 export const useUserManagementPage = () => {
     // Route API với search params trên URL
@@ -11,11 +12,12 @@ export const useUserManagementPage = () => {
     const { users: usersData, total: totalUsers } = routeApi.useLoaderData() || { users: [], total: 0 }
     const search = routeApi.useSearch()
     const navigate = useNavigate({ from: ENDPOINTS.ADMIN.USERS })
+    const router = useRouter()
 
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
-    const [editingUser, setEditingUser] = useState<any>(null)
-    const [deletingUser, setDeletingUser] = useState<any>(null)
+    const [editingUser, setEditingUser] = useState<UserNoPass | null>(null)
+    const [deletingUser, setDeletingUser] = useState<UserNoPass | null>(null)
     const [form] = Form.useForm()
 
     // Mutation hooks
@@ -24,7 +26,9 @@ export const useUserManagementPage = () => {
             message.success('Thêm người dùng thành công!')
             form.resetFields()
             setIsModalVisible(false)
-            // Cache tự động invalidate, không cần navigate
+            setEditingUser(null)
+            // Refetch route loader data
+            router.invalidate()
         },
         onError: (error: Error) => {
             message.error(error.message || 'Không thể tạo người dùng mới')
@@ -36,7 +40,9 @@ export const useUserManagementPage = () => {
             message.success('Cập nhật người dùng thành công!')
             form.resetFields()
             setIsModalVisible(false)
-            // Cache tự động invalidate, không cần navigate
+            setEditingUser(null)
+            // Refetch route loader data
+            router.invalidate()
         },
         onError: (error: Error) => {
             message.error(error.message || 'Không thể cập nhật người dùng')
@@ -48,7 +54,8 @@ export const useUserManagementPage = () => {
             message.success('Xóa người dùng thành công!')
             setIsDeleteModalVisible(false)
             setDeletingUser(null)
-            // Cache tự động invalidate, không cần navigate
+            // Refetch route loader data
+            router.invalidate()
         },
         onError: (error: Error) => {
             message.error(error.message || 'Không thể xóa người dùng')
@@ -70,13 +77,13 @@ export const useUserManagementPage = () => {
         }, 0)
     }
 
-    const showEditModal = (user: any) => {
+    const showEditModal = (user: UserNoPass) => {
         setEditingUser(user)
         setIsModalVisible(true)
         form.setFieldsValue(user)
     }
 
-    const showDeleteModal = (user: any) => {
+    const showDeleteModal = (user: UserNoPass) => {
         setDeletingUser(user)
         setIsDeleteModalVisible(true)
     }
@@ -93,8 +100,8 @@ export const useUserManagementPage = () => {
                 // Add new user
                 createUser.mutate(values)
             }
-        } catch (error: any) {
-            if (error.errorFields) {
+        } catch (error: unknown) {
+            if (error && typeof error === 'object' && 'errorFields' in error) {
                 // Form validation errors
                 console.log('Validate Failed:', error)
             } else {
@@ -165,10 +172,10 @@ export const useUserManagementPage = () => {
         })
     }
 
-    // Statistics (tính từ API data)
-    const users = usersData || []
-    const adminCount = users.filter((user: any) => user.role === 0).length
-    const staffCount = users.filter((user: any) => user.role === 1).length
+    // Statistics (tính từ API data - đã được filter/sort ở backend)
+    const users: UserNoPass[] = usersData || []
+    const adminCount = users.filter((user: UserNoPass) => user.role === 0).length
+    const staffCount = users.filter((user: UserNoPass) => user.role === 1).length
 
     return {
         // Data
