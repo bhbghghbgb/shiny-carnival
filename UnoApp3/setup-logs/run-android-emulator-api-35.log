@@ -1,0 +1,594 @@
+﻿2025-12-07 20:27:29.670  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              I  Late-enabling -Xcheck:jni
+2025-12-07 20:27:30.811  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              I  Using CollectorTypeCMC GC.
+2025-12-07 20:27:30.857  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              W  Unexpected CPU variant for x86: x86_64.
+                                                                                                    Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+2025-12-07 20:27:32.094  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+2025-12-07 20:27:33.344  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load libstats_jni.so using APEX ns com_android_os_statsd for caller /apex/com.android.os.statsd/javalib/framework-statsd.jar: ok
+2025-12-07 20:27:33.625  9971-9971  ApplicationLoaders      com.companyname.UnoApp3              D  Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+2025-12-07 20:27:33.626  9971-9971  ApplicationLoaders      com.companyname.UnoApp3              D  Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+2025-12-07 20:27:33.673  9971-9971  ziparchive              com.companyname.UnoApp3              W  Unable to open '/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.dm': No such file or directory
+2025-12-07 20:27:33.673  9971-9971  ziparchive              com.companyname.UnoApp3              W  Unable to open '/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.dm': No such file or directory
+2025-12-07 20:27:35.233  9971-9971  nativeloader            com.companyname.UnoApp3              D  Configuring clns-7 for other apk /data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/lib/x86_64:/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.companyname.UnoApp3
+2025-12-07 20:27:35.399  9971-9971  GraphicsEnvironment     com.companyname.UnoApp3              V  Currently set values for:
+2025-12-07 20:27:35.426  9971-9971  GraphicsEnvironment     com.companyname.UnoApp3              V    angle_gl_driver_selection_pkgs=[]
+2025-12-07 20:27:35.427  9971-9971  GraphicsEnvironment     com.companyname.UnoApp3              V    angle_gl_driver_selection_values=[]
+2025-12-07 20:27:35.431  9971-9971  GraphicsEnvironment     com.companyname.UnoApp3              V  Global.Settings values are invalid: number of packages: 0, number of values: 0
+2025-12-07 20:27:35.433  9971-9971  GraphicsEnvironment     com.companyname.UnoApp3              V  Neither updatable production driver nor prerelease driver is supported.
+2025-12-07 20:27:36.110  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load /data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/lib/x86_64/libmonosgen-2.0.so using ns clns-7 from class loader (caller=/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk!classes2.dex): ok
+2025-12-07 20:27:36.269  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load /data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/lib/x86_64/libxamarin-app.so using ns clns-7 from class loader (caller=/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk!classes2.dex): ok
+2025-12-07 20:27:36.302  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load /data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/lib/x86_64/libmonodroid.so using ns clns-7 from class loader (caller=/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk!classes2.dex): ok
+2025-12-07 20:27:36.358  9971-9971  monodroid               com.companyname.UnoApp3              W  Failed to create directory '/data/user/0/com.companyname.UnoApp3/files/.__override__/x86_64'. File exists
+2025-12-07 20:27:36.362  9971-9971  monodroid               com.companyname.UnoApp3              W  Creating public update directory: `/data/user/0/com.companyname.UnoApp3/files/.__override__/x86_64`
+2025-12-07 20:27:36.428  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              W  Attempt to remove non-JNI local reference
+2025-12-07 20:27:36.457  9971-9971  monodroid               com.companyname.UnoApp3              W  runtime args empty
+2025-12-07 20:27:36.999  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load /data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/lib/x86_64/libSystem.Security.Cryptography.Native.Android.so using ns clns-7 from class loader (caller=/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk!classes2.dex): ok
+2025-12-07 20:27:37.012  9971-9971  DOTNET                  com.companyname.UnoApp3              D  AndroidCryptoNative_InitLibraryOnLoad: jint AndroidCryptoNative_InitLibraryOnLoad(JavaVM *, void *) in /__w/1/s/src/runtime/src/native/libs/System.Security.Cryptography.Native.Android/pal_jni.c
+2025-12-07 20:27:37.119  9971-9971  DOTNET                  com.companyname.UnoApp3              D  GetOptionalClassGRef: optional class com/android/org/conscrypt/OpenSSLEngineImpl was not found
+2025-12-07 20:27:37.242  9971-9971  nativeloader            com.companyname.UnoApp3              D  Load /data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/lib/x86_64/libxamarin-debug-app-helper.so using ns clns-7 from class loader (caller=/data/app/~~zhgSi9OMjul3zBWZR40trw==/com.companyname.UnoApp3-LsP6nt0YoTR5TqUV_BVl6A==/base.apk!classes2.dex): ok
+2025-12-07 20:27:37.245  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly UnoApp3.dll
+2025-12-07 20:27:37.245  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.326  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Mono.Android.dll
+2025-12-07 20:27:37.326  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.335  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.dll
+2025-12-07 20:27:37.340  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.342  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Java.Interop.dll
+2025-12-07 20:27:37.342  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.367  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.InteropServices.dll
+2025-12-07 20:27:37.367  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.503  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Mono.Android.Runtime.dll
+2025-12-07 20:27:37.503  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.507  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Collections.dll
+2025-12-07 20:27:37.507  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.515  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Collections.Concurrent.dll
+2025-12-07 20:27:37.515  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:37.549  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Threading.dll
+2025-12-07 20:27:37.550  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:38.491  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Threading.Thread.dll
+2025-12-07 20:27:38.491  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:38.494  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Diagnostics.StackTrace.dll
+2025-12-07 20:27:38.495  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.232  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              W  Attempt to remove non-JNI local reference
+2025-12-07 20:27:39.239  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.Runtime.Skia.Android.dll
+2025-12-07 20:27:39.240  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.343  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Memory.dll
+2025-12-07 20:27:39.344  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.735  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Console.dll
+2025-12-07 20:27:39.735  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.796  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.dll
+2025-12-07 20:27:39.799  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.847  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.dll
+2025-12-07 20:27:39.847  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.883  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Diagnostics.Eventing.dll
+2025-12-07 20:27:39.883  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.884  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Foundation.dll
+2025-12-07 20:27:39.885  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.885  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Foundation.Logging.dll
+2025-12-07 20:27:39.886  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:39.887  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.Composition.dll
+2025-12-07 20:27:39.887  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.533  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.AppCompat.dll
+2025-12-07 20:27:40.542  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.543  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Fragment.dll
+2025-12-07 20:27:40.543  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.553  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Activity.dll
+2025-12-07 20:27:40.553  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.554  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Core.dll
+2025-12-07 20:27:40.554  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.555  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Lifecycle.Common.Jvm.dll
+2025-12-07 20:27:40.555  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.571  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Lifecycle.ViewModel.Android.dll
+2025-12-07 20:27:40.571  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.575  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.SavedState.SavedState.Android.dll
+2025-12-07 20:27:40.575  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.576  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.DrawerLayout.dll
+2025-12-07 20:27:40.576  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.581  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.CustomView.dll
+2025-12-07 20:27:40.581  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:40.596  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Loader.dll
+2025-12-07 20:27:40.597  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:41.142  9971-9971  AppCompatDelegate       com.companyname.UnoApp3              D  Checking for metadata for AppLocalesMetadataHolderService : Service not found
+2025-12-07 20:27:41.287  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Core.SplashScreen.dll
+2025-12-07 20:27:41.288  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:41.564  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.Kotlin.StdLib.dll
+2025-12-07 20:27:41.564  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:41.574  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.Dispatching.dll
+2025-12-07 20:27:41.577  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.128  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.Loader.dll
+2025-12-07 20:27:42.128  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.219  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Collections.Immutable.dll
+2025-12-07 20:27:42.219  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.472  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Xml.ReaderWriter.dll
+2025-12-07 20:27:42.472  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.474  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Private.Xml.dll
+2025-12-07 20:27:42.474  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.696  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly SkiaSharp.dll
+2025-12-07 20:27:42.697  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.712  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Private.Uri.dll
+2025-12-07 20:27:42.712  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.723  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Hosting.Abstractions.dll
+2025-12-07 20:27:42.723  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.745  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Numerics.Vectors.dll
+2025-12-07 20:27:42.745  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.750  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.ObjectModel.dll
+2025-12-07 20:27:42.751  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.753  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Text.RegularExpressions.dll
+2025-12-07 20:27:42.753  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:42.851  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Linq.dll
+2025-12-07 20:27:42.851  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.072  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.RemoteControl.dll
+2025-12-07 20:27:43.072  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.074  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.RemoteControl.Messaging.dll
+2025-12-07 20:27:43.076  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.142  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly netstandard.dll
+2025-12-07 20:27:43.142  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.148  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Logging.Abstractions.dll
+2025-12-07 20:27:43.149  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.150  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Configuration.dll
+2025-12-07 20:27:43.151  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.200  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.DependencyInjection.Abstractions.dll
+2025-12-07 20:27:43.204  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.210  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Authentication.dll
+2025-12-07 20:27:43.211  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.215  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.FluentTheme.v2.dll
+2025-12-07 20:27:43.217  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.218  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Toolkit.WinUI.Material.dll
+2025-12-07 20:27:43.218  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.559  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Client.dll
+2025-12-07 20:27:43.563  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.784  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.InteropServices.JavaScript.dll
+2025-12-07 20:27:43.787  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.791  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.WebSockets.dll
+2025-12-07 20:27:43.791  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.893  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.WebSockets.Client.dll
+2025-12-07 20:27:43.893  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.901  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Http.dll
+2025-12-07 20:27:43.902  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.905  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Primitives.dll
+2025-12-07 20:27:43.905  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.912  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Security.dll
+2025-12-07 20:27:43.912  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.915  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Security.Cryptography.dll
+2025-12-07 20:27:43.915  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.935  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Collections.NonGeneric.dll
+2025-12-07 20:27:43.935  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.951  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.WebHeaderCollection.dll
+2025-12-07 20:27:43.951  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.952  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Collections.Specialized.dll
+2025-12-07 20:27:43.952  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:43.997  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Win32.Primitives.dll
+2025-12-07 20:27:43.997  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:44.049  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Diagnostics.DiagnosticSource.dll
+2025-12-07 20:27:44.049  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:44.101  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Diagnostics.Tracing.dll
+2025-12-07 20:27:44.103  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:44.845  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Quic.dll
+2025-12-07 20:27:44.848  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:44.853  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Quic.dll
+2025-12-07 20:27:44.853  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:44.855  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Threading.Channels.dll
+2025-12-07 20:27:44.858  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:44.863  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Threading.Channels.dll
+2025-12-07 20:27:44.868  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.025  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Sockets.dll
+2025-12-07 20:27:45.027  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.Sockets.dll
+2025-12-07 20:27:45.028  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.030  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.048  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.Intrinsics.dll
+2025-12-07 20:27:45.051  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.106  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Threading.ThreadPool.dll
+2025-12-07 20:27:45.107  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.161  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.NameResolution.dll
+2025-12-07 20:27:45.162  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.163  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Net.NameResolution.dll
+2025-12-07 20:27:45.168  9971-9996  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:45.826  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Xaml.Interactions.dll
+2025-12-07 20:27:45.830  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:46.143  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Xaml.Interactivity.dll
+2025-12-07 20:27:46.144  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:46.703  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Text.Encoding.Extensions.dll
+2025-12-07 20:27:46.706  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:46.874  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly SkiaSharp.Views.Windows.dll
+2025-12-07 20:27:46.874  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:46.989  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.AI.XamlGeneration.Contracts.dll
+2025-12-07 20:27:46.991  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.001  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Authentication.UI.dll
+2025-12-07 20:27:47.002  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.005  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Core.UI.dll
+2025-12-07 20:27:47.006  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.033  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Hosting.WinUI.dll
+2025-12-07 20:27:47.034  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.042  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Http.WinUI.dll
+2025-12-07 20:27:47.042  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.043  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Localization.WinUI.dll
+2025-12-07 20:27:47.045  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.046  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Logging.Serilog.dll
+2025-12-07 20:27:47.046  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.047  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Logging.WinUI.dll
+2025-12-07 20:27:47.047  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.234  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Navigation.Toolkit.UI.dll
+2025-12-07 20:27:47.234  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.235  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Navigation.UI.dll
+2025-12-07 20:27:47.235  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.237  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Storage.UI.dll
+2025-12-07 20:27:47.237  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.237  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Material.WinUI.dll
+2025-12-07 20:27:47.238  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.239  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Themes.WinUI.dll
+2025-12-07 20:27:47.239  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.240  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Toolkit.WinUI.dll
+2025-12-07 20:27:47.241  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.242  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.App.Mcp.Client.dll
+2025-12-07 20:27:47.242  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.244  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Chat.dll
+2025-12-07 20:27:47.244  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.245  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Client.Core.dll
+2025-12-07 20:27:47.246  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.247  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.CommunityToolkit.dll
+2025-12-07 20:27:47.247  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.248  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.dll
+2025-12-07 20:27:47.248  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.249  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Hierarchy.dll
+2025-12-07 20:27:47.250  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.251  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.PropertyGrid.dll
+2025-12-07 20:27:47.251  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.253  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Stories.dll
+2025-12-07 20:27:47.253  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.254  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Toolbox.dll
+2025-12-07 20:27:47.254  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.256  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.Lottie.dll
+2025-12-07 20:27:47.256  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.257  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.Toolkit.dll
+2025-12-07 20:27:47.257  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.258  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.WinUI.Graphics2DSK.dll
+2025-12-07 20:27:47.269  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.753  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Core.Extensions.Disposables.dll
+2025-12-07 20:27:47.758  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:47.876  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Xaml.dll
+2025-12-07 20:27:47.879  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:48.505  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Text.Json.dll
+2025-12-07 20:27:48.505  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:48.526  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Messaging.dll
+2025-12-07 20:27:48.528  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:48.530  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.HotDesign.Abstractions.dll
+2025-12-07 20:27:48.530  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:48.539  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Text.Encodings.Web.dll
+2025-12-07 20:27:48.557  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:49.470  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly CommunityToolkit.Mvvm.dll
+2025-12-07 20:27:49.471  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:49.537  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Core.Extensions.Collections.dll
+2025-12-07 20:27:49.539  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:49.653  9971-9977  anyname.UnoApp3         com.companyname.UnoApp3              I  Background concurrent mark compact GC freed 1689KB AllocSpace bytes, 0(0B) LOS objects, 49% free, 2380KB/4760KB, paused 1.601ms,5.013ms total 125.280ms
+2025-12-07 20:27:52.505  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly SkiaSharp.Skottie.dll
+2025-12-07 20:27:52.505  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:52.506  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly SkiaSharp.SceneGraph.dll
+2025-12-07 20:27:52.506  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:56.098  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly HarfBuzzSharp.dll
+2025-12-07 20:27:56.099  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:57.998  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.ComponentModel.dll
+2025-12-07 20:27:57.998  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:58.000  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Navigation.dll
+2025-12-07 20:27:58.001  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:59.327  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.ComponentModel.Primitives.dll
+2025-12-07 20:27:59.329  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:27:59.369  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Toolkit.dll
+2025-12-07 20:27:59.369  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:00.201  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              W  Accessing hidden method Landroid/view/ViewGroup;->makeOptionalFitsSystemWindows()V (unsupported, reflection, allowed)
+2025-12-07 20:28:00.276  9971-9971  HWUI                    com.companyname.UnoApp3              W  Unknown dataspace 0
+2025-12-07 20:28:00.566  9971-10037 ProfileInstaller        com.companyname.UnoApp3              D  Installing profile for com.companyname.UnoApp3
+2025-12-07 20:28:00.814  9971-9989  EGL_emulation           com.companyname.UnoApp3              I  Opening libGLESv1_CM_emulation.so
+2025-12-07 20:28:00.845  9971-9989  EGL_emulation           com.companyname.UnoApp3              I  Opening libGLESv2_emulation.so
+2025-12-07 20:28:01.079  9971-9989  HWUI                    com.companyname.UnoApp3              W  Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+2025-12-07 20:28:01.084  9971-9989  HWUI                    com.companyname.UnoApp3              W  Failed to initialize 101010-2 format, error = EGL_SUCCESS
+2025-12-07 20:28:01.273  9971-9989  Gralloc4                com.companyname.UnoApp3              I  mapper 4.x is not supported
+2025-12-07 20:28:01.518  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.App.Mcp.Messages.dll
+2025-12-07 20:28:01.528  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:01.599  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Core.Extensions.Logging.Singleton.dll
+2025-12-07 20:28:01.606  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:05.490  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Newtonsoft.Json.dll
+2025-12-07 20:28:05.504  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:05.563  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.Serialization.Formatters.dll
+2025-12-07 20:28:05.568  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:06.487  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.Serialization.Primitives.dll
+2025-12-07 20:28:06.487  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:06.590  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.Numerics.dll
+2025-12-07 20:28:06.591  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:07.334  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Diagnostics.TraceSource.dll
+2025-12-07 20:28:07.334  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:07.366  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Linq.Expressions.dll
+2025-12-07 20:28:07.421  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:07.429  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.ComponentModel.TypeConverter.dll
+2025-12-07 20:28:07.429  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:07.907  9971-9977  anyname.UnoApp3         com.companyname.UnoApp3              I  Background concurrent mark compact GC freed 612KB AllocSpace bytes, 11(1292KB) LOS objects, 49% free, 2845KB/5690KB, paused 6.281ms,149.197ms total 3.786s
+2025-12-07 20:28:08.115  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Data.Common.dll
+2025-12-07 20:28:08.115  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:08.997  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Reflection.Emit.ILGeneration.dll
+2025-12-07 20:28:08.998  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:09.075  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Reflection.Emit.Lightweight.dll
+2025-12-07 20:28:09.077  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:09.147  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Reflection.Primitives.dll
+2025-12-07 20:28:09.148  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:09.466  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 498 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:28:09.533  9971-9976  anyname.UnoApp3         com.companyname.UnoApp3              I  Compiler allocated 5174KB to compile void android.view.ViewRootImpl.performTraversals()
+2025-12-07 20:28:09.692  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.IO.Pipelines.dll
+2025-12-07 20:28:09.692  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:10.309  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 37 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:28:10.520  9971-9977  anyname.UnoApp3         com.companyname.UnoApp3              I  Background concurrent mark compact GC freed 60KB AllocSpace bytes, 77(10164KB) LOS objects, 49% free, 3241KB/6483KB, paused 1.371ms,7.370ms total 369.616ms
+2025-12-07 20:28:10.868  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Core.dll
+2025-12-07 20:28:10.869  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:10.933  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Drawing.Primitives.dll
+2025-12-07 20:28:10.933  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:10.980  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Xml.XDocument.dll
+2025-12-07 20:28:10.980  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:10.982  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Private.Xml.Linq.dll
+2025-12-07 20:28:10.982  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:10.999  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Xml.XPath.XDocument.dll
+2025-12-07 20:28:11.000  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:11.022  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly CommonServiceLocator.dll
+2025-12-07 20:28:11.022  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:11.025  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Logging.dll
+2025-12-07 20:28:11.025  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:11.033  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Options.dll
+2025-12-07 20:28:11.036  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:11.568  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Xaml.dll
+2025-12-07 20:28:11.569  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:12.404  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly _Microsoft.Android.Resource.Designer.dll
+2025-12-07 20:28:12.404  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:12.420  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Localization.Abstractions.dll
+2025-12-07 20:28:12.420  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:12.434  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Hosting.dll
+2025-12-07 20:28:12.434  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:12.437  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Serilog.dll
+2025-12-07 20:28:12.437  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:12.444  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.Abstractions.dll
+2025-12-07 20:28:12.445  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.021  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 161 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:28:13.121  9971-9983  HWUI                    com.companyname.UnoApp3              I  Davey! duration=2768ms; Flags=1, FrameTimelineVsyncId=76823, IntendedVsync=913688654792, Vsync=916371988018, InputEventId=0, HandleInputStart=916383427800, AnimationStart=916383468600, PerformTraversalsStart=916383573800, DrawStart=916401945600, FrameDeadline=913705321458, FrameInterval=916381796000, FrameStartTime=16666666, SyncQueued=916424068200, SyncStart=916425427600, IssueDrawCommandsStart=916429198500, SwapBuffers=916431768400, FrameCompleted=916458071100, DequeueBufferDuration=35700, QueueBufferDuration=664000, GpuCompleted=916457902000, SwapBuffersCompleted=916458071100, DisplayPresentTime=0, CommandSubmissionCompleted=916431768400,
+2025-12-07 20:28:13.254  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.FileProviders.Physical.dll
+2025-12-07 20:28:13.254  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.257  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.FileProviders.Abstractions.dll
+2025-12-07 20:28:13.258  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.274  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.DependencyInjection.dll
+2025-12-07 20:28:13.274  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.336  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Serialization.dll
+2025-12-07 20:28:13.338  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.355  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Hosting.dll
+2025-12-07 20:28:13.356  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.373  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Storage.dll
+2025-12-07 20:28:13.381  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.446  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Localization.dll
+2025-12-07 20:28:13.447  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.517  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Http.dll
+2025-12-07 20:28:13.524  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.573  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.dll
+2025-12-07 20:28:13.578  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.622  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+2025-12-07 20:28:13.622  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.629  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.CommandLine.dll
+2025-12-07 20:28:13.636  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.658  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Web.HttpUtility.dll
+2025-12-07 20:28:13.659  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:13.719  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Primitives.dll
+2025-12-07 20:28:13.726  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.010  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.FileExtensions.dll
+2025-12-07 20:28:14.015  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.031  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.Json.dll
+2025-12-07 20:28:14.038  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.061  9971-10074 SurfaceSyncGroup        com.companyname.UnoApp3              E  Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[MainActivity]#1) as ready
+2025-12-07 20:28:14.063  9971-10074 SurfaceSyncGroup        com.companyname.UnoApp3              E  Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[MainActivity]#2) as ready
+2025-12-07 20:28:14.064  9971-10074 SurfaceSyncGroup        com.companyname.UnoApp3              E  Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(SurfaceView[com.companyname.UnoApp3/crc647550fd11ca543fdf.MainActivity]#0) as ready
+2025-12-07 20:28:14.354  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Logging.Configuration.dll
+2025-12-07 20:28:14.360  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.377  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Options.ConfigurationExtensions.dll
+2025-12-07 20:28:14.381  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.430  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Configuration.Binder.dll
+2025-12-07 20:28:14.431  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.507  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Extensions.Logging.WebAssembly.Console.dll
+2025-12-07 20:28:14.510  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.536  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Logging.Console.dll
+2025-12-07 20:28:14.540  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.548  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.Logging.Debug.dll
+2025-12-07 20:28:14.548  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.599  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Serilog.Settings.Configuration.dll
+2025-12-07 20:28:14.601  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.616  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Microsoft.Extensions.DependencyModel.dll
+2025-12-07 20:28:14.616  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.632  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Serilog.Extensions.Logging.dll
+2025-12-07 20:28:14.642  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.860  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Serilog.Sinks.Console.dll
+2025-12-07 20:28:14.861  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.863  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Serilog.Sinks.Debug.dll
+2025-12-07 20:28:14.864  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:14.934  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly System.Runtime.InteropServices.RuntimeInformation.dll
+2025-12-07 20:28:14.934  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:15.544  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.UI.Adapter.Microsoft.Extensions.Logging.dll
+2025-12-07 20:28:15.544  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:15.801  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly en/System.Private.CoreLib.resources.dll
+2025-12-07 20:28:15.802  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:15.802  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_update_dir: assembly file DOES NOT EXIST
+2025-12-07 20:28:15.802  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly en/System.Private.CoreLib.resources.dll
+2025-12-07 20:28:15.802  9971-9993  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:16.004  9971-9993  app_process64           com.companyname.UnoApp3              D  12-07 20:28:15.760+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.keyvaluestorageconfiguration.json' does not exist in package
+2025-12-07 20:28:16.012  9971-9993  app_process64           com.companyname.UnoApp3              D  12-07 20:28:16.010+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.appconfig.json' does not exist in package
+2025-12-07 20:28:16.015  9971-9993  app_process64           com.companyname.UnoApp3              D  12-07 20:28:16.014+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.localizationconfiguration.json' does not exist in package
+2025-12-07 20:28:16.018  9971-9993  app_process64           com.companyname.UnoApp3              D  12-07 20:28:16.018+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.localizationsettings.json' does not exist in package
+2025-12-07 20:28:16.023  9971-9993  app_process64           com.companyname.UnoApp3              D  12-07 20:28:16.022+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.webconfiguration.json' does not exist in package
+2025-12-07 20:28:16.082  9971-9993  app_process64           com.companyname.UnoApp3              D  12-07 20:28:16.028+08:00 I/Uno.Extensions.Storage.FileStorage: ReadPackageFileAsync - File 'appsettings.navigationconfiguration.json' does not exist in package
+2025-12-07 20:28:16.943  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1138.53ms min=1122.32ms max=1154.75ms count=2
+2025-12-07 20:28:17.137  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:28:17.136+08:00 I/Uno.Extensions.Navigation.Navigators.ContentControlNavigator: NavigateAsync - Starting Navigation - Navigator: ContentControlNavigator Request:
+2025-12-07 20:28:17.220  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:28:17.219+08:00 I/Uno.Extensions.Navigation.Navigators.ContentControlNavigator: CreateControlFromType - Creating control of type FrameView
+2025-12-07 20:28:17.628  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1131.74ms min=6.30ms max=2941.48ms count=4
+2025-12-07 20:28:17.980  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=256.51ms min=99.23ms max=493.37ms count=4
+2025-12-07 20:28:18.763  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 53 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:28:18.777  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=573.71ms min=315.39ms max=832.03ms count=2
+2025-12-07 20:28:18.789  9971-9982  HWUI                    com.companyname.UnoApp3              I  Davey! duration=899ms; Flags=0, FrameTimelineVsyncId=77455, IntendedVsync=921238654490, Vsync=922121987788, InputEventId=0, HandleInputStart=922125451000, AnimationStart=922125515800, PerformTraversalsStart=922125626200, DrawStart=922125974900, FrameDeadline=921255321156, FrameInterval=922123902500, FrameStartTime=16666666, SyncQueued=922126083600, SyncStart=922126243900, IssueDrawCommandsStart=922126535900, SwapBuffers=922127183800, FrameCompleted=922138051500, DequeueBufferDuration=209100, QueueBufferDuration=3932400, GpuCompleted=922137258100, SwapBuffersCompleted=922138051500, DisplayPresentTime=0, CommandSubmissionCompleted=922127183800,
+2025-12-07 20:28:20.628  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=925.27ms min=69.91ms max=1780.63ms count=2
+2025-12-07 20:28:21.131  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Uno.Core.Extensions.Logging.dll
+2025-12-07 20:28:21.131  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:21.232  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1083.84ms min=141.57ms max=2382.64ms count=3
+2025-12-07 20:28:21.852  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 75 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:28:21.918  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1289.92ms min=1289.92ms max=1289.92ms count=1
+2025-12-07 20:28:22.009  9971-9982  HWUI                    com.companyname.UnoApp3              I  Davey! duration=1403ms; Flags=0, FrameTimelineVsyncId=77496, IntendedVsync=923955321048, Vsync=925205320998, InputEventId=0, HandleInputStart=925231564500, AnimationStart=925231617100, PerformTraversalsStart=925231689800, DrawStart=925232697000, FrameDeadline=924005321046, FrameInterval=925212990800, FrameStartTime=16666666, SyncQueued=925232819700, SyncStart=925233665100, IssueDrawCommandsStart=925233732400, SwapBuffers=925273651200, FrameCompleted=925359748800, DequeueBufferDuration=77400, QueueBufferDuration=3855300, GpuCompleted=925359748800, SwapBuffersCompleted=925279582800, DisplayPresentTime=0, CommandSubmissionCompleted=925273651200,
+2025-12-07 20:28:24.114  9971-9971  anyname.UnoApp3         com.companyname.UnoApp3              I  Explicit concurrent mark compact GC freed 660KB AllocSpace bytes, 2(104KB) LOS objects, 49% free, 3286KB/6572KB, paused 1.392ms,4.252ms total 46.258ms
+2025-12-07 20:28:25.034  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1900.56ms min=84.38ms max=3716.74ms count=2
+2025-12-07 20:28:25.110  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=3190.54ms min=3190.54ms max=3190.54ms count=1
+2025-12-07 20:28:25.404  9971-9971  app_process64           com.companyname.UnoApp3              D  The Bindable attribute is missing and the type [UnoApp3.Presentation.MainViewModel] is not known by the MetadataProvider. Reflection was used instead of the binding engine and generated static metadata. Add the Bindable attribute to prevent this message and performance issues.
+2025-12-07 20:28:25.878  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:28:25.875+08:00 I/Uno.Extensions.Navigation.Navigators.ContentControlNavigator: NavigateAsync - Starting Navigation - Navigator: ContentControlNavigator Request: ./Login
+2025-12-07 20:28:26.117  9971-9971  app_process64           com.companyname.UnoApp3              D  The Bindable attribute is missing and the type [Microsoft.UI.Xaml.Controls.ToolTipService] is not known by the MetadataProvider. Reflection was used instead of the binding engine and generated static metadata. Add the Bindable attribute to prevent this message and performance issues.
+2025-12-07 20:28:26.419  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=327.02ms min=109.39ms max=496.15ms count=4
+2025-12-07 20:28:26.593  9971-9971  app_process64           com.companyname.UnoApp3              D  The Bindable attribute is missing and the type [UnoApp3.Presentation.ShellViewModel] is not known by the MetadataProvider. Reflection was used instead of the binding engine and generated static metadata. Add the Bindable attribute to prevent this message and performance issues.
+2025-12-07 20:28:26.608  9971-9971  app_process64           com.companyname.UnoApp3              D  The Bindable attribute is missing and the type [UnoApp3.Presentation.LoginViewModel] is not known by the MetadataProvider. Reflection was used instead of the binding engine and generated static metadata. Add the Bindable attribute to prevent this message and performance issues.
+2025-12-07 20:28:26.681  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=410.95ms min=111.04ms max=999.07ms count=4
+2025-12-07 20:28:27.486  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=152.23ms min=39.39ms max=487.31ms count=7
+2025-12-07 20:28:27.706  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=170.62ms min=20.82ms max=450.98ms count=6
+2025-12-07 20:28:52.466  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=6189.20ms min=27.67ms max=24607.28ms count=4
+2025-12-07 20:28:52.629  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: failed to load bundled assembly Xamarin.AndroidX.Browser.dll
+2025-12-07 20:28:52.630  9971-9971  monodroid-assembly      com.companyname.UnoApp3              W  open_from_bundles: the assembly might have been uploaded to the device with FastDev instead
+2025-12-07 20:28:52.959  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=8488.99ms min=96.28ms max=25118.75ms count=3
+2025-12-07 20:28:54.497  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=760.90ms min=295.59ms max=1226.20ms count=2
+2025-12-07 20:28:54.521  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=684.65ms min=177.71ms max=1356.45ms count=3
+2025-12-07 20:28:55.474  9971-9976  anyname.UnoApp3         com.companyname.UnoApp3              I  Compiler allocated 4219KB to compile void android.widget.TextView.<init>(android.content.Context, android.util.AttributeSet, int, int)
+2025-12-07 20:28:58.267  9971-9971  VRI[PopupW...w:9301790] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=true newVisibility=false
+2025-12-07 20:28:58.673  9971-9971  VRI[PopupW...w:82748a8] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=true newVisibility=false
+2025-12-07 20:28:58.694  9971-9971  VRI[MainActivity]       com.companyname.UnoApp3              D  visibilityChanged oldVisibility=true newVisibility=false
+2025-12-07 20:28:59.815  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 32 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:29:37.152  9971-9971  VRI[PopupW...w:82748a8] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=false newVisibility=true
+2025-12-07 20:29:37.155  9971-9971  VRI[PopupW...w:9301790] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=false newVisibility=true
+2025-12-07 20:29:37.914  9971-9983  HWUI                    com.companyname.UnoApp3              I  Davey! duration=739ms; Flags=1, FrameTimelineVsyncId=87801, IntendedVsync=1000521984652, Vsync=1000805317974, InputEventId=0, HandleInputStart=1000812952500, AnimationStart=1000813114300, PerformTraversalsStart=1000813205100, DrawStart=1001181335000, FrameDeadline=1000538651318, FrameInterval=1000808348500, FrameStartTime=16666666, SyncQueued=1001182876200, SyncStart=1001184068800, IssueDrawCommandsStart=1001228819500, SwapBuffers=1001230268300, FrameCompleted=1001262405100, DequeueBufferDuration=21268900, QueueBufferDuration=1025700, GpuCompleted=1001240981400, SwapBuffersCompleted=1001262405100, DisplayPresentTime=0, CommandSubmissionCompleted=1001230268300,
+2025-12-07 20:29:39.253  9971-9971  WindowOnBackDispatcher  com.companyname.UnoApp3              W  sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda11@6485bd9
+2025-12-07 20:29:41.545  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1731.08ms min=116.02ms max=3346.14ms count=2
+2025-12-07 20:29:41.580  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=727.89ms min=35.60ms max=3407.38ms count=5
+2025-12-07 20:29:43.147  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=308.14ms min=37.74ms max=1181.14ms count=5
+2025-12-07 20:29:43.272  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:29:43.270+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: -
+2025-12-07 20:29:43.495  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=375.05ms min=15.61ms max=1574.61ms count=5
+2025-12-07 20:29:44.251  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=135.62ms min=39.45ms max=435.07ms count=8
+2025-12-07 20:29:45.506  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:349653fc: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser true
+2025-12-07 20:29:45.718  9971-9971  InputMethodManager      com.companyname.UnoApp3              D  showSoftInput() view=crc64d465fbe34e0c11e4.UnoSKCanvasView{bd79611 VFED..... .F....ID 0,0-1080,2424 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+2025-12-07 20:29:46.219  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 67 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:29:46.252  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=304.77ms min=8.87ms max=2093.39ms count=9
+2025-12-07 20:29:46.347  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1047.54ms min=885.97ms max=1209.10ms count=2
+2025-12-07 20:29:46.458  9971-9971  AssistStructure         com.companyname.UnoApp3              I  Flattened final assist data: 844 bytes, containing 3 windows, 6 views
+2025-12-07 20:29:46.471  9971-9971  RemoteInpu...ectionImpl com.companyname.UnoApp3              W  getSurroundingText on inactive InputConnection
+2025-12-07 20:29:47.216  9971-9971  RemoteInpu...ectionImpl com.companyname.UnoApp3              W  getSurroundingText on inactive InputConnection
+2025-12-07 20:29:47.284  9971-9971  RemoteInpu...ectionImpl com.companyname.UnoApp3              W  getSurroundingText on inactive InputConnection
+2025-12-07 20:29:47.386  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=169.86ms min=5.56ms max=323.65ms count=6
+2025-12-07 20:29:47.433  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=195.22ms min=42.85ms max=342.24ms count=6
+2025-12-07 20:29:48.060  9971-9971  RemoteInpu...ectionImpl com.companyname.UnoApp3              W  getSurroundingText on inactive InputConnection
+2025-12-07 20:29:48.207  9971-9971  RemoteInpu...ectionImpl com.companyname.UnoApp3              W  requestCursorUpdates on inactive InputConnection
+2025-12-07 20:29:48.448  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=144.76ms min=32.45ms max=362.11ms count=7
+2025-12-07 20:29:48.492  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=157.52ms min=37.92ms max=251.83ms count=7
+2025-12-07 20:29:48.585  9971-9971  RemoteInpu...ectionImpl com.companyname.UnoApp3              W  getSurroundingText on inactive InputConnection
+2025-12-07 20:29:49.490  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=259.88ms min=27.29ms max=518.10ms count=4
+2025-12-07 20:29:49.521  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=256.71ms min=32.47ms max=461.26ms count=4
+2025-12-07 20:29:50.538  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=508.34ms min=61.88ms max=954.79ms count=2
+2025-12-07 20:29:50.576  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=354.21ms min=20.86ms max=1014.69ms count=3
+2025-12-07 20:29:51.586  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=167.11ms min=13.49ms max=450.36ms count=6
+2025-12-07 20:29:51.624  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=215.67ms min=28.86ms max=536.28ms count=5
+2025-12-07 20:29:52.639  9971-9971  InsetsController        com.companyname.UnoApp3              D  show(ime(), fromIme=true)
+2025-12-07 20:29:52.752  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=375.42ms min=115.69ms max=774.43ms count=3
+2025-12-07 20:29:53.146  9971-10648 InteractionJankMonitor  com.companyname.UnoApp3              W  Initializing without READ_DEVICE_CONFIG permission. enabled=true, interval=1, missedFrameThreshold=3, frameTimeThreshold=64, package=com.companyname.UnoApp3
+2025-12-07 20:29:53.405  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1818.13ms min=1818.13ms max=1818.13ms count=1
+2025-12-07 20:29:53.432  9971-10078 HWUI                    com.companyname.UnoApp3              I  Davey! duration=1141ms; Flags=0, FrameTimelineVsyncId=91027, IntendedVsync=1015638650714, Vsync=1016005317366, InputEventId=882165004, HandleInputStart=1016016064700, AnimationStart=1016016113700, PerformTraversalsStart=1016016315100, DrawStart=1016761503600, FrameDeadline=1015655317380, FrameInterval=1016015604400, FrameStartTime=16666666, SyncQueued=1016761599800, SyncStart=1016761812300, IssueDrawCommandsStart=1016762083400, SwapBuffers=1016762815700, FrameCompleted=1016780040800, DequeueBufferDuration=79000, QueueBufferDuration=1809200, GpuCompleted=1016780040800, SwapBuffersCompleted=1016777276500, DisplayPresentTime=0, CommandSubmissionCompleted=1016762815700,
+2025-12-07 20:29:53.599  9971-10648 Choreographer           com.companyname.UnoApp3              I  Skipped 46 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:29:53.848  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1061.81ms min=1061.81ms max=1061.81ms count=1
+2025-12-07 20:29:54.080  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:6faaf5c4: onShown
+2025-12-07 20:29:54.655  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=309.30ms min=249.75ms max=462.60ms count=4
+2025-12-07 20:29:54.884  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=344.21ms min=200.30ms max=474.26ms count=3
+2025-12-07 20:29:55.724  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=206.70ms min=36.17ms max=352.56ms count=5
+2025-12-07 20:29:55.962  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=268.82ms min=18.45ms max=668.03ms count=4
+2025-12-07 20:29:56.872  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=286.87ms min=48.52ms max=473.17ms count=4
+2025-12-07 20:29:57.034  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=256.50ms min=57.47ms max=393.99ms count=3
+2025-12-07 20:29:58.136  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=550.78ms min=376.50ms max=725.06ms count=2
+2025-12-07 20:29:58.393  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=379.18ms min=153.57ms max=775.45ms count=4
+2025-12-07 20:29:59.313  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=588.48ms min=353.20ms max=823.75ms count=2
+2025-12-07 20:29:59.539  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=231.98ms min=85.19ms max=408.31ms count=4
+2025-12-07 20:30:00.355  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=218.13ms min=20.10ms max=411.24ms count=4
+2025-12-07 20:30:00.696  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=285.63ms min=164.85ms max=461.12ms count=4
+2025-12-07 20:30:01.445  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=272.26ms min=93.97ms max=424.21ms count=4
+2025-12-07 20:30:01.891  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=225.22ms min=18.63ms max=477.11ms count=5
+2025-12-07 20:30:02.480  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=251.71ms min=97.20ms max=579.63ms count=4
+2025-12-07 20:30:02.502  9971-9971  InputMethodManager      com.companyname.UnoApp3              W  Timeout waiting for IME to handle input event after 2500 ms: com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME
+2025-12-07 20:30:02.976  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=171.53ms min=59.40ms max=395.78ms count=6
+2025-12-07 20:30:03.147  9971-9971  InputMethodManager      com.companyname.UnoApp3              W  Timeout waiting for IME to handle input event after 2500 ms: com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME
+2025-12-07 20:30:03.959  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=244.31ms min=22.10ms max=548.68ms count=6
+2025-12-07 20:30:04.055  9971-9971  InputMethodManager      com.companyname.UnoApp3              W  Timeout waiting for IME to handle input event after 2500 ms: com.google.android.inputmethod.latin/com.android.inputmethod.latin.LatinIME
+2025-12-07 20:30:04.325  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=267.05ms min=75.22ms max=517.69ms count=5
+2025-12-07 20:30:04.831  9971-9971  FrameTracker            com.companyname.UnoApp3              E  force finish cuj, time out: J<IME_INSETS_SHOW_ANIMATION::0@0@com.companyname.UnoApp3>
+2025-12-07 20:30:05.083  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=165.19ms min=77.04ms max=264.40ms count=6
+2025-12-07 20:30:05.538  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=292.18ms min=37.56ms max=520.84ms count=4
+2025-12-07 20:30:06.410  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=262.63ms min=20.84ms max=526.29ms count=5
+2025-12-07 20:30:06.888  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=188.18ms min=20.77ms max=551.91ms count=7
+2025-12-07 20:30:07.504  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=543.62ms min=288.99ms max=798.25ms count=2
+2025-12-07 20:30:07.921  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=343.94ms min=149.92ms max=716.99ms count=3
+2025-12-07 20:30:08.514  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=164.91ms min=40.69ms max=269.89ms count=5
+2025-12-07 20:30:09.210  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=207.79ms min=77.61ms max=409.05ms count=6
+2025-12-07 20:30:09.942  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=285.20ms min=20.74ms max=530.42ms count=5
+2025-12-07 20:30:10.342  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=282.85ms min=83.07ms max=501.72ms count=4
+2025-12-07 20:30:10.995  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=169.24ms min=9.47ms max=388.81ms count=6
+2025-12-07 20:30:11.356  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=154.32ms min=21.82ms max=381.76ms count=6
+2025-12-07 20:30:12.011  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=253.58ms min=120.26ms max=418.40ms count=4
+2025-12-07 20:30:12.403  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=261.47ms min=71.61ms max=502.87ms count=4
+2025-12-07 20:30:12.996  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:a5460d2f: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser true
+2025-12-07 20:30:12.997  9971-9971  InputMethodManager      com.companyname.UnoApp3              D  showSoftInput() view=crc64d465fbe34e0c11e4.UnoSKCanvasView{bd79611 VFED..... .F...... 0,0-1080,2424 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+2025-12-07 20:30:13.058  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=204.16ms min=86.46ms max=369.03ms count=5
+2025-12-07 20:30:13.254  9971-9971  AssistStructure         com.companyname.UnoApp3              I  Flattened final assist data: 844 bytes, containing 3 windows, 6 views
+2025-12-07 20:30:13.583  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=288.65ms min=45.83ms max=715.40ms count=4
+2025-12-07 20:30:14.093  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=136.52ms min=8.98ms max=348.62ms count=7
+2025-12-07 20:30:22.230  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1427.69ms min=14.14ms max=8173.70ms count=6
+2025-12-07 20:30:22.438  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=8343.82ms min=8343.82ms max=8343.82ms count=1
+2025-12-07 20:30:22.737  9971-9971  InsetsController        com.companyname.UnoApp3              D  show(ime(), fromIme=true)
+2025-12-07 20:30:23.407  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:a5460d2f: onShown
+2025-12-07 20:30:23.439  9971-9971  FrameTracker            com.companyname.UnoApp3              W  Missed App frame:UNKNOWN: 24, 93061, 0, CUJ=J<IME_INSETS_SHOW_ANIMATION::0@0@com.companyname.UnoApp3>
+2025-12-07 20:30:23.440  9971-9971  FrameTracker            com.companyname.UnoApp3              W  Missed SF frame:UNKNOWN: 24, 93061, 0, CUJ=J<IME_INSETS_SHOW_ANIMATION::0@0@com.companyname.UnoApp3>
+2025-12-07 20:30:33.524  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:fda2d268: onRequestShow at ORIGIN_CLIENT reason SHOW_SOFT_INPUT fromUser true
+2025-12-07 20:30:33.528  9971-9971  InputMethodManager      com.companyname.UnoApp3              D  showSoftInput() view=crc64d465fbe34e0c11e4.UnoSKCanvasView{bd79611 VFED..... .F...... 0,0-1080,2424 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+2025-12-07 20:30:33.615  9971-9971  InsetsController        com.companyname.UnoApp3              D  show(ime(), fromIme=true)
+2025-12-07 20:30:33.619  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:fda2d268: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+2025-12-07 20:30:33.653  9971-9971  AssistStructure         com.companyname.UnoApp3              I  Flattened final assist data: 844 bytes, containing 3 windows, 6 views
+2025-12-07 20:30:33.955  9971-9971  InsetsController        com.companyname.UnoApp3              D  show(ime(), fromIme=true)
+2025-12-07 20:30:33.959  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:e2e91f38: onCancelled at PHASE_CLIENT_APPLY_ANIMATION
+2025-12-07 20:30:34.719  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=6140.47ms min=72.42ms max=12208.51ms count=2
+2025-12-07 20:30:34.759  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=6254.54ms min=61.45ms max=12447.63ms count=2
+2025-12-07 20:30:36.551  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:70a7e00: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT fromUser true
+2025-12-07 20:30:36.592  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=615.17ms min=15.71ms max=1671.25ms count=3
+2025-12-07 20:30:36.952  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:30:36.949+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: Second
+2025-12-07 20:30:37.214  9971-9971  Choreographer           com.companyname.UnoApp3              I  Skipped 41 frames!  The application may be doing too much work on its main thread.
+2025-12-07 20:30:37.225  9971-9971  InsetsController        com.companyname.UnoApp3              D  hide(ime(), fromIme=true)
+2025-12-07 20:30:37.227  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1233.50ms min=96.41ms max=2370.59ms count=2
+2025-12-07 20:30:37.245  9971-9983  HWUI                    com.companyname.UnoApp3              I  Davey! duration=702ms; Flags=0, FrameTimelineVsyncId=94546, IntendedVsync=1059888648944, Vsync=1060571982250, InputEventId=130688442, HandleInputStart=1060577615800, AnimationStart=1060577660900, PerformTraversalsStart=1060577719700, DrawStart=1060578072300, FrameDeadline=1059905315610, FrameInterval=1060574891500, FrameStartTime=16666666, SyncQueued=1060578156600, SyncStart=1060579507000, IssueDrawCommandsStart=1060579613900, SwapBuffers=1060581794600, FrameCompleted=1060592506100, DequeueBufferDuration=58200, QueueBufferDuration=3825000, GpuCompleted=1060587873500, SwapBuffersCompleted=1060592506100, DisplayPresentTime=0, CommandSubmissionCompleted=1060581794600,
+2025-12-07 20:30:37.635  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:715b6e0c: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT_ON_ANIMATION_STATE_CHANGED fromUser false
+2025-12-07 20:30:37.641  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:70a7e00: onHidden
+2025-12-07 20:30:37.683  9971-9971  app_process64           com.companyname.UnoApp3              D  The Bindable attribute is missing and the type [UnoApp3.Presentation.SecondViewModel] is not known by the MetadataProvider. Reflection was used instead of the binding engine and generated static metadata. Add the Bindable attribute to prevent this message and performance issues.
+2025-12-07 20:30:37.688  9971-9971  app_process64           com.companyname.UnoApp3              D  The Bindable attribute is missing and the type [UnoApp3.Models.Entity] is not known by the MetadataProvider. Reflection was used instead of the binding engine and generated static metadata. Add the Bindable attribute to prevent this message and performance issues.
+2025-12-07 20:30:37.707  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=556.83ms min=419.84ms max=693.81ms count=2
+2025-12-07 20:30:37.741  9971-9971  FrameTracker            com.companyname.UnoApp3              W  Missed App frame:UNKNOWN: 88, 94748, 0, CUJ=J<IME_INSETS_HIDE_ANIMATION::1@0@com.companyname.UnoApp3>
+2025-12-07 20:30:37.743  9971-9971  FrameTracker            com.companyname.UnoApp3              W  Missed SF frame:UNKNOWN: 88, 94748, 0, CUJ=J<IME_INSETS_HIDE_ANIMATION::1@0@com.companyname.UnoApp3>
+2025-12-07 20:30:40.275  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=854.59ms min=24.19ms max=2475.02ms count=3
+2025-12-07 20:30:40.295  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=766.75ms min=30.23ms max=2530.17ms count=4
+2025-12-07 20:30:40.353  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:30:40.353+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: -
+2025-12-07 20:30:41.282  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=22.24ms min=4.55ms max=83.92ms count=39
+2025-12-07 20:30:41.311  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=27.97ms min=3.16ms max=67.41ms count=34
+2025-12-07 20:30:42.083  9971-9971  ImeTracker              com.companyname.UnoApp3              I  com.companyname.UnoApp3:69190bb4: onRequestHide at ORIGIN_CLIENT reason HIDE_SOFT_INPUT fromUser false
+2025-12-07 20:30:42.558  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=171.39ms min=2.23ms max=461.05ms count=7
+2025-12-07 20:30:42.637  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=133.41ms min=5.08ms max=525.73ms count=10
+2025-12-07 20:30:45.866  9971-9971  VRI[PopupW...w:82748a8] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=true newVisibility=false
+2025-12-07 20:30:45.930  9971-9971  VRI[PopupW...w:9301790] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=true newVisibility=false
+2025-12-07 20:30:45.973  9971-9971  VRI[MainActivity]       com.companyname.UnoApp3              D  visibilityChanged oldVisibility=true newVisibility=false
+2025-12-07 20:30:58.318  9971-9977  anyname.UnoApp3         com.companyname.UnoApp3              I  Background concurrent mark compact GC freed 1433KB AllocSpace bytes, 20(1392KB) LOS objects, 49% free, 3673KB/7346KB, paused 6.033ms,14.046ms total 101.693ms
+2025-12-07 20:30:58.807  9971-9971  VRI[PopupW...w:9301790] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=false newVisibility=true
+2025-12-07 20:30:58.808  9971-9971  VRI[PopupW...w:82748a8] com.companyname.UnoApp3              D  visibilityChanged oldVisibility=false newVisibility=true
+2025-12-07 20:31:00.493  9971-9971  WindowOnBackDispatcher  com.companyname.UnoApp3              W  sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda11@b9ec9ef
+2025-12-07 20:31:02.231  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1475.96ms min=82.47ms max=2869.45ms count=2
+2025-12-07 20:31:02.262  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=770.21ms min=39.54ms max=2918.19ms count=4
+2025-12-07 20:31:02.295  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:31:02.291+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: Second
+2025-12-07 20:31:03.268  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=169.36ms min=22.05ms max=580.79ms count=6
+2025-12-07 20:31:03.271  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=167.89ms min=12.33ms max=549.47ms count=6
+2025-12-07 20:31:05.750  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=2479.98ms min=2479.98ms max=2479.98ms count=1
+2025-12-07 20:31:05.775  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=2493.45ms min=2493.45ms max=2493.45ms count=1
+2025-12-07 20:31:05.820  9971-9971  app_process64           com.companyname.UnoApp3              D  12-07 20:31:05.819+08:00 I/Uno.Extensions.Navigation.Navigators.FrameNavigator: NavigateAsync - Starting Navigation - Navigator: FrameNavigator Request: -
+2025-12-07 20:31:06.759  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=19.64ms min=4.49ms max=64.75ms count=43
+2025-12-07 20:31:06.787  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=29.84ms min=6.73ms max=81.43ms count=32
+2025-12-07 20:31:16.215  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=2359.40ms min=10.02ms max=9372.39ms count=4
+2025-12-07 20:31:16.234  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=4722.87ms min=51.96ms max=9393.78ms count=2
+2025-12-07 20:31:22.084  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=977.00ms min=6.30ms max=5620.84ms count=6
+2025-12-07 20:31:22.174  9971-9989  EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=1483.03ms min=46.26ms max=5714.33ms count=4
+2025-12-07 20:31:23.153  9971-10036 EGL_emulation           com.companyname.UnoApp3              D  app_time_stats: avg=534.15ms min=263.14ms max=805.17ms count=2
