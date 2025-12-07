@@ -1,4 +1,11 @@
-// Export tất cả API functions và types cho Users feature
-export * from './userApi'
-export * from './userService'
-export { default as userApi } from './userApi'
+/**
+ * Users API
+ * 
+ * Export UserApiService và instance
+ */
+
+export { UserApiService, userApiService } from './UserApiService';
+
+// Re-export types
+export type { UserEntity } from '../types/entity';
+export type { CreateUserRequest, UpdateUserRequest } from '../types/api';

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Form, message } from 'antd'
-import { userApi } from '../api/userApi'
 import { getRouteApi, useNavigate } from '@tanstack/react-router'
 import { ENDPOINTS } from '../../../app/routes/type/endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
+import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
 
 export const useUserManagementPage = () => {
     // Route API với search params trên URL
@@ -17,6 +17,43 @@ export const useUserManagementPage = () => {
     const [editingUser, setEditingUser] = useState<any>(null)
     const [deletingUser, setDeletingUser] = useState<any>(null)
     const [form] = Form.useForm()
+
+    // Mutation hooks
+    const createUser = useCreateUser({
+        onSuccess: () => {
+            message.success('Thêm người dùng thành công!')
+            form.resetFields()
+            setIsModalVisible(false)
+            // Cache tự động invalidate, không cần navigate
+        },
+        onError: (error: Error) => {
+            message.error(error.message || 'Không thể tạo người dùng mới')
+        },
+    })
+
+    const updateUser = useUpdateUser({
+        onSuccess: () => {
+            message.success('Cập nhật người dùng thành công!')
+            form.resetFields()
+            setIsModalVisible(false)
+            // Cache tự động invalidate, không cần navigate
+        },
+        onError: (error: Error) => {
+            message.error(error.message || 'Không thể cập nhật người dùng')
+        },
+    })
+
+    const deleteUser = useDeleteUser({
+        onSuccess: () => {
+            message.success('Xóa người dùng thành công!')
+            setIsDeleteModalVisible(false)
+            setDeletingUser(null)
+            // Cache tự động invalidate, không cần navigate
+        },
+        onError: (error: Error) => {
+            message.error(error.message || 'Không thể xóa người dùng')
+        },
+    })
 
     // Search/Filter/Sort đọc từ URL (TanStack Router Query)
     const searchText = search?.search || ''
@@ -51,41 +88,17 @@ export const useUserManagementPage = () => {
 
             if (editingUser) {
                 // Update user
-                const response = await userApi.updateUser(
-                    editingUser.id,
-                    values
-                )
-                if (!response.isError && response.data) {
-                    message.success('Cập nhật người dùng thành công!')
-                    // Refresh data by navigating to current page
-                    navigate({ search: (prev) => ({ ...prev }) })
-                } else {
-                    message.error(
-                        response.message || 'Không thể cập nhật người dùng'
-                    )
-                }
+                updateUser.mutate({ id: editingUser.id, data: values })
             } else {
                 // Add new user
-                const response = await userApi.createUser(values)
-                if (!response.isError && response.data) {
-                    message.success('Thêm người dùng thành công!')
-                    // Refresh data by navigating to current page
-                    navigate({ search: (prev) => ({ ...prev }) })
-                } else {
-                    message.error(
-                        response.message || 'Không thể tạo người dùng mới'
-                    )
-                }
+                createUser.mutate(values)
             }
-            form.resetFields()
-            setIsModalVisible(false)
         } catch (error: any) {
             if (error.errorFields) {
                 // Form validation errors
                 console.log('Validate Failed:', error)
             } else {
-                // API errors
-                message.error(error.message || 'Có lỗi xảy ra')
+                // API errors - đã được handle trong onError của mutation hooks
                 console.error('API Error:', error)
             }
         }
@@ -93,25 +106,7 @@ export const useUserManagementPage = () => {
 
     const handleDelete = async () => {
         if (deletingUser) {
-            try {
-                const response = await userApi.deleteUser(deletingUser.id)
-                if (!response.isError && response.data) {
-                    message.success('Xóa người dùng thành công!')
-                    // Refresh data by navigating to current page
-                    navigate({ search: (prev) => ({ ...prev }) })
-                    setIsDeleteModalVisible(false)
-                    setDeletingUser(null)
-                } else {
-                    message.error(
-                        response.message || 'Không thể xóa người dùng'
-                    )
-                }
-            } catch (error: any) {
-                message.error(
-                    error.message || 'Có lỗi xảy ra khi xóa người dùng'
-                )
-                console.error('Delete error:', error)
-            }
+            deleteUser.mutate(deletingUser.id)
         }
     }
 
