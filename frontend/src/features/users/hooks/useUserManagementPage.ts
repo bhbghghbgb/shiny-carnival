@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { Form, message } from 'antd'
 import { userApi } from '../api/userApi'
-import { Route } from '../../../app/routes/users'
+import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import { ENDPOINTS } from '../../../app/routes/type/endpoint'
+import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
 
 export const useUserManagementPage = () => {
-    // Lấy dữ liệu và search params từ route context
-    const { data: usersData } = (Route.useLoaderData() || {}) as any
-    const { search } = (Route.useSearch() || {}) as any
-    const navigate = Route.useNavigate()
+    // Route API với search params trên URL
+    const routeApi = getRouteApi(ENDPOINTS.ADMIN.USERS)
+    const { users: usersData, total: totalUsers } = routeApi.useLoaderData() || { users: [], total: 0 }
+    const search = routeApi.useSearch()
+    const navigate = useNavigate({ from: ENDPOINTS.ADMIN.USERS })
 
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
@@ -15,11 +18,11 @@ export const useUserManagementPage = () => {
     const [deletingUser, setDeletingUser] = useState<any>(null)
     const [form] = Form.useForm()
 
-    // Search, Filter, Sort states (giống Mock page)
-    const [searchText, setSearchText] = useState(search || '')
-    const [roleFilter, setRoleFilter] = useState<number | undefined>(undefined)
-    const [sortField, setSortField] = useState<string>('createdAt')
-    const [sortOrder, setSortOrder] = useState<'ascend' | 'descend'>('descend')
+    // Search/Filter/Sort đọc từ URL (TanStack Router Query)
+    const searchText = search?.search || ''
+    const roleFilter = (search as UserSearch | undefined)?.role
+    const sortField = (search as UserSearch | undefined)?.sortField || 'createdAt'
+    const sortOrder = (search as UserSearch | undefined)?.sortOrder || 'descend'
 
     const showModal = () => {
         setEditingUser(null)
@@ -125,9 +128,8 @@ export const useUserManagementPage = () => {
 
     // Search, Filter, Sort handlers (giống Mock page)
     const handleSearch = (value: string) => {
-        setSearchText(value)
         navigate({
-            search: (prev) => ({
+            search: (prev: UserSearch) => ({
                 ...prev,
                 search: value || undefined,
                 page: 1,
@@ -136,37 +138,47 @@ export const useUserManagementPage = () => {
     }
 
     const handleRoleFilter = (value: number | undefined) => {
-        setRoleFilter(value)
-    }
-
-    const handleSort = (field: string, order: 'ascend' | 'descend') => {
-        setSortField(field)
-        setSortOrder(order)
-    }
-
-    const clearFilters = () => {
-        setSearchText('')
-        setRoleFilter(undefined)
-        setSortField('createdAt')
-        setSortOrder('descend')
         navigate({
-            search: (prev) => ({
+            search: (prev: UserSearch) => ({
                 ...prev,
-                search: undefined,
+                role: value,
                 page: 1,
             }),
         })
     }
 
+    const handleSort = (field: string, order: 'ascend' | 'descend') => {
+        navigate({
+            search: (prev: UserSearch) => ({
+                ...prev,
+                sortField: field,
+                sortOrder: order,
+            }),
+        })
+    }
+
+    const clearFilters = () => {
+        navigate({
+            search: {
+                page: 1,
+                pageSize: 10,
+                search: undefined,
+                role: undefined,
+                sortField: 'createdAt',
+                sortOrder: 'descend',
+            },
+        })
+    }
+
     // Statistics (tính từ API data)
-    const users = usersData?.items || []
+    const users = usersData || []
     const adminCount = users.filter((user: any) => user.role === 0).length
     const staffCount = users.filter((user: any) => user.role === 1).length
 
     return {
         // Data
         users,
-        totalUsers: users.length,
+        totalUsers: totalUsers ?? users.length,
         adminCount,
         staffCount,
 
