@@ -5,6 +5,7 @@ import { ENDPOINTS } from '../../../app/routes/type/endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
 import type { UserNoPass } from '../types/entity'
+import type { UpdateUserRequest } from '../types/api'
 
 export const useUserManagementPage = () => {
     // Route API với search params trên URL
@@ -16,36 +17,55 @@ export const useUserManagementPage = () => {
 
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
+    const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false)
+    const [notificationType, setNotificationType] = useState<'success' | 'error'>('success')
+    const [notificationMessage, setNotificationMessage] = useState<string>('')
     const [editingUser, setEditingUser] = useState<UserNoPass | null>(null)
     const [deletingUser, setDeletingUser] = useState<UserNoPass | null>(null)
     const [form] = Form.useForm()
 
     // Mutation hooks
     const createUser = useCreateUser({
-        onSuccess: () => {
-            message.success('Thêm người dùng thành công!')
+        onSuccess: (data) => {
+            console.log('✅ [CreateUser] Success:', data)
             form.resetFields()
             setIsModalVisible(false)
             setEditingUser(null)
+            // Show success notification modal
+            setNotificationType('success')
+            setNotificationMessage('Thêm người dùng thành công!')
+            setIsNotificationModalVisible(true)
             // Refetch route loader data
             router.invalidate()
         },
         onError: (error: Error) => {
-            message.error(error.message || 'Không thể tạo người dùng mới')
+            console.error('❌ [CreateUser] Error:', error)
+            // Show error notification modal
+            setNotificationType('error')
+            setNotificationMessage(error.message || 'Không thể tạo người dùng mới')
+            setIsNotificationModalVisible(true)
         },
     })
 
     const updateUser = useUpdateUser({
-        onSuccess: () => {
-            message.success('Cập nhật người dùng thành công!')
+        onSuccess: (data) => {
+            console.log('✅ [UpdateUser] Success:', data)
             form.resetFields()
             setIsModalVisible(false)
             setEditingUser(null)
+            // Show success notification modal
+            setNotificationType('success')
+            setNotificationMessage('Cập nhật người dùng thành công!')
+            setIsNotificationModalVisible(true)
             // Refetch route loader data
             router.invalidate()
         },
         onError: (error: Error) => {
-            message.error(error.message || 'Không thể cập nhật người dùng')
+            console.error('❌ [UpdateUser] Error:', error)
+            // Show error notification modal
+            setNotificationType('error')
+            setNotificationMessage(error.message || 'Không thể cập nhật người dùng')
+            setIsNotificationModalVisible(true)
         },
     })
 
@@ -91,13 +111,32 @@ export const useUserManagementPage = () => {
     const handleOk = async () => {
         try {
             const values = await form.validateFields()
-            console.log('Form Values: ', values)
+            console.log('✅ [Form] Validation passed. Form Values:', values)
 
             if (editingUser) {
                 // Update user
-                updateUser.mutate({ id: editingUser.id, data: values })
+                // Xử lý password: theo tài liệu, password là optional, nullable
+                // - Nếu null hoặc empty string → không đổi password
+                // - Nếu có giá trị → đổi password
+                const updateData: UpdateUserRequest = {
+                    id: editingUser.id,
+                    username: values.username,
+                    fullName: values.fullName,
+                    role: values.role,
+                    // Nếu password undefined hoặc empty → gửi null (không đổi password)
+                    // Nếu password có giá trị → gửi giá trị đó (đổi password)
+                    password: (values.password === undefined || values.password === '')
+                        ? null
+                        : values.password,
+                }
+
+                console.log('📤 [UpdateUser] Calling mutation with:', { id: editingUser.id, data: updateData })
+                console.log('📤 [UpdateUser] Mutation state:', { isPending: updateUser.isPending, isError: updateUser.isError })
+
+                updateUser.mutate({ id: editingUser.id, data: updateData })
             } else {
                 // Add new user
+                console.log('📤 [CreateUser] Calling mutation with:', values)
                 createUser.mutate(values)
             }
         } catch (error: unknown) {
@@ -126,6 +165,11 @@ export const useUserManagementPage = () => {
     const handleDeleteCancel = () => {
         setIsDeleteModalVisible(false)
         setDeletingUser(null)
+    }
+
+    const handleNotificationClose = () => {
+        setIsNotificationModalVisible(false)
+        setNotificationMessage('')
     }
 
     // Search, Filter, Sort handlers (giống Mock page)
@@ -187,6 +231,9 @@ export const useUserManagementPage = () => {
         // Modal states
         isModalVisible,
         isDeleteModalVisible,
+        isNotificationModalVisible,
+        notificationType,
+        notificationMessage,
         editingUser,
         deletingUser,
         form,
@@ -205,6 +252,7 @@ export const useUserManagementPage = () => {
         handleDelete,
         handleCancel,
         handleDeleteCancel,
+        handleNotificationClose,
         handleSearch,
         handleRoleFilter,
         handleSort,

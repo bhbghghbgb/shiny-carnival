@@ -18,6 +18,9 @@ export function UserManagementPage() {
         // Modal states
         isModalVisible,
         isDeleteModalVisible,
+        isNotificationModalVisible,
+        notificationType,
+        notificationMessage,
         editingUser,
         deletingUser,
         form,
@@ -36,6 +39,7 @@ export function UserManagementPage() {
         handleDelete,
         handleCancel,
         handleDeleteCancel,
+        handleNotificationClose,
         handleSearch,
         handleRoleFilter,
         handleSort,
@@ -85,6 +89,9 @@ export function UserManagementPage() {
             <UserModals
                 isModalVisible={isModalVisible}
                 isDeleteModalVisible={isDeleteModalVisible}
+                isNotificationModalVisible={isNotificationModalVisible}
+                notificationType={notificationType}
+                notificationMessage={notificationMessage}
                 editingUser={editingUser}
                 deletingUser={deletingUser}
                 form={form}
@@ -92,6 +99,7 @@ export function UserManagementPage() {
                 onModalCancel={handleCancel}
                 onDeleteOk={handleDelete}
                 onDeleteCancel={handleDeleteCancel}
+                onNotificationClose={handleNotificationClose}
             />
         </div>
     )

@@ -76,10 +76,10 @@ async function fetchProducts(ctx: LoaderContext<Record<string, never>, ProductSe
       }
     }
 
-    return {
+  return {
       products: [],
       total: 0,
-    };
+  };
   }
 }
 

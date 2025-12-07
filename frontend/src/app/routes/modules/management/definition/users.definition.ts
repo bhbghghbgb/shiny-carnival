@@ -77,10 +77,10 @@ async function fetchUsers(ctx: LoaderContext<Record<string, never>, UserSearch, 
       }
     }
 
-    return {
+  return {
       users: [],
       total: 0,
-    };
+  };
   }
 }
 
