@@ -21,6 +21,8 @@ public class UnitOfWork : IUnitOfWork
         Orders = new Repository<OrderEntity, int>(context);
         OrderItems = new Repository<OrderItemEntity, int>(context);
         Payments = new Repository<PaymentEntity, int>(context);
+        InventoryHistories = new Repository<InventoryHistoryEntity, int>(context);
+        UserRefreshTokens = new Repository<UserRefreshToken, Guid>(context);
     }
 
     public IRepository<UserEntity, int> Users { get; }
@@ -33,6 +35,8 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<OrderEntity, int> Orders { get; }
     public IRepository<OrderItemEntity, int> OrderItems { get; }
     public IRepository<PaymentEntity, int> Payments { get; }
+    public IRepository<InventoryHistoryEntity, int> InventoryHistories { get; }
+    public IRepository<UserRefreshToken, Guid> UserRefreshTokens { get; }
 
     public async Task<int> SaveChangesAsync()
     {

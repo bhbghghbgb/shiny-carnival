@@ -1,0 +1,21 @@
+import type { ModuleRoutes } from '../type/types';
+import HomePage from '../../../pages/HomePage';
+import { PendingComponent } from '../../../components/feedback/PendingComponent';
+import { ErrorComponent } from '../../../components/feedback/ErrorComponent';
+
+// Home module routes configuration
+export const homeRoutes: ModuleRoutes<any> = {
+  moduleName: 'home',
+  basePath: '/',
+  routes: [
+    {
+      path: '', // Index route - sẽ match path của parent (mainLayoutRoute có path '/')
+      component: HomePage,
+      pendingComponent: PendingComponent,
+      errorComponent: ErrorComponent,
+      meta: {
+        requiresAuth: false, // Trang chủ không yêu cầu đăng nhập
+      },
+    },
+  ],
+};
