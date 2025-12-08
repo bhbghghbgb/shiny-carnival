@@ -1,4 +1,6 @@
-﻿namespace UnoApp3.Models.Product;
+﻿using UnoApp3.Models.Common;
+
+namespace UnoApp3.Models.Product;
 
 public class ProductListDto
 {
