@@ -46,7 +46,7 @@ public class InventoryService : IInventoryService
                 .ToListAsync();
 
             var inventoryDtos = _mapper.Map<List<InventoryResponseDto>>(items);
-            var pagedList = new PagedList<InventoryResponseDto>(inventoryDtos, totalCount, request.Page, request.PageSize);
+            var pagedList = new PagedList<InventoryResponseDto>(inventoryDtos, request.Page, request.PageSize, totalCount);
 
             return ApiResponse<PagedList<InventoryResponseDto>>.Success(pagedList);
         }
@@ -172,7 +172,7 @@ public class InventoryService : IInventoryService
                 .ToListAsync();
 
             var historyDtos = _mapper.Map<List<InventoryHistoryDto>>(items);
-            var pagedList = new PagedList<InventoryHistoryDto>(historyDtos, totalCount, request.Page, request.PageSize);
+            var pagedList = new PagedList<InventoryHistoryDto>(historyDtos, request.Page, request.PageSize, totalCount);
 
             return ApiResponse<PagedList<InventoryHistoryDto>>.Success(pagedList);
         }

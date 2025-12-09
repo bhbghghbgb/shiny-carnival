@@ -57,7 +57,7 @@ async function fetchUsers(ctx: LoaderContext<Record<string, never>, UserSearch, 
 
     return {
       users,
-      total: pagedList.totalCount,
+      total: pagedList.totalCount || users.length,
     };
   } catch (error: unknown) {
     console.error('❌ [Loader] Exception caught:', error);

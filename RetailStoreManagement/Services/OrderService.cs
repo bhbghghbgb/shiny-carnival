@@ -81,7 +81,7 @@ public class OrderService : IOrderService
                 .ToListAsync();
 
             var orderDtos = _mapper.Map<List<OrderListDto>>(items);
-            var pagedList = new PagedList<OrderListDto>(orderDtos, totalCount, request.Page, request.PageSize);
+            var pagedList = new PagedList<OrderListDto>(orderDtos, request.Page, request.PageSize, totalCount);
 
             return ApiResponse<PagedList<OrderListDto>>.Success(pagedList);
         }

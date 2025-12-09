@@ -46,7 +46,7 @@ public class SupplierService : ISupplierService
                 .ToListAsync();
 
             var supplierDtos = _mapper.Map<List<SupplierResponseDto>>(items);
-            var pagedList = new PagedList<SupplierResponseDto>(supplierDtos, totalCount, request.Page, request.PageSize);
+            var pagedList = new PagedList<SupplierResponseDto>(supplierDtos, request.Page, request.PageSize, totalCount);
 
             return ApiResponse<PagedList<SupplierResponseDto>>.Success(pagedList);
         }

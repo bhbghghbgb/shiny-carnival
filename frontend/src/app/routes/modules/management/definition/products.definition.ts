@@ -56,7 +56,7 @@ async function fetchProducts(ctx: LoaderContext<Record<string, never>, ProductSe
 
     return {
       products: pagedList.items || [],
-      total: pagedList.totalCount,
+      total: pagedList.totalCount || 0,
     };
   } catch (error: unknown) {
     console.error('❌ [Loader] Exception caught:', error);
@@ -76,10 +76,10 @@ async function fetchProducts(ctx: LoaderContext<Record<string, never>, ProductSe
       }
     }
 
-    return {
+  return {
       products: [],
       total: 0,
-    };
+  };
   }
 }
 
