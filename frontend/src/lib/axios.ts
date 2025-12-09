@@ -1,7 +1,8 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import type { LoginResponse } from "../features/auth/types/api.ts";
-import type { ApiResponse, PagedRequest, PagedList } from './api/types/api.types';
+import { ENDPOINTS } from "../app/routes/type/endpoint";
+import type { ApiResponse } from './api/types/api.types';
 
 const TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -34,11 +35,11 @@ const axiosClient: AxiosInstance = axios.create({
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value?: string | null) => void;
-  reject: (reason?: never) => void;
+  reject: (reason?: unknown) => void;
 }> = [];
 
 // Xử lý queue khi refresh token hoàn thành
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) {
       reject(error);
@@ -59,7 +60,7 @@ axiosClient.interceptors.request.use(
     }
     return config;
   },
-  (error: any) => {
+  (error: unknown) => {
     return Promise.reject(error);
   }
 );
@@ -98,9 +99,9 @@ axiosClient.interceptors.response.use(
           const accessToken = tokenUtils.getToken();
           const response = await axios.post<ApiResponse<LoginResponse>>(
             `${axiosClient.defaults.baseURL}/api/Auth/refresh`,
-            { 
+            {
               accessToken: accessToken || '',
-              refreshToken 
+              refreshToken
             }
           );
 
@@ -122,7 +123,7 @@ axiosClient.interceptors.response.use(
           tokenUtils.clearAllTokens();
 
           // Redirect về trang login
-          window.location.href = '/login';
+          window.location.href = ENDPOINTS.AUTH.LOGIN;
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
@@ -130,7 +131,7 @@ axiosClient.interceptors.response.use(
       } else {
         // Không có refresh token, redirect về login
         tokenUtils.clearAllTokens();
-        window.location.href = '/login';
+        window.location.href = ENDPOINTS.AUTH.LOGIN;
         return Promise.reject(error);
       }
     }
