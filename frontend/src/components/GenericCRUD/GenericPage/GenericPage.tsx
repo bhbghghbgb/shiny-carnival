@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
-import { Button, Form, Input, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
+import { useCallback, useMemo, useState } from 'react'
+import { Alert, Button, Form, Input, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import type { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
-import type { SorterResult } from 'antd/es/table/interface'
+import type { ColumnsType, TablePaginationConfig, TableProps, ColumnType, ColumnGroupType } from 'antd/es/table'
 import type { GenericPageConfig } from './GenericPageConfig'
 
 type Order = 'ascend' | 'descend' | undefined
@@ -29,6 +28,10 @@ export interface GenericPageProps<TData, TCreate, TUpdate> {
     createLoading?: boolean
     updateLoading?: boolean
     deleteLoading?: boolean
+    pageErrorMessage?: string | null
+    onClearPageError?: () => void
+    formErrorMessage?: string | null
+    onClearFormError?: () => void
 }
 
 export function GenericPage<TData extends { id?: string | number }, TCreate, TUpdate>({
@@ -53,13 +56,37 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     createLoading,
     updateLoading,
     deleteLoading,
+    pageErrorMessage,
+    onClearPageError,
+    formErrorMessage,
+    onClearFormError,
 }: GenericPageProps<TData, TCreate, TUpdate>) {
     const [form] = Form.useForm()
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [editingRecord, setEditingRecord] = useState<TData | null>(null)
 
-    const actionColumn = useMemo<ColumnsType<TData>[number]>(() => {
-        const actions = []
+    const handleDelete = useCallback(async (record: TData) => {
+        if (!onDelete) return
+        try {
+            await onDelete(record)
+            message.success('Xóa thành công')
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : 'Không thể xóa'
+            message.error(msg)
+        }
+    }, [onDelete])
+
+    const handleEdit = useCallback((record: TData) => {
+        setEditingRecord(record)
+        onClearFormError?.()
+        const initial =
+            config.form.getUpdateInitialValues?.(record) ?? (record as unknown as Partial<TUpdate>)
+        form.setFieldsValue(initial)
+        setIsModalVisible(true)
+    }, [config.form, form, onClearFormError])
+
+    const actionColumn = useMemo<ColumnsType<TData>[number] | null>(() => {
+        const actions: Array<'edit' | 'delete'> = []
         if (config.features?.enableEdit !== false && onUpdate) {
             actions.push('edit')
         }
@@ -67,7 +94,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             actions.push('delete')
         }
 
-        if (!actions.length) return undefined
+        if (!actions.length) return null
 
         return {
             title: 'Actions',
@@ -94,17 +121,28 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 </Space>
             ),
         }
-    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate])
+    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate, handleDelete, handleEdit])
 
     const columns: ColumnsType<TData> = useMemo(() => {
         const base = config.table.columns
         const merged = actionColumn ? [...base, actionColumn] : base
         if (!sortField || !sortOrder) return merged
         return merged.map((col) => {
-            const isMatch =
-                (typeof col.dataIndex === 'string' && col.dataIndex === sortField) ||
-                col.key === sortField
-            return isMatch ? { ...col, sortOrder } : col
+            const hasDataIndex =
+                (col as ColumnType<TData>).dataIndex !== undefined ||
+                (col as ColumnGroupType<TData>).children !== undefined
+            if (
+                hasDataIndex &&
+                'dataIndex' in col &&
+                typeof col.dataIndex === 'string' &&
+                (col.dataIndex === sortField || col.key === sortField)
+            ) {
+                return { ...col, sortOrder }
+            }
+            if (!('dataIndex' in col) && col.key === sortField) {
+                return { ...col, sortOrder }
+            }
+            return col
         })
     }, [actionColumn, config.table.columns, sortField, sortOrder])
 
@@ -134,28 +172,10 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
 
     const openCreateModal = () => {
         setEditingRecord(null)
+        onClearFormError?.()
         const initial = config.form.getCreateInitialValues?.() ?? {}
         form.setFieldsValue(initial)
         setIsModalVisible(true)
-    }
-
-    const handleEdit = (record: TData) => {
-        setEditingRecord(record)
-        const initial =
-            config.form.getUpdateInitialValues?.(record) ?? (record as unknown as Partial<TUpdate>)
-        form.setFieldsValue(initial)
-        setIsModalVisible(true)
-    }
-
-    const handleDelete = async (record: TData) => {
-        if (!onDelete) return
-        try {
-            await onDelete(record)
-            message.success('Xóa thành công')
-        } catch (error: unknown) {
-            const msg = error instanceof Error ? error.message : 'Không thể xóa'
-            message.error(msg)
-        }
     }
 
     const handleSubmit = async () => {
@@ -188,18 +208,20 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     const closeModal = () => {
         setIsModalVisible(false)
         setEditingRecord(null)
+        onClearFormError?.()
         form.resetFields()
     }
 
     const renderFormFields = useMemo(() => {
         const fields = editingRecord ? config.form.update : config.form.create
         return fields.map((field) => {
+            const fieldName = field.name as string
             if (field.type === 'select') {
                 return (
                     <Form.Item
                         key={field.name}
                         label={field.label}
-                        name={field.name}
+                        name={fieldName}
                         rules={field.rules}
                     >
                         <Select
@@ -216,7 +238,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                     <Form.Item
                         key={field.name}
                         label={field.label}
-                        name={field.name}
+                        name={fieldName}
                         rules={field.rules}
                     >
                         <Input.Password placeholder={field.placeholder} />
@@ -228,7 +250,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 <Form.Item
                     key={field.name}
                     label={field.label}
-                    name={field.name}
+                    name={fieldName}
                     rules={field.rules}
                 >
                     <Input placeholder={field.placeholder} />
@@ -242,6 +264,15 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             {renderHeader ? renderHeader({ openCreate: openCreateModal }) : headerSlot}
             {statisticsSlot}
             {filtersSlot}
+            {pageErrorMessage && (
+                <Alert
+                    type="error"
+                    showIcon
+                    closable
+                    message={pageErrorMessage}
+                    onClose={onClearPageError}
+                />
+            )}
 
             <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <Space>
@@ -280,6 +311,16 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 destroyOnClose
                 forceRender
             >
+                {formErrorMessage && (
+                    <Alert
+                        style={{ marginBottom: 16 }}
+                        type="error"
+                        showIcon
+                        closable
+                        message={formErrorMessage}
+                        onClose={onClearFormError}
+                    />
+                )}
                 <Form form={form} layout="vertical">
                     {renderFormFields}
                 </Form>

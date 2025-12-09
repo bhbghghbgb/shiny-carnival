@@ -1,4 +1,3 @@
-import { Space } from 'antd'
 import { UserHeader } from '../components/UserHeader'
 import { UserStatistics } from '../components/UserStatistics'
 import { UserSearchFilter } from '../components/UserSearchFilter'
@@ -32,11 +31,18 @@ export function UserManagementPage() {
         createUser,
         updateUser,
         deleteUser,
+        pageErrorMessage,
+        formErrorMessage,
+        clearPageError,
+        clearFormError,
     } = useUserManagementPage()
 
-    const handleCreate = (values: CreateUserRequest) => createUser.mutateAsync(values)
-    const handleUpdate = (record: UserNoPass, values: UpdateUserRequest) =>
-        updateUser.mutateAsync({ id: record.id, data: values })
+    const handleCreate = async (values: CreateUserRequest) => {
+        await createUser.mutateAsync(values)
+    }
+    const handleUpdate = async (record: UserNoPass, values: UpdateUserRequest) => {
+        await updateUser.mutateAsync({ id: record.id, data: values })
+    }
     const handleDelete = (record: UserNoPass) => deleteUser.mutateAsync(record.id)
 
     return (
@@ -64,6 +70,10 @@ export function UserManagementPage() {
                 createLoading={createUser.isPending}
                 updateLoading={updateUser.isPending}
                 deleteLoading={deleteUser.isPending}
+                pageErrorMessage={pageErrorMessage}
+                onClearPageError={clearPageError}
+                formErrorMessage={formErrorMessage}
+                onClearFormError={clearFormError}
                 renderHeader={({ openCreate }) => <UserHeader onAddUser={openCreate} />}
                 statisticsSlot={
                     <UserStatistics

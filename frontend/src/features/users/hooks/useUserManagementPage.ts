@@ -1,4 +1,5 @@
 import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
+import { useState } from 'react'
 import { ENDPOINTS } from '../../../app/routes/type/endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
@@ -10,14 +11,24 @@ export const useUserManagementPage = () => {
     const search = routeApi.useSearch()
     const navigate = useNavigate({ from: ENDPOINTS.ADMIN.USERS })
     const router = useRouter()
+    const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
+    const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
+
+    const parseErrorMessage = (error: unknown) => {
+        if (error instanceof Error) return error.message
+        if (typeof error === 'string') return error
+        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
+    }
 
     const createUser = useCreateUser({
         onSuccess: (data) => {
             console.log('✅ [CreateUser] Success:', data)
             router.invalidate()
+            setFormErrorMessage(null)
         },
         onError: (error: Error) => {
             console.error('❌ [CreateUser] Error:', error)
+            setFormErrorMessage(`Tạo user thất bại: ${parseErrorMessage(error)}`)
         },
     })
 
@@ -25,18 +36,22 @@ export const useUserManagementPage = () => {
         onSuccess: (data) => {
             console.log('✅ [UpdateUser] Success:', data)
             router.invalidate()
+            setFormErrorMessage(null)
         },
         onError: (error: Error) => {
             console.error('❌ [UpdateUser] Error:', error)
+            setFormErrorMessage(`Cập nhật user thất bại: ${parseErrorMessage(error)}`)
         },
     })
 
     const deleteUser = useDeleteUser({
         onSuccess: () => {
             router.invalidate()
+            setPageErrorMessage(null)
         },
         onError: (error: Error) => {
             console.error('❌ [DeleteUser] Error:', error)
+            setPageErrorMessage(`Xóa user thất bại: ${parseErrorMessage(error)}`)
         },
     })
 
@@ -131,5 +146,9 @@ export const useUserManagementPage = () => {
         createUser,
         updateUser,
         deleteUser,
+        pageErrorMessage,
+        formErrorMessage,
+        clearPageError: () => setPageErrorMessage(null),
+        clearFormError: () => setFormErrorMessage(null),
     }
 }
