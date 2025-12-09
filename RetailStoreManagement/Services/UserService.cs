@@ -45,7 +45,7 @@ public class UserService : IUserService
                 .ToListAsync();
 
             var userDtos = _mapper.Map<List<UserResponseDto>>(items);
-            var pagedList = new PagedList<UserResponseDto>(userDtos, request.Page, request.PageSize, totalCount);
+            var pagedList = new PagedList<UserResponseDto>(userDtos, totalCount, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<UserResponseDto>>.Success(pagedList);
         }

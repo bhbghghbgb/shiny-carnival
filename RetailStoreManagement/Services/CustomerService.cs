@@ -47,7 +47,7 @@ public class CustomerService : ICustomerService
                 .ToListAsync();
 
             var customerDtos = _mapper.Map<List<CustomerListDto>>(items);
-            var pagedList = new PagedList<CustomerListDto>(customerDtos, request.Page, request.PageSize, totalCount);
+            var pagedList = new PagedList<CustomerListDto>(customerDtos, totalCount, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<CustomerListDto>>.Success(pagedList);
         }

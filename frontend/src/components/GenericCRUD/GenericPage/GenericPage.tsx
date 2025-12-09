@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Button, Form, Input, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import type { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
-import type { SorterResult } from 'antd/es/table/interface'
+import type { ColumnType, ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
 import type { GenericPageConfig } from './GenericPageConfig'
 
 type Order = 'ascend' | 'descend' | undefined
@@ -58,8 +57,8 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [editingRecord, setEditingRecord] = useState<TData | null>(null)
 
-    const actionColumn = useMemo<ColumnsType<TData>[number]>(() => {
-        const actions = []
+    const actionColumn = useMemo<ColumnType<TData> | undefined>(() => {
+        const actions: Array<'edit' | 'delete'> = []
         if (config.features?.enableEdit !== false && onUpdate) {
             actions.push('edit')
         }
@@ -75,7 +74,18 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             render: (_, record) => (
                 <Space>
                     {actions.includes('edit') && (
-                        <Button size="small" onClick={() => handleEdit(record)}>
+                        <Button
+                            size="small"
+                            onClick={() => {
+                                const rec = record
+                                setEditingRecord(rec)
+                                const initial =
+                                    config.form.getUpdateInitialValues?.(rec) ??
+                                    (rec as unknown as Partial<TUpdate>)
+                                form.setFieldsValue(initial)
+                                setIsModalVisible(true)
+                            }}
+                        >
                             Edit
                         </Button>
                     )}
@@ -84,7 +94,17 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                             title="Xóa người dùng?"
                             okText="Xóa"
                             cancelText="Hủy"
-                            onConfirm={() => handleDelete(record)}
+                            onConfirm={async () => {
+                                if (!onDelete) return
+                                try {
+                                    await onDelete(record)
+                                    message.success('Xóa thành công')
+                                } catch (error: unknown) {
+                                    const msg =
+                                        error instanceof Error ? error.message : 'Không thể xóa'
+                                    message.error(msg)
+                                }
+                            }}
                         >
                             <Button size="small" danger loading={deleteLoading}>
                                 Delete
@@ -94,16 +114,17 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 </Space>
             ),
         }
-    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate])
+    }, [config.features?.enableDelete, config.features?.enableEdit, config.form, deleteLoading, form, onDelete, onUpdate])
 
     const columns: ColumnsType<TData> = useMemo(() => {
-        const base = config.table.columns
+        const base = config.table.columns as ColumnsType<TData>
         const merged = actionColumn ? [...base, actionColumn] : base
         if (!sortField || !sortOrder) return merged
         return merged.map((col) => {
+            const colAny = col as ColumnType<TData>
             const isMatch =
-                (typeof col.dataIndex === 'string' && col.dataIndex === sortField) ||
-                col.key === sortField
+                (typeof colAny.dataIndex === 'string' && colAny.dataIndex === sortField) ||
+                colAny.key === sortField
             return isMatch ? { ...col, sortOrder } : col
         })
     }, [actionColumn, config.table.columns, sortField, sortOrder])
@@ -113,10 +134,19 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
         pageSize,
         total,
         showSizeChanger: true,
-        onChange: (current, size) => onPageChange?.(current, size ?? pageSize),
     }
 
-    const handleTableChange: TableProps<TData>['onChange'] = (_p, _f, sorter) => {
+    const handleTableChange: TableProps<TData>['onChange'] = (pg, _f, sorter) => {
+        // Pagination
+        if (onPageChange) {
+            const nextPage = pg.current ?? page
+            const nextSize = pg.pageSize ?? pageSize
+            if (nextPage !== page || nextSize !== pageSize) {
+                onPageChange(nextPage, nextSize)
+            }
+        }
+
+        // Sorting
         const s = Array.isArray(sorter) ? sorter[0] : sorter
         if (s && s.order && s.field && typeof s.field === 'string') {
             onSortChange?.(s.field, s.order)
@@ -130,25 +160,6 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
         setIsModalVisible(true)
     }
 
-    const handleEdit = (record: TData) => {
-        setEditingRecord(record)
-        const initial =
-            config.form.getUpdateInitialValues?.(record) ?? (record as unknown as Partial<TUpdate>)
-        form.setFieldsValue(initial)
-        setIsModalVisible(true)
-    }
-
-    const handleDelete = async (record: TData) => {
-        if (!onDelete) return
-        try {
-            await onDelete(record)
-            message.success('Xóa thành công')
-        } catch (error: unknown) {
-            const msg = error instanceof Error ? error.message : 'Không thể xóa'
-            message.error(msg)
-        }
-    }
-
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields()
@@ -158,21 +169,19 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                     ? config.form.mapUpdatePayload(values, editingRecord)
                     : values
                 await onUpdate(editingRecord, payload)
-                message.success(`${config.entity.displayName} đã được cập nhật`)
             } else {
                 if (!onCreate) return
                 await onCreate(values)
-                message.success(`${config.entity.displayName} đã được tạo`)
             }
             form.resetFields()
             setIsModalVisible(false)
             setEditingRecord(null)
         } catch (error: unknown) {
             if (error && typeof error === 'object' && 'errorFields' in error) {
+                // Validation error đã được Antd Form hiển thị
                 return
             }
-            const msg = error instanceof Error ? error.message : 'Thao tác không thành công'
-            message.error(msg)
+            // Lỗi API đã được handle trong mutation onError (message/notification)
         }
     }
 
@@ -190,7 +199,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                     <Form.Item
                         key={field.name}
                         label={field.label}
-                        name={field.name}
+                        name={field.name as string}
                         rules={field.rules}
                     >
                         <Select
@@ -207,7 +216,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                     <Form.Item
                         key={field.name}
                         label={field.label}
-                        name={field.name}
+                        name={field.name as string}
                         rules={field.rules}
                     >
                         <Input.Password placeholder={field.placeholder} />
@@ -219,7 +228,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 <Form.Item
                     key={field.name}
                     label={field.label}
-                    name={field.name}
+                    name={field.name as string}
                     rules={field.rules}
                 >
                     <Input placeholder={field.placeholder} />

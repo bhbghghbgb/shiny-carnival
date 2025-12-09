@@ -44,7 +44,7 @@ public class CategoryService : ICategoryService
                 .ToListAsync();
 
             var categoryDtos = _mapper.Map<List<CategoryResponseDto>>(items);
-            var pagedList = new PagedList<CategoryResponseDto>(categoryDtos, request.Page, request.PageSize, totalCount);
+            var pagedList = new PagedList<CategoryResponseDto>(categoryDtos, totalCount, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<CategoryResponseDto>>.Success(pagedList);
         }

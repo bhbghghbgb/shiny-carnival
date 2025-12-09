@@ -71,7 +71,7 @@ public class ProductService : IProductService
                 .ToListAsync();
 
             var productDtos = _mapper.Map<List<ProductListDto>>(items);
-            var pagedList = new PagedList<ProductListDto>(productDtos, request.Page, request.PageSize, totalCount);
+            var pagedList = new PagedList<ProductListDto>(productDtos, totalCount, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<ProductListDto>>.Success(pagedList);
         }

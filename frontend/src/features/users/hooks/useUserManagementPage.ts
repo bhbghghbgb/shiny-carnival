@@ -1,3 +1,4 @@
+import { message } from 'antd'
 import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
 import { ENDPOINTS } from '../../../app/routes/type/endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
@@ -18,6 +19,7 @@ export const useUserManagementPage = () => {
         },
         onError: (error: Error) => {
             console.error('❌ [CreateUser] Error:', error)
+            message.error(error.message || 'Không thể tạo người dùng mới')
         },
     })
 
@@ -28,6 +30,7 @@ export const useUserManagementPage = () => {
         },
         onError: (error: Error) => {
             console.error('❌ [UpdateUser] Error:', error)
+            message.error(error.message || 'Không thể cập nhật người dùng')
         },
     })
 
@@ -37,6 +40,7 @@ export const useUserManagementPage = () => {
         },
         onError: (error: Error) => {
             console.error('❌ [DeleteUser] Error:', error)
+            message.error(error.message || 'Không thể xóa người dùng')
         },
     })
 
@@ -108,7 +112,7 @@ export const useUserManagementPage = () => {
     return {
         // Data
         users,
-        totalUsers: totalUsers ?? users.length,
+        totalUsers,
         adminCount,
         staffCount,
 

@@ -45,7 +45,7 @@ public class PromotionService : IPromotionService
                 .ToListAsync();
 
             var promotionDtos = _mapper.Map<List<PromotionListDto>>(items);
-            var pagedList = new PagedList<PromotionListDto>(promotionDtos, request.Page, request.PageSize, totalCount);
+            var pagedList = new PagedList<PromotionListDto>(promotionDtos, totalCount, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<PromotionListDto>>.Success(pagedList);
         }
