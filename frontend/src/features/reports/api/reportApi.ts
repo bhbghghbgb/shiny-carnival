@@ -1,7 +1,8 @@
-import axiosClient, { type ApiResponse } from '../../../lib/axios';
+import axiosClient from '../../../lib/axios';
+import type { ApiResponse, PagedList } from '../../../lib/api/types/api.types';
 import { API_CONFIG } from '../../../config/api';
 import type { RevenueReportDto } from '../types/entity.ts';
-import type { RevenueReportParams } from '../types/api.ts';
+import type { RevenueReportParams, SalesReportParams, TopItemsReportParams } from '../types/api.ts';
 
 // Report API functions (Admin only)
 export const reportApi = {
@@ -14,11 +15,12 @@ export const reportApi = {
         API_CONFIG.ENDPOINTS.ADMIN.REVENUE_REPORT,
         { params },
       );
-      return response.data;
-    } catch (error: any) {
+      return response as unknown as ApiResponse<RevenueReportDto>;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Không thể lấy báo cáo doanh thu';
       throw {
         isError: true,
-        message: error.message || 'Không thể lấy báo cáo doanh thu',
+        message,
         data: null,
         timestamp: new Date().toISOString()
       };
@@ -73,7 +75,7 @@ export const reportApi = {
     const today = new Date();
     const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
     const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-    
+
     return reportApi.getDailyRevenue(
       startOfWeek.toISOString().split('T')[0],
       endOfWeek.toISOString().split('T')[0]
@@ -87,7 +89,7 @@ export const reportApi = {
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    
+
     return reportApi.getDailyRevenue(
       startOfMonth.toISOString().split('T')[0],
       endOfMonth.toISOString().split('T')[0]
@@ -101,11 +103,74 @@ export const reportApi = {
     const today = new Date();
     const startOfYear = new Date(today.getFullYear(), 0, 1);
     const endOfYear = new Date(today.getFullYear(), 11, 31);
-    
+
     return reportApi.getMonthlyRevenue(
       startOfYear.toISOString().split('T')[0],
       endOfYear.toISOString().split('T')[0]
     );
+  },
+
+  /**
+   * Báo cáo bán hàng tổng hợp
+   */
+  getSalesReport: async (params: SalesReportParams): Promise<ApiResponse<unknown>> => {
+    try {
+      const response = await axiosClient.get<ApiResponse<unknown>>(
+        API_CONFIG.ENDPOINTS.ADMIN.SALES_REPORT,
+        { params }
+      );
+      return response as unknown as ApiResponse<unknown>;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Không thể lấy báo cáo bán hàng';
+      throw {
+        isError: true,
+        message,
+        data: null,
+        timestamp: new Date().toISOString()
+      };
+    }
+  },
+
+  /**
+   * Top sản phẩm bán chạy
+   */
+  getTopProducts: async (params: TopItemsReportParams): Promise<ApiResponse<PagedList<unknown>>> => {
+    try {
+      const response = await axiosClient.get<ApiResponse<PagedList<unknown>>>(
+        API_CONFIG.ENDPOINTS.ADMIN.TOP_PRODUCTS,
+        { params }
+      );
+      return response as unknown as ApiResponse<PagedList<unknown>>;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Không thể lấy top sản phẩm';
+      throw {
+        isError: true,
+        message,
+        data: null,
+        timestamp: new Date().toISOString()
+      };
+    }
+  },
+
+  /**
+   * Top khách hàng mua nhiều
+   */
+  getTopCustomers: async (params: TopItemsReportParams): Promise<ApiResponse<PagedList<unknown>>> => {
+    try {
+      const response = await axiosClient.get<ApiResponse<PagedList<unknown>>>(
+        API_CONFIG.ENDPOINTS.ADMIN.TOP_CUSTOMERS,
+        { params }
+      );
+      return response as unknown as ApiResponse<PagedList<unknown>>;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Không thể lấy top khách hàng';
+      throw {
+        isError: true,
+        message,
+        data: null,
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 };
 

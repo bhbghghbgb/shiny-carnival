@@ -1,10 +1,30 @@
-import axiosClient, { type ApiResponse } from '../../../lib/axios';
+import axiosClient, { type ApiResponse, type PagedList } from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api';
 import type { InventoryEntity } from "../types/inventoryEntity.ts";
-import type { UpdateInventoryRequest } from "../types/api.ts";
+import type { InventoryFilterParams, InventoryHistoryEntry, UpdateInventoryRequest } from "../types/api.ts";
 
 // Inventory API functions
 export const inventoryApi = {
+  /**
+   * Lấy danh sách tồn kho với phân trang và filter
+   */
+  getInventories: async (params?: InventoryFilterParams): Promise<ApiResponse<PagedList<InventoryEntity>>> => {
+    try {
+      const response = await axiosClient.get<ApiResponse<PagedList<InventoryEntity>>>(
+        API_CONFIG.ENDPOINTS.ADMIN.INVENTORY,
+        { params }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw {
+        isError: true,
+        message: error.message || 'Không thể lấy danh sách tồn kho',
+        data: null,
+        timestamp: new Date().toISOString()
+      };
+    }
+  },
+
   /**
    * Lấy thông tin tồn kho theo productId
    */
@@ -71,7 +91,7 @@ export const inventoryApi = {
     try {
       // Lấy số lượng hiện tại
       const currentInventory = await inventoryApi.getInventoryByProduct(productId);
-      
+
       if (currentInventory.isError || !currentInventory.data) {
         throw new Error('Không thể lấy thông tin tồn kho hiện tại');
       }
@@ -91,6 +111,48 @@ export const inventoryApi = {
       throw {
         isError: true,
         message: error.message || 'Không thể thực hiện kiểm kê',
+        data: null,
+        timestamp: new Date().toISOString()
+      };
+    }
+  },
+
+  /**
+   * Lấy danh sách sản phẩm tồn kho thấp
+   */
+  getLowStock: async (): Promise<ApiResponse<InventoryEntity[]>> => {
+    try {
+      const response = await axiosClient.get<ApiResponse<InventoryEntity[]>>(
+        API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_LOW_STOCK
+      );
+      return response.data;
+    } catch (error: any) {
+      throw {
+        isError: true,
+        message: error.message || 'Không thể lấy danh sách tồn kho thấp',
+        data: null,
+        timestamp: new Date().toISOString()
+      };
+    }
+  },
+
+  /**
+   * Lịch sử thay đổi tồn kho theo productId
+   */
+  getInventoryHistory: async (
+    productId: number,
+    params?: InventoryFilterParams
+  ): Promise<ApiResponse<PagedList<InventoryHistoryEntry>>> => {
+    try {
+      const response = await axiosClient.get<ApiResponse<PagedList<InventoryHistoryEntry>>>(
+        API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_HISTORY(productId),
+        { params }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw {
+        isError: true,
+        message: error.message || 'Không thể lấy lịch sử tồn kho',
         data: null,
         timestamp: new Date().toISOString()
       };

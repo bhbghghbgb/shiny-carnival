@@ -1,4 +1,4 @@
-import type {ProductEntity} from "./entity.ts";
+import type { ProductEntity } from "./entity.ts";
 
 export interface CreateProductRequest {
     categoryId: number;
@@ -9,4 +9,6 @@ export interface CreateProductRequest {
     unit: string;
 }
 
-export type UpdateProductRequest = ProductEntity
+export interface UpdateProductRequest extends CreateProductRequest {
+    id: number;
+}
