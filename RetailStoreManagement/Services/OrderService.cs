@@ -72,16 +72,23 @@ public class OrderService : IOrderService
                 ? query.OrderByDescending(o => EF.Property<object>(o, request.SortBy))
                 : query.OrderBy(o => EF.Property<object>(o, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
+            // Project to DTO and keep IQueryable
+            var dtoQuery = query
                 .Include(o => o.Customer)
                 .Include(o => o.User)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+                .Select(o => new OrderListDto
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    CustomerName = o.Customer != null ? o.Customer.Name : string.Empty,
+                    StaffName = o.User.FullName ?? string.Empty,
+                    Status = o.Status.ToString().ToLower(),
+                    TotalAmount = o.TotalAmount,
+                    FinalAmount = o.TotalAmount - o.DiscountAmount
+                });
 
-            var orderDtos = _mapper.Map<List<OrderListDto>>(items);
-            var pagedList = new PagedList<OrderListDto>(orderDtos, request.Page, request.PageSize, totalCount);
+            // Use PagedList.CreateAsync for database-level pagination
+            var pagedList = await PagedList<OrderListDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<OrderListDto>>.Success(pagedList);
         }

@@ -1,4 +1,5 @@
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 

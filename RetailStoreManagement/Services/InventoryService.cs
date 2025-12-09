@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
@@ -20,7 +21,7 @@ public class InventoryService : IInventoryService
         _mapper = mapper;
     }
 
-    public async Task<ApiResponse<PagedList<InventoryResponseDto>>> GetInventoryAsync(PagedRequest request)
+    public async Task<ApiResponse<PagedList<InventoryResponseDto>>> GetInventoryAsync(InventorySearchRequest request)
     {
         try
         {
@@ -33,20 +34,44 @@ public class InventoryService : IInventoryService
                                         (i.Product.Barcode != null && i.Product.Barcode.Contains(request.Search)));
             }
 
+            // Apply ProductId filter
+            if (request.ProductId.HasValue)
+            {
+                query = query.Where(i => i.ProductId == request.ProductId.Value);
+            }
+
+            // Apply quantity filters
+            if (request.MinQuantity.HasValue)
+            {
+                query = query.Where(i => i.Quantity >= request.MinQuantity.Value);
+            }
+
+            if (request.MaxQuantity.HasValue)
+            {
+                query = query.Where(i => i.Quantity <= request.MaxQuantity.Value);
+            }
+
             // Apply sorting
             query = request.SortDesc
                 ? query.OrderByDescending(i => EF.Property<object>(i, request.SortBy))
                 : query.OrderBy(i => EF.Property<object>(i, request.SortBy));
 
-            var totalCount = await query.CountAsync();
-            var items = await query
+            // Project to DTO and keep IQueryable
+            var dtoQuery = query
                 .Include(i => i.Product)
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .ToListAsync();
+                .Select(i => new InventoryResponseDto
+                {
+                    InventoryId = i.Id,
+                    ProductId = i.ProductId,
+                    ProductName = i.Product.ProductName,
+                    Barcode = i.Product.Barcode ?? string.Empty,
+                    Quantity = i.Quantity,
+                    UpdatedAt = i.UpdatedAt ?? i.CreatedAt,
+                    Status = i.Quantity == 0 ? "out_of_stock" : (i.Quantity < 10 ? "low_stock" : "in_stock")
+                });
 
-            var inventoryDtos = _mapper.Map<List<InventoryResponseDto>>(items);
-            var pagedList = new PagedList<InventoryResponseDto>(inventoryDtos, request.Page, request.PageSize, totalCount);
+            // Use PagedList.CreateAsync for database-level pagination
+            var pagedList = await PagedList<InventoryResponseDto>.CreateAsync(dtoQuery, request.Page, request.PageSize);
 
             return ApiResponse<PagedList<InventoryResponseDto>>.Success(pagedList);
         }
