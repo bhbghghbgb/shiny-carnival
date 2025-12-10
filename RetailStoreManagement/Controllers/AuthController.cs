@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Filters;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models;
 using RetailStoreManagement.Models.Authentication;
@@ -16,21 +18,43 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly IUserService _userService;
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
+    private readonly IAntiforgery _antiforgery;
 
-    public AuthController(IAuthService authService, IUserService userService)
+    public AuthController(IAuthService authService, IUserService userService, IConfiguration configuration, IWebHostEnvironment environment, IAntiforgery antiforgery)
     {
         _authService = authService;
         _userService = userService;
+        _configuration = configuration;
+        _environment = environment;
+        _antiforgery = antiforgery;
     }
 
     [HttpPost("login")]
+    [ValidateCsrfToken]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var result = await _authService.LoginAsync(request);
+        
+        if (!result.IsError && result.Data != null)
+        {
+            // Set httpOnly cookies cho access token và refresh token
+            SetTokenCookies(result.Data.Token, result.Data.RefreshToken);
+        }
+        
         return StatusCode(result.StatusCode, result);
     }
 
+    [HttpGet("csrf-token")]
+    public IActionResult GetCsrfToken()
+    {
+        var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
+        return Ok(new { csrfToken = tokens.RequestToken });
+    }
+
     [HttpPost("setup-admin")]
+    [ValidateCsrfToken]
     public async Task<IActionResult> SetupAdmin([FromBody] CreateUserRequest request)
     {
         var result = await _userService.SetupAdminAsync(request);
@@ -38,17 +62,90 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+    [ValidateCsrfToken]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest? request)
     {
+        // Đọc refresh token từ cookie nếu không có trong body
+        if (request == null || string.IsNullOrEmpty(request.RefreshToken))
+        {
+            request = new RefreshTokenRequest
+            {
+                AccessToken = Request.Cookies["accessToken"] ?? string.Empty,
+                RefreshToken = Request.Cookies["refreshToken"] ?? string.Empty
+            };
+        }
+        
         var result = await _authService.RefreshTokenAsync(request);
+        
+        if (!result.IsError && result.Data != null)
+        {
+            // Set httpOnly cookies cho tokens mới
+            SetTokenCookies(result.Data.Token, result.Data.RefreshToken);
+        }
+        
         return StatusCode(result.StatusCode, result);
     }
 
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+    [ValidateCsrfToken]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequest? request)
     {
+        // Đọc refresh token từ cookie nếu không có trong body
+        if (request == null || string.IsNullOrEmpty(request.RefreshToken))
+        {
+            request = new LogoutRequest
+            {
+                RefreshToken = Request.Cookies["refreshToken"] ?? string.Empty
+            };
+        }
+        
         var result = await _authService.LogoutAsync(request);
+        
+        // Xóa cookies
+        ClearTokenCookies();
+        
         return StatusCode(result.StatusCode, result);
+    }
+
+    private void SetTokenCookies(string accessToken, string refreshToken)
+    {
+        var jwtSettings = _configuration.GetSection("JwtSettings");
+        var accessTokenExpiry = int.Parse(jwtSettings["ExpirationInMinutes"] ?? "15");
+        var refreshTokenExpiry = 7; // 7 ngày
+        
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true, // Chống XSS
+            Secure = !_environment.IsDevelopment(), // HTTPS trong production
+            SameSite = SameSiteMode.Lax, // Chống CSRF
+            Path = "/"
+        };
+
+        // Set access token cookie (15 phút)
+        Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !_environment.IsDevelopment(),
+            SameSite = SameSiteMode.Lax,
+            Path = "/",
+            MaxAge = TimeSpan.FromMinutes(accessTokenExpiry)
+        });
+
+        // Set refresh token cookie (7 ngày)
+        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !_environment.IsDevelopment(),
+            SameSite = SameSiteMode.Lax,
+            Path = "/",
+            MaxAge = TimeSpan.FromDays(refreshTokenExpiry)
+        });
+    }
+
+    private void ClearTokenCookies()
+    {
+        Response.Cookies.Delete("accessToken");
+        Response.Cookies.Delete("refreshToken");
     }
 }
 

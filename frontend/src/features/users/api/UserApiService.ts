@@ -1,6 +1,6 @@
 import { BaseApiService } from '../../../lib/api/base';
 import axiosClient from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
+import { API_CONFIG } from '../../../config/api.config';
 import type { UserEntity } from '../types/entity';
 import type { CreateUserRequest, UpdateUserRequest } from '../types/api';
 import type { PagedRequest } from '../../../lib/api/types/api.types';

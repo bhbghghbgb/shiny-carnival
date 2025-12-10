@@ -1,6 +1,6 @@
 import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ENDPOINTS } from '../../../app/routes/type/endpoint'
+import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
 import type { UserNoPass } from '../types/entity'

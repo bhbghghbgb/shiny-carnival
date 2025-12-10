@@ -1,5 +1,5 @@
 import axiosClient, { type ApiResponse, type PagedList } from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
+import { API_CONFIG } from '../../../config/api.config.ts';
 import type { InventoryEntity } from "../types/inventoryEntity.ts";
 import type { InventoryFilterParams, InventoryHistoryEntry, UpdateInventoryRequest } from "../types/api.ts";
 

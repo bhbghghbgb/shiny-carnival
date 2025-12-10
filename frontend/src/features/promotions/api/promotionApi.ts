@@ -1,5 +1,5 @@
 import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
+import { API_CONFIG } from '../../../config/api.config.ts';
 import type { PromotionEntity } from '../types/entity.ts';
 import type { CreatePromotionRequest, UpdatePromotionRequest, PromotionFilterParams, ValidatePromoRequest } from '../types/api.ts';
 

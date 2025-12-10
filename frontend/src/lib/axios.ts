@@ -1,25 +1,66 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import type { LoginResponse } from "../features/auth/types/api.ts";
-import { ENDPOINTS } from "../app/routes/type/endpoint";
+import { ENDPOINTS } from "../app/routes/type/routes.endpoint.ts";
+import { API_CONFIG } from "../config/api.config";
 import type { ApiResponse } from './api/types/api.types';
 
-const TOKEN_KEY = 'accessToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
+// CSRF Token management
+let csrfToken: string | null = null;
+let csrfTokenPromise: Promise<string> | null = null;
 
-export const tokenUtils = {
-  getToken: (): string | null => localStorage.getItem(TOKEN_KEY),
-  setToken: (token: string): void => localStorage.setItem(TOKEN_KEY, token),
-  removeToken: (): void => localStorage.removeItem(TOKEN_KEY),
-
-  getRefreshToken: (): string | null => localStorage.getItem(REFRESH_TOKEN_KEY),
-  setRefreshToken: (token: string): void => localStorage.setItem(REFRESH_TOKEN_KEY, token),
-  removeRefreshToken: (): void => localStorage.removeItem(REFRESH_TOKEN_KEY),
-
-  clearAllTokens: (): void => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
+/**
+ * Lấy CSRF token từ server
+ */
+async function getCsrfToken(): Promise<string> {
+  // Nếu đã có token, trả về ngay
+  if (csrfToken) {
+    return csrfToken;
   }
+
+  // Nếu đang có request lấy token, đợi request đó
+  if (csrfTokenPromise) {
+    return csrfTokenPromise;
+  }
+
+  // Tạo request mới để lấy token
+  csrfTokenPromise = axios
+    .get<{ csrfToken: string }>(`${axiosClient.defaults.baseURL}${API_CONFIG.ENDPOINTS.AUTH.CSRF_TOKEN}`, {
+      withCredentials: true
+    })
+    .then(response => {
+      csrfToken = response.data.csrfToken;
+      csrfTokenPromise = null;
+      return csrfToken;
+    })
+    .catch(error => {
+      csrfTokenPromise = null;
+      throw error;
+    });
+
+  return csrfTokenPromise;
+}
+
+/**
+ * Reset CSRF token (dùng khi logout hoặc token hết hạn)
+ */
+export function resetCsrfToken(): void {
+  csrfToken = null;
+  csrfTokenPromise = null;
+}
+
+// TokenUtils không còn cần thiết vì tokens được lưu trong httpOnly cookies
+// Giữ lại để tương thích với code cũ, nhưng không thực hiện gì
+export const tokenUtils = {
+  getToken: (): string | null => null, // Tokens trong cookies, không thể đọc từ JS
+  setToken: (): void => { /* Tokens được set bởi backend qua cookies */ },
+  removeToken: (): void => { /* Cookies được xóa bởi backend */ },
+
+  getRefreshToken: (): string | null => null, // Tokens trong cookies, không thể đọc từ JS
+  setRefreshToken: (): void => { /* Tokens được set bởi backend qua cookies */ },
+  removeRefreshToken: (): void => { /* Cookies được xóa bởi backend */ },
+
+  clearAllTokens: (): void => { /* Cookies được xóa bởi backend khi logout */ }
 };
 
 // Tạo Axios instance với cấu hình đầy đủ
@@ -29,6 +70,7 @@ const axiosClient: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Quan trọng: Cho phép gửi cookies với mọi request
 });
 
 // Biến để theo dõi việc refresh token đang diễn ra
@@ -51,13 +93,25 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Request interceptor - Tự động thêm token vào headers
+// Request interceptor - Thêm CSRF token vào headers
 axiosClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = tokenUtils.getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Đảm bảo withCredentials luôn được set
+    config.withCredentials = true;
+
+    // Chỉ thêm CSRF token cho các method không phải GET, HEAD, OPTIONS
+    const method = config.method?.toUpperCase();
+    if (method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+      try {
+        const token = await getCsrfToken();
+        config.headers['X-CSRF-TOKEN'] = token;
+      } catch (error) {
+        // Nếu không lấy được CSRF token, vẫn tiếp tục request
+        // Backend sẽ trả về lỗi nếu cần
+        console.warn('Failed to get CSRF token:', error);
+      }
     }
+
     return config;
   },
   (error: unknown) => {
@@ -80,8 +134,8 @@ axiosClient.interceptors.response.use(
         // Nếu đang refresh token, thêm request vào queue
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+        }).then(() => {
+          // Không cần set header vì backend đọc từ cookie
           return axiosClient(originalRequest);
         }).catch(err => {
           return Promise.reject(err);
@@ -91,48 +145,39 @@ axiosClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = tokenUtils.getRefreshToken();
-
-      if (refreshToken) {
-        try {
-          // Gọi API refresh token
-          const accessToken = tokenUtils.getToken();
-          const response = await axios.post<ApiResponse<LoginResponse>>(
-            `${axiosClient.defaults.baseURL}/api/Auth/refresh`,
-            {
-              accessToken: accessToken || '',
-              refreshToken
-            }
-          );
-
-          if (!response.data.isError && response.data.data) {
-            const newToken = response.data.data.token;
-            tokenUtils.setToken(newToken);
-
-            // Cập nhật header cho request gốc
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-            processQueue(null, newToken);
-
-            return axiosClient(originalRequest);
-          } else {
-            throw new Error('Refresh token failed');
+      try {
+        // Gọi API refresh token - backend sẽ đọc refresh token từ cookie tự động
+        // Không cần gửi tokens trong body vì đã có trong cookies
+        const response = await axios.post<ApiResponse<LoginResponse>>(
+          `${axiosClient.defaults.baseURL}${API_CONFIG.ENDPOINTS.AUTH.REFRESH}`,
+          {}, // Empty body - backend đọc từ cookies
+          {
+            withCredentials: true // Đảm bảo gửi cookies
           }
-        } catch (refreshError) {
-          processQueue(refreshError, null);
-          tokenUtils.clearAllTokens();
+        );
 
-          // Redirect về trang login
-          window.location.href = ENDPOINTS.AUTH.LOGIN;
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
+        if (!response.data.isError && response.data.data) {
+          // Tokens mới đã được set vào cookies bởi backend
+          // Không cần lưu vào localStorage nữa
+
+          processQueue(null, null); // Không cần token vì backend đọc từ cookie
+
+          // Retry request gốc - cookies mới sẽ tự động được gửi
+          return axiosClient(originalRequest);
+        } else {
+          throw new Error('Refresh token failed');
         }
-      } else {
-        // Không có refresh token, redirect về login
-        tokenUtils.clearAllTokens();
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+
+        // Reset CSRF token khi refresh thất bại
+        resetCsrfToken();
+
+        // Redirect về trang login
         window.location.href = ENDPOINTS.AUTH.LOGIN;
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 

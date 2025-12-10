@@ -6,8 +6,8 @@ import {
   PieChartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import {Link} from "@tanstack/react-router";
-import { ENDPOINTS } from '../../app/routes/type/endpoint';
+import { Link } from "@tanstack/react-router";
+import { ENDPOINTS } from '../../app/routes/type/routes.endpoint';
 
 type MenuItem = Required<MenuProps>['items'][number];
 

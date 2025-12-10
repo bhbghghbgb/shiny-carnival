@@ -2,6 +2,8 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -24,7 +26,8 @@ builder.Services.AddCors(options =>
         {
             policy.WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials(); // Cho phép gửi cookies
         });
 });
 
@@ -78,8 +81,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!))
         };
+        
+        // Đọc token từ cookie nếu không có trong header
+        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Ưu tiên đọc từ Authorization header
+                if (string.IsNullOrEmpty(context.Token))
+                {
+                    // Nếu không có trong header, đọc từ cookie
+                    context.Token = context.Request.Cookies["accessToken"];
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
+
+// Antiforgery (CSRF Protection)
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+    options.Cookie.Name = "CSRF-TOKEN";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
 
 builder.Services.AddControllers(options => { options.Filters.Add<ApiResponseFilter>(); });
 
@@ -138,6 +166,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(MyAllowSpecificOrigins);
+
+app.UseAntiforgery(); // CSRF Protection middleware
 
 app.UseAuthentication();
 app.UseAuthorization();

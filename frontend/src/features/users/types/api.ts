@@ -1,4 +1,4 @@
-import type { UserRole } from '../../../config/api';
+import type { UserRole } from '../../../config/api.config.ts';
 import type { UserEntity } from './entity.ts';
 
 export interface CreateUserRequest {

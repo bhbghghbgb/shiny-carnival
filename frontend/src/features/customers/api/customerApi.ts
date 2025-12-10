@@ -1,7 +1,7 @@
-import axiosClient, {type ApiResponse, type PagedRequest, type PagedList} from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
-import type {CreateCustomerRequest, UpdateCustomerRequest} from "../types/api.ts";
-import type {CustomerEntity} from "../types/entity.ts";
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
+import { API_CONFIG } from '../../../config/api.config.ts';
+import type { CreateCustomerRequest, UpdateCustomerRequest } from "../types/api.ts";
+import type { CustomerEntity } from "../types/entity.ts";
 
 
 
@@ -116,10 +116,10 @@ export const customerApi = {
       );
 
       return {
-          isError: false,
-          message: "",
-          timestamp: "",
-          ...response,
+        isError: false,
+        message: "",
+        timestamp: "",
+        ...response,
         data: response.data?.data?.items || []
       };
     } catch (error: any) {
@@ -143,10 +143,10 @@ export const customerApi = {
       );
 
       return {
-          isError: false,
-          message: "",
-          timestamp: "",
-          ...response,
+        isError: false,
+        message: "",
+        timestamp: "",
+        ...response,
         data: response.data?.data?.items || []
       };
     } catch (error: any) {

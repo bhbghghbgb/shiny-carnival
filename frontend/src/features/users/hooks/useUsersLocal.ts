@@ -2,7 +2,7 @@ import { usePaginationLocal } from '../../../hooks/usePaginationLocal';
 import { userApiService } from '../api/UserApiService';
 import type { UserEntity } from '../types/entity';
 import type { PagedRequest } from '../../../lib/api/types/api.types';
-import type { UserRole } from '../../../config/api';
+import type { UserRole } from '../../../config/api.config';
 
 /**
  * UserFilters - Type cho advanced filters của Users

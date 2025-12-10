@@ -7,6 +7,7 @@ export interface LoginRequest {
 // Định nghĩa interface cho login response
 export interface LoginResponse {
     token: string;
+    refreshToken: string;
     user: {
         id: number;
         username: string;

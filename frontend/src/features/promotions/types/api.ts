@@ -1,5 +1,5 @@
 import type { PagedRequest } from '../../../lib/axios';
-import type { DiscountType, PromotionStatus } from '../../../config/api';
+import type { DiscountType, PromotionStatus } from '../../../config/api.config.ts';
 import type { PromotionEntity } from './entity.ts';
 
 export interface CreatePromotionRequest {
