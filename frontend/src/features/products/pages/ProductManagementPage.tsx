@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { Table, Button, Modal, Form } from 'antd';
-import { ProductForm } from '../components/ProductForm';
 import { getRouteApi } from '@tanstack/react-router';
+import { Button, Form, Modal, Table } from 'antd';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { useState } from 'react';
+import { ProductForm } from '../components/ProductForm';
 
 const routeApi = getRouteApi('/admin/products');
+pdfMake.vfs = pdfFonts.vfs;
 
 export function ProductManagementPage() {
     const { products } = routeApi.useLoaderData();
@@ -36,6 +39,40 @@ export function ProductManagementPage() {
         setIsModalVisible(false);
     };
 
+    const exportPDF = () => {
+        const docDefinition = {
+            content: [
+                { text: "Danh sách sản phẩm", style: "header" },
+    
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ["auto", "*", "auto", "auto", "auto"],
+                        body: [
+                            ["ID", "Tên sản phẩm", "Barcode", "Giá", "ĐVT"],
+                            ...products.map((p) => [
+                                p.id,
+                                p.productName,
+                                p.barcode,
+                                p.price,
+                                p.unit,
+                            ]),
+                        ],
+                    },
+                },
+            ],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 20],
+                },
+            },
+        };
+    
+        pdfMake.createPdf(docDefinition).download("products.pdf");
+    };
+
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: 'Product Name', dataIndex: 'productName', key: 'productName' },
@@ -56,9 +93,13 @@ export function ProductManagementPage() {
 
     return (
         <div>
-            <div style={{ marginBottom: 16 }}>
+            <div style={{ marginBottom: 16 ,  marginLeft: 12}}>
                 <Button type="primary" onClick={showModal}>
                     Add Product
+                </Button>
+
+                <Button type="primary" onClick={exportPDF} style={{ marginLeft: 12 }}>
+                    Export PDF 
                 </Button>
             </div>
             <Table dataSource={products} columns={columns} rowKey="id" />
