@@ -18,6 +18,6 @@ public class ShellViewModel
 
     private async void LoggedOut(object? sender, EventArgs e)
     {
-        await _navigator.NavigateViewModelAsync<LoginViewModel>(this, qualifier: Qualifiers.ClearBackStack);
+        await _navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.ClearBackStack);
     }
 }

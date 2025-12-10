@@ -1,6 +1,6 @@
 namespace UnoApp3.Presentation;
 
-public partial class MainViewModel : ObservableObject
+public partial class MainScaffoldViewModel : ObservableObject
 {
     private IAuthenticationService _authentication;
 
@@ -8,7 +8,7 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private string? name;
 
-    public MainViewModel(
+    public MainScaffoldViewModel(
         IStringLocalizer localizer,
         IOptions<AppConfig> appInfo,
         IAuthenticationService authentication,
@@ -31,7 +31,7 @@ public partial class MainViewModel : ObservableObject
 
     private async Task GoToSecondView()
     {
-        await _navigator.NavigateViewModelAsync<SecondViewModel>(this, data: new Entity(Name!));
+        await _navigator.NavigateViewModelAsync<SecondScaffoldViewModel>(this, data: new Entity(Name!));
     }
 
     public async Task DoLogout(CancellationToken token)

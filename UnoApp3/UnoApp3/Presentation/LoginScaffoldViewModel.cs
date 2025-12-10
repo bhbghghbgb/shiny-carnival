@@ -1,6 +1,6 @@
 namespace UnoApp3.Presentation;
 
-public partial class LoginViewModel : ObservableObject
+public partial class LoginScaffoldViewModel : ObservableObject
 {
     private IAuthenticationService _authentication;
 
@@ -9,7 +9,7 @@ public partial class LoginViewModel : ObservableObject
     private IDispatcher _dispatcher;
 
 
-    public LoginViewModel(
+    public LoginScaffoldViewModel(
         IDispatcher dispatcher,
         INavigator navigator,
         IAuthenticationService authentication)
@@ -25,7 +25,7 @@ public partial class LoginViewModel : ObservableObject
         var success = await _authentication.LoginAsync(_dispatcher);
         if (success)
         {
-            await _navigator.NavigateViewModelAsync<MainViewModel>(this, qualifier: Qualifiers.ClearBackStack);
+            await _navigator.NavigateViewModelAsync<MainScaffoldViewModel>(this, qualifier: Qualifiers.ClearBackStack);
         }
     }
 

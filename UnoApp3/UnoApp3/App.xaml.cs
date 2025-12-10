@@ -92,11 +92,11 @@ public partial class App : Application
             var authenticated = await auth.RefreshAsync();
             if (authenticated)
             {
-                await navigator.NavigateViewModelAsync<MainViewModel>(this, qualifier: Qualifiers.Nested);
+                await navigator.NavigateViewModelAsync<MainScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
             }
             else
             {
-                await navigator.NavigateViewModelAsync<LoginViewModel>(this, qualifier: Qualifiers.Nested);
+                await navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
             }
         });
     }
@@ -105,18 +105,18 @@ public partial class App : Application
     {
         views.Register(
             new ViewMap(ViewModel: typeof(ShellViewModel)),
-            new ViewMap<LoginPage, LoginViewModel>(),
-            new ViewMap<MainPage, MainViewModel>(),
-            new DataViewMap<SecondPage, SecondViewModel, Entity>()
+            new ViewMap<LoginScaffoldPage, LoginScaffoldViewModel>(),
+            new ViewMap<MainScaffoldPage, MainScaffoldViewModel>(),
+            new DataViewMap<SecondScaffoldPage, SecondScaffoldViewModel, Entity>()
         );
 
         routes.Register(
             new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
                 Nested:
                 [
-                    new("Login", View: views.FindByViewModel<LoginViewModel>()),
-                    new("Main", View: views.FindByViewModel<MainViewModel>(), IsDefault: true),
-                    new("Second", View: views.FindByViewModel<SecondViewModel>()),
+                    new("Login", View: views.FindByViewModel<LoginScaffoldViewModel>()),
+                    new("Main", View: views.FindByViewModel<MainScaffoldViewModel>(), IsDefault: true),
+                    new("Second", View: views.FindByViewModel<SecondScaffoldViewModel>()),
                 ]
             )
         );

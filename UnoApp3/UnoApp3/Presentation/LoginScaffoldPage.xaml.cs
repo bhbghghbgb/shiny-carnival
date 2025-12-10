@@ -1,8 +1,8 @@
 ﻿namespace UnoApp3.Presentation;
 
-public sealed partial class MainPage : Page
+public sealed partial class LoginScaffoldPage : Page
 {
-    public MainPage()
+    public LoginScaffoldPage()
     {
         this.InitializeComponent();
     }
