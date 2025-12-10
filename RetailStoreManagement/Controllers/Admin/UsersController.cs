@@ -9,7 +9,7 @@ namespace RetailStoreManagement.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/users")]
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;

@@ -15,13 +15,13 @@ export const authApi = {
       );
 
       // Lưu tokens vào localStorage nếu đăng nhập thành công
-      if (!response.data.isError && response.data.data) {
-        tokenUtils.setToken(response.data.data.token);
+      if (!response.isError && response.data) {
+        tokenUtils.setToken(response.data.token);
         // Note: Refresh token sẽ được implement khi backend hỗ trợ
-        // tokenUtils.setRefreshToken(response.data.data.refreshToken);
+        // tokenUtils.setRefreshToken(response.data.refreshToken);
       }
 
-      return response.data;
+      return response;
     } catch (error: any) {
       throw {
         isError: true,
@@ -47,11 +47,11 @@ export const authApi = {
       );
 
       // Cập nhật token mới nếu refresh thành công
-      if (!response.data.isError && response.data.data) {
-        tokenUtils.setToken(response.data.data.token);
+      if (!response.isError && response.data) {
+        tokenUtils.setToken(response.data.token);
       }
 
-      return response.data;
+      return response;
     } catch (error: any) {
       // Nếu refresh token thất bại, xóa tất cả tokens
       tokenUtils.clearAllTokens();
@@ -99,7 +99,7 @@ export const authApi = {
         API_CONFIG.ENDPOINTS.AUTH.SETUP_ADMIN,
         userData
       );
-      return response.data;
+      return response;
     } catch (error: any) {
       throw {
         isError: true,
