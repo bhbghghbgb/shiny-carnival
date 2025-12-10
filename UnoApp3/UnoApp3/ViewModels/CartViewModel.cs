@@ -80,12 +80,32 @@ public partial class CartViewModel : BaseViewModel
         }
     }
 
+    // Option 1: Separate increase/decrease commands (recommended for UI)
     [RelayCommand]
-    private async Task UpdateQuantity(CartItem item, int quantity)
+    private async Task IncreaseQuantity(CartItem item)
     {
-        if (item == null || quantity < 1) return;
+        if (item == null) return;
         
-        await _cartRepository.UpdateCartItemAsync(item.ProductId, quantity);
+        await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity + 1);
+        await LoadCart();
+    }
+
+    [RelayCommand]
+    private async Task DecreaseQuantity(CartItem item)
+    {
+        if (item == null || item.Quantity <= 1) return;
+        
+        await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity - 1);
+        await LoadCart();
+    }
+
+    // Option 2: If you need to set a specific quantity from a TextBox
+    [RelayCommand]
+    private async Task SetQuantity(CartItem item)
+    {
+        if (item == null || item.Quantity < 1) return;
+        
+        await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity);
         await LoadCart();
     }
 
@@ -103,6 +123,7 @@ public partial class CartViewModel : BaseViewModel
     {
         if (!CartItems.Any()) return;
         
-        await Navigator.NavigateRouteAsync("OrderConfirmation");
+        // Fixed: Added 'this' as first parameter
+        await Navigator.NavigateRouteAsync(this, "OrderConfirmation");
     }
 }

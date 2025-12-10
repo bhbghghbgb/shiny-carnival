@@ -78,10 +78,12 @@ public partial class ProductListViewModel : BaseViewModel
     {
         if (product == null) return;
         
-        await Navigator.NavigateRouteAsync("ProductDetail", Data: new Dictionary<string, object>
-        {
-            ["productId"] = product.Id
-        });
+        // Fixed: Added 'this' as first parameter
+        await Navigator.NavigateRouteAsync(this, "ProductDetail", 
+            data: new Dictionary<string, object>
+            {
+                ["productId"] = product.Id
+            });
     }
 
     [RelayCommand]
@@ -97,6 +99,7 @@ public partial class ProductListViewModel : BaseViewModel
     [RelayCommand]
     private async Task GoToCart()
     {
-        await Navigator.NavigateRouteAsync("Cart");
+        // Fixed: Added 'this' as first parameter
+        await Navigator.NavigateRouteAsync(this, "Cart");
     }
 }

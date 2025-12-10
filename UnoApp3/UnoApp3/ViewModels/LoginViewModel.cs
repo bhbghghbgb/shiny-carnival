@@ -44,7 +44,8 @@ public partial class LoginViewModel : BaseViewModel
             // }
             
             // For now, navigate directly without login
-            await Navigator.NavigateRouteAsync("Main");
+            // Fixed: Added 'this' as first parameter
+            await Navigator.NavigateRouteAsync(this, "Main");
         }
         finally
         {

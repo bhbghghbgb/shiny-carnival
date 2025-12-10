@@ -22,6 +22,7 @@ public partial class BaseViewModel : ObservableObject
     [RelayCommand]
     private async Task GoBack()
     {
-        await Navigator.GoBackAsync();
+        // Changed: Use NavigateBackAsync() instead of GoBackAsync()
+        await Navigator.NavigateBackAsync(this);
     }
 }
