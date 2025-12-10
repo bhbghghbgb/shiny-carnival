@@ -115,21 +115,27 @@ public class AuthService : IAuthService
     {
         try
         {
-            var principal = GetPrincipalFromExpiredToken(request.AccessToken);
-            var username = principal.Identity?.Name;
-
-            var user = await _unitOfWork.Users.GetQueryable().FirstOrDefaultAsync(u => u.Username == username);
-            if (user == null)
+            if (string.IsNullOrWhiteSpace(request.RefreshToken))
             {
-                return ApiResponse<LoginResponse>.Error("Invalid client request", 400);
+                return ApiResponse<LoginResponse>.Error("Missing refresh token", 400);
             }
 
+            // Tìm refresh token và load user tương ứng
             var refreshToken = await _unitOfWork.UserRefreshTokens.GetQueryable()
-                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken && rt.UserId == user.Id);
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
 
             if (refreshToken == null || refreshToken.IsRevoked || refreshToken.ExpiresAt <= DateTime.UtcNow)
             {
                 return ApiResponse<LoginResponse>.Error("Invalid refresh token", 401);
+            }
+
+            var user = refreshToken.User
+                ?? await _unitOfWork.Users.GetQueryable().FirstOrDefaultAsync(u => u.Id == refreshToken.UserId);
+
+            if (user == null)
+            {
+                return ApiResponse<LoginResponse>.Error("Invalid client request", 400);
             }
 
             // Revoke the old refresh token

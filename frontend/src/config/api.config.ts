@@ -15,7 +15,6 @@ export const API_CONFIG = {
       REFRESH: '/api/Auth/refresh',
       LOGOUT: '/api/Auth/logout',
       SETUP_ADMIN: '/api/Auth/setup-admin',
-      CSRF_TOKEN: '/api/Auth/csrf-token',
     },
     
     // Admin endpoints

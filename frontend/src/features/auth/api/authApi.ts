@@ -1,4 +1,4 @@
-import axiosClient, { resetCsrfToken } from '../../../lib/axios';
+import axiosClient from '../../../lib/axios';
 import { API_CONFIG } from '../../../config/api.config.ts';
 import type { LoginRequest, LoginResponse } from "../types/api.ts";
 import type { ApiResponse } from '../../../lib/api/types/api.types';
@@ -16,10 +16,6 @@ export const authApi = {
         credentials
       ) as unknown as ApiResponse<LoginResponse>;
 
-      // Tokens được lưu trong httpOnly cookies bởi backend
-      // Không cần lưu vào localStorage nữa
-      // User info có thể được lưu trong memory/context nếu cần
-
       return response;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Đăng nhập thất bại';
@@ -34,18 +30,16 @@ export const authApi = {
 
   /**
    * Refresh access token
-   * Backend sẽ đọc refresh token từ cookie tự động
+   * Gửi accessToken và refreshToken trong body theo swagger spec
    */
   refreshToken: async (): Promise<ApiResponse<LoginResponse>> => {
     try {
-      // Không cần gửi tokens trong body - backend đọc từ cookies
-      // Interceptor đã unwrap response.data, nên response đã là ApiResponse
+      // Backend đọc refresh token từ HttpOnly cookie
       const response = await axiosClient.post<ApiResponse<LoginResponse>>(
         API_CONFIG.ENDPOINTS.AUTH.REFRESH,
-        {} // Empty body - backend đọc từ cookies
+        {}
       ) as unknown as ApiResponse<LoginResponse>;
 
-      // Tokens mới đã được set vào cookies bởi backend
       return response;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Refresh token thất bại';
@@ -64,14 +58,16 @@ export const authApi = {
    */
   logout: async (): Promise<void> => {
     try {
-      // Không cần gửi refresh token - backend đọc từ cookie
-      await axiosClient.post(API_CONFIG.ENDPOINTS.AUTH.LOGOUT, {});
+      // Backend đọc refresh token từ HttpOnly cookie
+      await axiosClient.post(
+        API_CONFIG.ENDPOINTS.AUTH.LOGOUT,
+        {}
+      );
     } catch (error) {
       // Bỏ qua lỗi từ server khi logout
       console.warn('Logout API failed:', error);
     } finally {
-      // Reset CSRF token khi logout
-      resetCsrfToken();
+      // Không cần xử lý token client-side vì BE quản lý qua cookies
     }
     // Cookies được xóa bởi backend
   },
