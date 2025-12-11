@@ -44,4 +44,18 @@ public class ReportsController : ControllerBase
         var result = await _reportService.GetTopCustomersAsync(request);
         return StatusCode(result.StatusCode, result);
     }
+
+    [HttpGet("promotion")]
+    public async Task<IActionResult> GetPromotionReport([FromQuery] PromotionReportRequest request)
+    {
+        var result = await _reportService.GetPromotionReportAsync(request);
+        return StatusCode(result.StatusCode, result);
+    }
+
+    [HttpGet("inventory-forecast")]
+    public async Task<IActionResult> GetInventoryForecast([FromQuery] InventoryForecastRequest request)
+    {
+        var result = await _reportService.GetInventoryForecastAsync(request);
+        return StatusCode(result.StatusCode, result);
+    }
 }
