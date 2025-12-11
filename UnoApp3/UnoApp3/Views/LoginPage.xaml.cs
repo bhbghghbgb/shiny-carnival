@@ -10,6 +10,7 @@ public sealed partial class LoginPage : Page
     public LoginPage()
     {
         this.InitializeComponent();
-        DataContext = App.Services.GetRequiredService<LoginViewModel>();
+        // DataContext will be automatically set by Uno.Extensions navigation
+        // DataContext = App.Services.GetRequiredService<LoginViewModel>();
     }
 }

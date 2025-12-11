@@ -188,9 +188,6 @@ public partial class App : Application
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<OrderService>();
-
-        // API Clients with Refit
-        var apiBaseUrl = "http://your-api-base-url"; // TODO: Move to configuration
         
         // API Clients with Refit using Uno.Extensions
         // These read from appsettings.json endpoints
