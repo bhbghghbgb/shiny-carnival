@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
@@ -9,6 +9,14 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "http-watch": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "watch run --launch-profile http",
+      "workingDirectory": "/home/nguyen-thanh-hung/Documents/TapHoaNho/shiny-carnival/RetailStoreManagement",
+      "dotnetRunMessages": true,
+      "launchBrowser": false
     }
   }
 }

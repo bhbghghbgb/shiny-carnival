@@ -1,13 +1,9 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RetailStoreManagement.Models.Authentication
 {
     public class RefreshTokenRequest
     {
-        [Required]
+        // Cho phép rỗng để controller tự đọc từ HttpOnly cookies
         public string AccessToken { get; set; } = string.Empty;
-
-        [Required]
         public string RefreshToken { get; set; } = string.Empty;
     }
 }
