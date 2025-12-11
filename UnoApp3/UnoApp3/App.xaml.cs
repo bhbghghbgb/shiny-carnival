@@ -1,4 +1,11 @@
 using Uno.Resizetizer;
+using UnoApp3.Data;
+using UnoApp3.Services;
+using UnoApp3.Services.Api;
+using UnoApp3.Services.Interfaces;
+using UnoApp3.Services.Repositories;
+using UnoApp3.ViewModels;
+using UnoApp3.Views;
 
 namespace UnoApp3;
 
@@ -18,6 +25,13 @@ public partial class App : Application
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        // Ensure database is created
+        using (var scope = Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            dbContext.Database.EnsureCreated();
+        }
+        
         var builder = this.CreateBuilder(args)
             // Add navigation support for toolkit controls such as TabBar and NavigationView
             .UseToolkitNavigation()
@@ -103,22 +117,81 @@ public partial class App : Application
 
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
+        // views.Register(
+        //     new ViewMap(ViewModel: typeof(ShellViewModel)),
+        //     new ViewMap<LoginScaffoldPage, LoginScaffoldViewModel>(),
+        //     new ViewMap<MainScaffoldPage, MainScaffoldViewModel>(),
+        //     new DataViewMap<SecondScaffoldPage, SecondScaffoldViewModel, Entity>()
+        // );
+        //
+        // routes.Register(
+        //     new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
+        //         Nested:
+        //         [
+        //             new("Login", View: views.FindByViewModel<LoginScaffoldViewModel>()),
+        //             new("Main", View: views.FindByViewModel<MainScaffoldViewModel>(), IsDefault: true),
+        //             new("Second", View: views.FindByViewModel<SecondScaffoldViewModel>()),
+        //         ]
+        //     )
+        // );
+        
         views.Register(
             new ViewMap(ViewModel: typeof(ShellViewModel)),
-            new ViewMap<LoginScaffoldPage, LoginScaffoldViewModel>(),
-            new ViewMap<MainScaffoldPage, MainScaffoldViewModel>(),
-            new DataViewMap<SecondScaffoldPage, SecondScaffoldViewModel, Entity>()
+            new ViewMap<LoginPage, LoginViewModel>(),
+            new ViewMap<MainPage, MainViewModel>(),
+            new ViewMap<ProductListPage, ProductListViewModel>(),
+            new ViewMap<CartPage, CartViewModel>(),
+            new ViewMap<OrderConfirmationPage, OrderConfirmationViewModel>()
         );
 
         routes.Register(
             new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
                 Nested:
                 [
-                    new("Login", View: views.FindByViewModel<LoginScaffoldViewModel>()),
-                    new("Main", View: views.FindByViewModel<MainScaffoldViewModel>(), IsDefault: true),
-                    new("Second", View: views.FindByViewModel<SecondScaffoldViewModel>()),
+                    new("Login", View: views.FindByViewModel<LoginViewModel>()),
+                    new("Main", View: views.FindByViewModel<MainViewModel>(), 
+                        Nested: 
+                        [
+                            new("ProductList", View: views.FindByViewModel<ProductListViewModel>(), IsDefault: true),
+                            new("Cart", View: views.FindByViewModel<CartViewModel>()),
+                            new("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationViewModel>()),
+                        ]),
                 ]
             )
         );
     }
+    
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        // Database
+        services.AddDbContext<AppDbContext>();
+    
+        // Repositories
+        services.AddScoped<ICartRepository, CartRepository>();
+    
+        // Services
+        services.AddScoped<AuthService>();
+        services.AddScoped<ProductService>();
+        services.AddScoped<OrderService>();
+    
+        // API Clients with Refit
+        var apiBaseUrl = "http://your-api-base-url"; // TODO: Move to configuration
+    
+        services.AddRefitClient<IAuthApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
+        // TODO: Add authorization handler here
+        
+        services.AddRefitClient<IProductApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
+        
+        services.AddRefitClient<IOrderApi>()
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
+    
+        // ViewModels
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<ProductListViewModel>();
+        services.AddTransient<CartViewModel>();
+        // Add other ViewModels...
+    }
+
 }
