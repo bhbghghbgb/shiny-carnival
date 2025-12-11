@@ -13,11 +13,10 @@ interface User {
 interface AuthState {
   // State
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
 
   // Actions
-  setAuth: (data: { user: User; token: string }) => void;
+  setAuth: (data: { user: User }) => void;
   clearAuth: () => void;
   checkAuth: () => void;
 
@@ -33,36 +32,28 @@ export const useAuthStore = create<AuthState>()(
       (set, get) => ({
         // Initial state
         user: null,
-        token: null,
         isAuthenticated: false,
 
         // Actions
-        setAuth: (data: { user: User; token: string }) => set({
-          user: data.user,
-          token: data.token,
-          isAuthenticated: true,
-        }),
+        setAuth: (data: { user: User }) => {
+          set({
+            user: data.user,
+            isAuthenticated: true,
+          });
+        },
 
-        clearAuth: () => set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-        }),
+        clearAuth: () => {
+          set({
+            user: null,
+            isAuthenticated: false,
+          });
+        },
 
         checkAuth: () => {
-          const token = localStorage.getItem('accessToken');
-          // Giả sử bạn có một hàm để giải mã token và lấy thông tin user
-          // const user = decodeToken(token);
-          // Tạm thời để là null
-          const user = null;
-
-          if (token && user) {
-            set({
-              isAuthenticated: true,
-              user: user,
-              token: token,
-            });
-          } else {
+          // Với httpOnly cookies, không thể đọc token từ frontend
+          // Chỉ kiểm tra xem có user trong store không
+          const { user } = get();
+          if (!user) {
             get().clearAuth();
           }
         },
@@ -88,11 +79,12 @@ export const useAuthStore = create<AuthState>()(
       }),
       {
         name: 'auth-store',
-        partialize: (state) => ({
-          user: state.user,
-          token: state.token,
-          isAuthenticated: state.isAuthenticated
-        })
+        partialize: (state) => {
+          return {
+            user: state.user,
+            isAuthenticated: state.isAuthenticated
+          };
+        },
       }
     ),
     {
@@ -102,19 +94,25 @@ export const useAuthStore = create<AuthState>()(
 );
 
 // Selector hooks để tối ưu re-renders
+// Hook này subscribe vào state và tự động re-render component khi state thay đổi
+// Sử dụng cho các component cần hiển thị user info và tự động cập nhật
 export const useAuth = () => useAuthStore((state) => ({
   user: state.user,
   isAuthenticated: state.isAuthenticated,
 }));
 
-export const useAuthActions = () => useAuthStore((state) => ({
-  setAuth: state.setAuth,
-  clearAuth: state.clearAuth,
-  checkAuth: state.checkAuth
-}));
-
-export const useAuthPermissions = () => useAuthStore((state) => ({
-  hasRole: state.hasRole,
-  isAdmin: state.isAdmin,
-  isStaff: state.isStaff
-}));
+// Lưu ý: Actions và Permissions nên dùng getState() để tránh re-render không cần thiết
+// 
+// Actions (không cần subscribe):
+//   useAuthStore.getState().setAuth({ user })
+//   useAuthStore.getState().clearAuth()
+//   useAuthStore.getState().checkAuth()
+//
+// Permissions (không cần subscribe):
+//   useAuthStore.getState().isAdmin()
+//   useAuthStore.getState().isStaff()
+//   useAuthStore.getState().hasRole(role)
+//
+// Nếu cần subscribe permissions (hiếm khi cần):
+//   const isAdmin = useAuthStore((state) => state.isAdmin());
+//   const hasRole = useAuthStore((state) => state.hasRole(role));

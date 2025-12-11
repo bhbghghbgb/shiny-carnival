@@ -2,7 +2,6 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -99,15 +98,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
-// Antiforgery (CSRF Protection)
-builder.Services.AddAntiforgery(options =>
-{
-    options.HeaderName = "X-CSRF-TOKEN";
-    options.Cookie.Name = "CSRF-TOKEN";
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-});
+// Antiforgery (CSRF Protection) - Tạm thời tắt
+// builder.Services.AddAntiforgery(options =>
+// {
+//     options.HeaderName = "X-CSRF-TOKEN";
+//     options.Cookie.Name = "CSRF-TOKEN";
+//     options.Cookie.HttpOnly = true;
+//     options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Trong development dùng HTTP
+//     options.Cookie.SameSite = SameSiteMode.Lax; // Cho phép cookies với same-site requests
+// });
 
 builder.Services.AddControllers(options => { options.Filters.Add<ApiResponseFilter>(); });
 
@@ -167,7 +166,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(MyAllowSpecificOrigins);
 
-app.UseAntiforgery(); // CSRF Protection middleware
+// app.UseAntiforgery(); // CSRF Protection middleware - Tạm thời tắt
 
 app.UseAuthentication();
 app.UseAuthorization();

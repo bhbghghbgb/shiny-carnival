@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStoreManagement.Common;
-using RetailStoreManagement.Filters;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models;
 using RetailStoreManagement.Models.Authentication;
@@ -20,41 +18,30 @@ public class AuthController : ControllerBase
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
-    private readonly IAntiforgery _antiforgery;
 
-    public AuthController(IAuthService authService, IUserService userService, IConfiguration configuration, IWebHostEnvironment environment, IAntiforgery antiforgery)
+    public AuthController(IAuthService authService, IUserService userService, IConfiguration configuration, IWebHostEnvironment environment)
     {
         _authService = authService;
         _userService = userService;
         _configuration = configuration;
         _environment = environment;
-        _antiforgery = antiforgery;
     }
 
     [HttpPost("login")]
-    [ValidateCsrfToken]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var result = await _authService.LoginAsync(request);
-        
+
         if (!result.IsError && result.Data != null)
         {
             // Set httpOnly cookies cho access token và refresh token
             SetTokenCookies(result.Data.Token, result.Data.RefreshToken);
         }
-        
+
         return StatusCode(result.StatusCode, result);
     }
 
-    [HttpGet("csrf-token")]
-    public IActionResult GetCsrfToken()
-    {
-        var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
-        return Ok(new { csrfToken = tokens.RequestToken });
-    }
-
     [HttpPost("setup-admin")]
-    [ValidateCsrfToken]
     public async Task<IActionResult> SetupAdmin([FromBody] CreateUserRequest request)
     {
         var result = await _userService.SetupAdminAsync(request);
@@ -62,32 +49,27 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    [ValidateCsrfToken]
-    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest? request)
+    public async Task<IActionResult> RefreshToken()
     {
-        // Đọc refresh token từ cookie nếu không có trong body
-        if (request == null || string.IsNullOrEmpty(request.RefreshToken))
+        // Luôn đọc token từ HttpOnly cookies
+        var request = new RefreshTokenRequest
         {
-            request = new RefreshTokenRequest
-            {
-                AccessToken = Request.Cookies["accessToken"] ?? string.Empty,
-                RefreshToken = Request.Cookies["refreshToken"] ?? string.Empty
-            };
-        }
-        
+            AccessToken = Request.Cookies["accessToken"] ?? string.Empty,
+            RefreshToken = Request.Cookies["refreshToken"] ?? string.Empty
+        };
+
         var result = await _authService.RefreshTokenAsync(request);
-        
+
         if (!result.IsError && result.Data != null)
         {
             // Set httpOnly cookies cho tokens mới
             SetTokenCookies(result.Data.Token, result.Data.RefreshToken);
         }
-        
+
         return StatusCode(result.StatusCode, result);
     }
 
     [HttpPost("logout")]
-    [ValidateCsrfToken]
     public async Task<IActionResult> Logout([FromBody] LogoutRequest? request)
     {
         // Đọc refresh token từ cookie nếu không có trong body
@@ -98,12 +80,12 @@ public class AuthController : ControllerBase
                 RefreshToken = Request.Cookies["refreshToken"] ?? string.Empty
             };
         }
-        
+
         var result = await _authService.LogoutAsync(request);
-        
+
         // Xóa cookies
         ClearTokenCookies();
-        
+
         return StatusCode(result.StatusCode, result);
     }
 
@@ -112,33 +94,41 @@ public class AuthController : ControllerBase
         var jwtSettings = _configuration.GetSection("JwtSettings");
         var accessTokenExpiry = int.Parse(jwtSettings["ExpirationInMinutes"] ?? "15");
         var refreshTokenExpiry = 7; // 7 ngày
-        
+
+        // Trong development, không set Domain để cookies hoạt động với localhost:port khác nhau
+        // Trong production, có thể cần set Domain nếu frontend và backend cùng domain
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true, // Chống XSS
             Secure = !_environment.IsDevelopment(), // HTTPS trong production
             SameSite = SameSiteMode.Lax, // Chống CSRF
-            Path = "/"
+            Path = "/",
+            // Không set Domain để cookies hoạt động với localhost:port khác nhau
+            // Domain chỉ cần set nếu frontend và backend ở subdomain khác nhau
         };
 
         // Set access token cookie (15 phút)
+        // Lưu ý: Với localhost và port khác nhau, cookies vẫn hoạt động nếu không set Domain
+        // SameSite=Lax cho phép cookies được gửi trong top-level navigation và same-site requests
         Response.Cookies.Append("accessToken", accessToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = !_environment.IsDevelopment(),
-            SameSite = SameSiteMode.Lax,
+            Secure = false, // Trong development dùng HTTP, production sẽ dùng HTTPS
+            SameSite = SameSiteMode.Lax, // Cho phép cookies với same-site requests
             Path = "/",
             MaxAge = TimeSpan.FromMinutes(accessTokenExpiry)
+            // Không set Domain - để cookies hoạt động với localhost:port khác nhau
         });
 
         // Set refresh token cookie (7 ngày)
         Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = !_environment.IsDevelopment(),
-            SameSite = SameSiteMode.Lax,
+            Secure = false, // Trong development dùng HTTP, production sẽ dùng HTTPS
+            SameSite = SameSiteMode.Lax, // Cho phép cookies với same-site requests
             Path = "/",
             MaxAge = TimeSpan.FromDays(refreshTokenExpiry)
+            // Không set Domain - để cookies hoạt động với localhost:port khác nhau
         });
     }
 

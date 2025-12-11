@@ -1,10 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RetailStoreManagement.Models.Authentication
 {
     public class LogoutRequest
     {
-        [Required]
+        // Cho phép rỗng để controller tự đọc từ HttpOnly cookies
         public string RefreshToken { get; set; } = string.Empty;
     }
 }
