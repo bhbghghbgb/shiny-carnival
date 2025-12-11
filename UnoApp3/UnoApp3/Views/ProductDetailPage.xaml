@@ -1,0 +1,106 @@
+﻿<Page x:Class="UnoApp3.Views.ProductDetailPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:utu="using:Uno.Toolkit.UI"
+      mc:Ignorable="d"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Navigation Bar -->
+        <utu:NavigationBar Title="Chi tiết sản phẩm"
+                            Grid.Row="0">
+            <utu:NavigationBar.LeadingContent>
+                <Button Command="{Binding GoBackCommand}">
+                    <SymbolIcon Symbol="Back"/>
+                </Button>
+            </utu:NavigationBar.LeadingContent>
+        </utu:NavigationBar>
+
+        <!-- Product Details -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Padding="20" Spacing="16">
+                <!-- Product Image -->
+                <Border Height="300"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="12">
+                    <Image Source="{Binding ProductImageUrl}"
+                           Stretch="Uniform"/>
+                </Border>
+
+                <!-- Product Name -->
+                <TextBlock Text="{Binding Product.ProductName}"
+                           Style="{StaticResource TitleTextBlockStyle}"/>
+
+                <!-- Price -->
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Product.Price, StringFormat='Giá: {0:C}'}"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               FontWeight="SemiBold"
+                               Foreground="{ThemeResource SystemAccentColor}"/>
+                    <TextBlock Text="{Binding Product.Unit, StringFormat='/ {0}'}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               VerticalAlignment="Bottom"/>
+                </StackPanel>
+
+                <!-- Category and Supplier -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Danh mục"
+                                   Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <TextBlock Text="{Binding Product.CategoryName}"
+                                   Style="{StaticResource BodyTextBlockStyle}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Nhà cung cấp"
+                                   Style="{StaticResource CaptionTextBlockStyle}"/>
+                        <TextBlock Text="{Binding Product.SupplierName}"
+                                   Style="{StaticResource BodyTextBlockStyle}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Inventory -->
+                <StackPanel>
+                    <TextBlock Text="Tồn kho"
+                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBlock Text="{Binding Product.InventoryQuantity}"
+                               Style="{StaticResource BodyTextBlockStyle}"/>
+                </StackPanel>
+
+                <!-- Barcode -->
+                <StackPanel>
+                    <TextBlock Text="Mã vạch"
+                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBlock Text="{Binding Product.Barcode}"
+                               Style="{StaticResource BodyTextBlockStyle}"/>
+                </StackPanel>
+
+                <!-- Created Date -->
+                <StackPanel>
+                    <TextBlock Text="Ngày tạo"
+                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                    <TextBlock Text="{Binding Product.CreatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}"
+                               Style="{StaticResource BodyTextBlockStyle}"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Add to Cart Button -->
+        <Button Grid.Row="2"
+                Content="Thêm vào giỏ hàng"
+                Command="{Binding AddToCartCommand}"
+                Margin="20"
+                HorizontalAlignment="Stretch"/>
+    </Grid>
+</Page>

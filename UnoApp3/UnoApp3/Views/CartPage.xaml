@@ -1,0 +1,74 @@
+﻿<Page x:Class="UnoApp3.Views.CartPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:utu="using:Uno.Toolkit.UI"
+      mc:Ignorable="d"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Navigation Bar -->
+        <utu:NavigationBar Title="Giỏ hàng"
+                            Grid.Row="0">
+            <utu:NavigationBar.LeadingContent>
+                <Button Command="{Binding GoBackCommand}">
+                    <SymbolIcon Symbol="Back"/>
+                </Button>
+            </utu:NavigationBar.LeadingContent>
+        </utu:NavigationBar>
+
+        <!-- Cart Items List -->
+        <ListView Grid.Row="1"
+                  ItemsSource="{Binding CartItems}"
+                  SelectionMode="None"
+                  ItemTemplate="{StaticResource CartItemTemplate}"/>
+
+        <!-- Empty State -->
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+            <SymbolIcon Symbol="ShoppingCart"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        FontSize="48"/>
+            <TextBlock Text="Giỏ hàng trống"
+                       Style="{StaticResource TitleTextBlockStyle}"
+                       Margin="0,12,0,0"/>
+            <TextBlock Text="Hãy thêm sản phẩm vào giỏ hàng"
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Total and Checkout Button -->
+        <Border Grid.Row="2"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                Padding="20">
+            <StackPanel Spacing="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Tổng tiền:"
+                               Style="{StaticResource BodyTextBlockStyle}"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding TotalAmount, StringFormat='{}{0:C}'}"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               Foreground="{ThemeResource SystemAccentColor}"/>
+                </Grid>
+
+                <Button Content="Đặt hàng"
+                        Command="{Binding CheckoutCommand}"
+                        IsEnabled="{Binding HasItems}"
+                        HorizontalAlignment="Stretch"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
