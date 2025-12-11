@@ -25,13 +25,6 @@ public partial class App : Application
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // Ensure database is created
-        using (var scope = Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            dbContext.Database.EnsureCreated();
-        }
-        
         var builder = this.CreateBuilder(args)
             // Add navigation support for toolkit controls such as TabBar and NavigationView
             .UseToolkitNavigation()
@@ -89,6 +82,7 @@ public partial class App : Application
                 {
                     // TODO: Register your services
                     //services.AddSingleton<IMyService, MyService>();
+                    ConfigureAppServices(services, context);
                 })
                 .UseNavigation(RegisterRoutes)
             );
@@ -102,6 +96,9 @@ public partial class App : Application
         Host = await builder.NavigateAsync<Shell>
         (initialNavigate: async (services, navigator) =>
         {
+            // Initialize database before any navigation
+            await InitializeDatabaseAsync(services);
+            
             var auth = services.GetRequiredService<IAuthenticationService>();
             var authenticated = await auth.RefreshAsync();
             if (authenticated)
@@ -114,7 +111,10 @@ public partial class App : Application
             }
         });
     }
-
+    
+    /// <summary>
+    /// Register navigation routes
+    /// </summary>
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         // views.Register(
@@ -134,7 +134,7 @@ public partial class App : Application
         //         ]
         //     )
         // );
-        
+
         views.Register(
             new ViewMap(ViewModel: typeof(ShellViewModel)),
             new ViewMap<LoginPage, LoginViewModel>(),
@@ -149,8 +149,8 @@ public partial class App : Application
                 Nested:
                 [
                     new("Login", View: views.FindByViewModel<LoginViewModel>()),
-                    new("Main", View: views.FindByViewModel<MainViewModel>(), 
-                        Nested: 
+                    new("Main", View: views.FindByViewModel<MainViewModel>(),
+                        Nested:
                         [
                             new("ProductList", View: views.FindByViewModel<ProductListViewModel>(), IsDefault: true),
                             new("Cart", View: views.FindByViewModel<CartViewModel>()),
@@ -160,38 +160,48 @@ public partial class App : Application
             )
         );
     }
-    
-    private static void ConfigureServices(IServiceCollection services)
+
+    /// <summary>
+    /// Initialize the database (create tables if needed)
+    /// </summary>
+    private static async Task InitializeDatabaseAsync(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        // Use async version if available in your EF Core version
+        await Task.Run(() => dbContext.Database.EnsureCreated());
+    }
+
+    /// <summary>
+    /// Configure application-specific services
+    /// </summary>
+    private static void ConfigureAppServices(IServiceCollection services, HostBuilderContext context)
     {
         // Database
         services.AddDbContext<AppDbContext>();
-    
+
         // Repositories
         services.AddScoped<ICartRepository, CartRepository>();
-    
+
         // Services
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<OrderService>();
-    
+
         // API Clients with Refit
         var apiBaseUrl = "http://your-api-base-url"; // TODO: Move to configuration
-    
-        services.AddRefitClient<IAuthApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
-        // TODO: Add authorization handler here
         
-        services.AddRefitClient<IProductApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
-        
-        services.AddRefitClient<IOrderApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseUrl));
-    
+        // API Clients with Refit using Uno.Extensions
+        // These read from appsettings.json endpoints
+        services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint");
+        services.AddRefitClient<IProductApi>(context, name: "ProductEndpoint");
+        services.AddRefitClient<IOrderApi>(context, name: "OrderEndpoint");
+
         // ViewModels
         services.AddTransient<LoginViewModel>();
         services.AddTransient<ProductListViewModel>();
         services.AddTransient<CartViewModel>();
         // Add other ViewModels...
     }
-
 }
