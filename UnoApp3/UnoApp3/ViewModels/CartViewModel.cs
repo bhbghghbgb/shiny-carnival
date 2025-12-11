@@ -16,6 +16,9 @@ public partial class CartViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<CartItem> _cartItems;
+    
+    [ObservableProperty]
+    private bool _hasItems;
 
     [ObservableProperty]
     private Dictionary<int, ProductListDto> _productCache;
@@ -42,21 +45,21 @@ public partial class CartViewModel : BaseViewModel
     private async Task LoadCart()
     {
         if (IsBusy) return;
-        
+    
         IsBusy = true;
-        
+    
         try
         {
             CartItems.Clear();
             ProductCache.Clear();
             TotalAmount = 0;
-            
+        
             var items = await _cartRepository.GetCartItemsAsync();
-            
+        
             foreach (var item in items)
             {
                 CartItems.Add(item);
-                
+            
                 // Fetch product details
                 var product = await _productService.GetProductAsync(item.ProductId);
                 if (product != null)
@@ -68,11 +71,13 @@ public partial class CartViewModel : BaseViewModel
                         Price = product.Price,
                         Unit = product.Unit
                     };
-                    
+                
                     ProductCache[item.ProductId] = productDto;
                     TotalAmount += product.Price * item.Quantity;
                 }
             }
+        
+            HasItems = CartItems.Any();
         }
         finally
         {
