@@ -1,16 +1,14 @@
 import { z } from 'zod';
+import { queryOptions } from '@tanstack/react-query';
 import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { ProductManagementPage } from '../../../../../features/products/pages/ProductManagementPage.tsx';
 import { productApiService } from '../../../../../features/products/api';
 import type { ProductEntity } from '../../../../../features/products/types/entity.ts';
 import type { PagedRequest } from '../../../../../lib/api/types/api.types';
+import type { QueryClient } from '@tanstack/react-query';
+import { createPaginatedQueryOptions, createQueryKeys } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
-
-interface ProductLoaderData {
-  products: ProductEntity[];
-  total: number;
-}
 
 const productSearchSchema = baseSearchSchema.extend({
   categoryId: z.number().optional(), // Filter theo category
@@ -23,72 +21,48 @@ const productSearchSchema = baseSearchSchema.extend({
 
 export type ProductSearch = z.infer<typeof productSearchSchema>;
 
-async function fetchProducts(ctx: LoaderContext<Record<string, never>, ProductSearch, { apiClient: never }>): Promise<ProductLoaderData> {
-  const search = ctx.search;
-  console.log('🔍 [Loader] Fetching products with filters:', search);
-
-  try {
-    // Convert search params sang PagedRequest format (theo swagger.json)
-    // Backend expect: Page, PageSize, Search, SortBy, SortDesc, CategoryId, SupplierId, MinPrice, MaxPrice (PascalCase)
-    const params: PagedRequest = {
-      page: search.page || 1,
-      pageSize: search.pageSize || 10,
-      search: search.search,
-      // Convert sortField sang SortBy format của backend
-      sortBy: search.sortField === 'productName' ? 'ProductName' :
-              search.sortField === 'price' ? 'Price' :
-              search.sortField === 'createdAt' ? 'CreatedAt' : 'Id',
-      sortDesc: search.sortOrder === 'descend',
-      // Add filters
-      ...(search.categoryId !== undefined && { categoryId: search.categoryId }),
-      ...(search.supplierId !== undefined && { supplierId: search.supplierId }),
-      ...(search.minPrice !== undefined && { minPrice: search.minPrice }),
-      ...(search.maxPrice !== undefined && { maxPrice: search.maxPrice }),
-    };
-
-    console.log('📤 [Loader] Calling API with params:', params);
-
-    // Gọi API thật từ backend (productApiService.getPaginated tự động unwrap ApiResponse)
-    const pagedList = await productApiService.getPaginated(params);
-
-    console.log('📥 [Loader] PagedList:', pagedList);
-    console.log('✅ [Loader] Successfully loaded products:', pagedList.items.length, 'total:', pagedList.totalCount);
-
-    return {
-      products: pagedList.items || [],
-      total: pagedList.totalCount || 0,
-    };
-  } catch (error: unknown) {
-    console.error('❌ [Loader] Exception caught:', error);
-
-    // Log chi tiết error nếu có
-    if (error && typeof error === 'object') {
-      if ('message' in error) {
-        console.error('❌ [Loader] Error message:', error.message);
-      }
-      if ('response' in error) {
-        const axiosError = error as { response?: { data?: unknown; status?: number } };
-        console.error('❌ [Loader] Axios error response data:', axiosError.response?.data);
-        console.error('❌ [Loader] Axios error status:', axiosError.response?.status);
-      }
-      if ('stack' in error) {
-        console.error('❌ [Loader] Error stack:', error.stack);
-      }
-    }
-
+function buildPagedRequest(search: ProductSearch): PagedRequest {
   return {
-      products: [],
-      total: 0,
+    page: search.page || 1,
+    pageSize: search.pageSize || 10,
+    search: search.search,
+    sortBy: search.sortField === 'productName' ? 'ProductName' :
+      search.sortField === 'price' ? 'Price' :
+        search.sortField === 'createdAt' ? 'CreatedAt' : 'Id',
+    sortDesc: search.sortOrder === 'descend',
+    ...(search.categoryId !== undefined && { categoryId: search.categoryId }),
+    ...(search.supplierId !== undefined && { supplierId: search.supplierId }),
+    ...(search.minPrice !== undefined && { minPrice: search.minPrice }),
+    ...(search.maxPrice !== undefined && { maxPrice: search.maxPrice }),
   };
-  }
+}
+
+async function fetchProducts(ctx: LoaderContext<Record<string, never>, ProductSearch, { queryClient: QueryClient }>): Promise<{ products: ProductEntity[]; total: number }> {
+  const { search, context } = ctx;
+  const params = buildPagedRequest(search);
+
+  const productsQueryOptions = createPaginatedQueryOptions<ProductEntity>(
+    'products',
+    productApiService,
+    params,
+  );
+
+  // ensure data in cache
+  const data = await context.queryClient.ensureQueryData(productsQueryOptions);
+
+  // filter client-side if needed already in params; no extra filter
+  return {
+    products: data.items || [],
+    total: data.totalCount || (data.items ? data.items.length : 0),
+  };
 }
 
 // 2. Tạo "Bản thiết kế" cho trang quản trị
 
 export const productAdminDefinition: ManagementRouteDefinition<
-  ProductLoaderData,     // Kiểu loader data
+  { products: ProductEntity[]; total: number },     // Kiểu loader data
   ProductSearch,         // Kiểu search params
-  { apiClient: never }     // Kiểu router context (ví dụ)
+  { queryClient: QueryClient }     // Kiểu router context
 > = {
   entityName: 'Sản phẩm',
   path: 'products',
