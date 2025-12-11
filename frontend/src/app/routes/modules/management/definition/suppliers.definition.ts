@@ -1,15 +1,12 @@
 import { z } from 'zod';
-import { baseSearchSchema, type ManagementRouteDefinition } from '../../../type/types';
+import { queryOptions, type QueryClient } from '@tanstack/react-query';
+import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { SupplierManagementPage } from '../../../../../features/suppliers/pages/SupplierManagementPage';
 import { suppliers as mockSuppliers } from '../../../../../_mocks/suppliers';
+import { createQueryKeys } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
 // --------------------------
-
-interface SupplierLoaderData {
-  suppliers: (typeof mockSuppliers);
-  total: number;
-}
 
 const supplierSearchSchema = baseSearchSchema.extend({
   // country: z.string().optional(),
@@ -19,27 +16,34 @@ const supplierSearchSchema = baseSearchSchema.extend({
 
 export type SupplierSearch = z.infer<typeof supplierSearchSchema>;
 
-async function fetchSuppliers(search: SupplierSearch): Promise<SupplierLoaderData> {
-  console.log('Fetching suppliers with filters:', search);
-  // Giả lập gọi API
-  await new Promise(resolve => setTimeout(resolve, 200));
-  return {
-    suppliers: mockSuppliers,
-    total: mockSuppliers.length,
-  };
+async function fetchSuppliers(ctx: LoaderContext<Record<string, never>, SupplierSearch, { queryClient: QueryClient }>): Promise<{ suppliers: typeof mockSuppliers; total: number }> {
+  const { search, context } = ctx;
+  const queryKeys = createQueryKeys('suppliers');
+  const queryOpts = queryOptions<{ suppliers: typeof mockSuppliers; total: number }>({
+    queryKey: [...queryKeys.lists(), 'mock', search],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      return {
+        suppliers: mockSuppliers,
+        total: mockSuppliers.length,
+      };
+    },
+  });
+
+  return context.queryClient.ensureQueryData(queryOpts);
 }
 
 // 2. Tạo "Bản thiết kế" cho trang quản trị
 // ----------------------------------------
 
 export const supplierAdminDefinition: ManagementRouteDefinition<
-  SupplierLoaderData,     // Kiểu loader data
+  { suppliers: typeof mockSuppliers; total: number },     // Kiểu loader data
   SupplierSearch,         // Kiểu search params
-  { apiClient: never }      // Kiểu router context (ví dụ)
+  { queryClient: QueryClient }      // Kiểu router context
 > = {
   entityName: 'Nhà cung cấp',
   path: 'suppliers',
   component: SupplierManagementPage,
   searchSchema: supplierSearchSchema,
-  loader: ({ search }) => fetchSuppliers(search),
+  loader: (ctx) => fetchSuppliers(ctx),
 };
