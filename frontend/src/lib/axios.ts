@@ -4,6 +4,7 @@ import type { LoginResponse } from "../features/auth/types/api.ts";
 import { ENDPOINTS } from "../app/routes/type/routes.endpoint.ts";
 import { API_CONFIG } from "../config/api.config";
 import type { ApiResponse } from './api/types/api.types';
+import { useAuthStore } from "../features/auth/store/authStore";
 
 // Token utils không còn dùng do BE đọc cookie trực tiếp
 export const tokenUtils = {
@@ -84,6 +85,9 @@ axiosClient.interceptors.response.use(
 
       originalRequest._retry = true;
       isRefreshing = true;
+
+      // Clear auth state trước khi refresh token
+      useAuthStore.getState().clearAuth();
 
       try {
         // Backend đọc refresh token từ HttpOnly cookie
