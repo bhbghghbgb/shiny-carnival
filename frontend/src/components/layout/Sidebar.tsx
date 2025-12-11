@@ -21,6 +21,7 @@ const items: MenuItem[] = [
     icon: <AppstoreOutlined />,
     children: [
       { key: '5', label: <Link to={ENDPOINTS.ADMIN.USERS}>Users</Link> },
+      { key: '5a', label: <Link to={ENDPOINTS.ADMIN.PRODUCTS}>Products</Link> },
       { key: '6', label: 'Suppliers' },
       { key: '7', label: 'Categories' },
     ],

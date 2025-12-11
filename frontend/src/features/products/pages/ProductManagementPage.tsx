@@ -1,75 +1,216 @@
-import { useState } from 'react';
-import { Table, Button, Modal, Form } from 'antd';
-import { ProductForm } from '../components/ProductForm';
-import { getRouteApi } from '@tanstack/react-router';
+async function fetchCategoryOptions(keyword: string) {
+    const paged = await categoryApiService.getPaginated({
+        search: keyword || undefined,
+        page: 1,
+        pageSize: 20,
+    })
+    const items = paged.items ?? []
+    return items.map((c: CategoryEntity) => ({
+        label: c.categoryName ?? `#${c.id}`,
+        value: c.id,
+    }))
+}
 
-const routeApi = getRouteApi('/admin/products');
+async function fetchSupplierOptions(keyword: string) {
+    const paged = await supplierApiService.getPaginated({
+        search: keyword || undefined,
+        page: 1,
+        pageSize: 20,
+    })
+    const items = paged.items ?? []
+    return items.map((s: SupplierEntity) => ({
+        label: s.name ?? `#${s.id}`,
+        value: s.id,
+    }))
+}
+import { Card, Input, InputNumber, Space, Typography } from 'antd'
+import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { productPageConfig } from '../config/productPageConfig'
+import { useProductManagementPage } from '../hooks/useProductManagementPage'
+import type { ProductEntity } from '../types/entity'
+import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
+import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
+import { categoryApiService } from '../../categories/api'
+import { supplierApiService } from '../../suppliers/api'
+import type { CategoryEntity } from '../../categories/types/entity'
+import type { SupplierEntity } from '../../suppliers/types/entity'
+
+const { Title } = Typography
+
+type ProductFiltersProps = {
+    searchText: string
+    categoryId?: number
+    supplierId?: number
+    minPrice?: number
+    maxPrice?: number
+    onSearchChange: (value: string) => void
+    onCategoryChange: (value?: number) => void
+    onSupplierChange: (value?: number) => void
+    onPriceRangeChange: (min?: number, max?: number) => void
+    onClearFilters: () => void
+}
+
+const ProductFilters = ({
+    searchText,
+    categoryId,
+    supplierId,
+    minPrice,
+    maxPrice,
+    onSearchChange,
+    onCategoryChange,
+    onSupplierChange,
+    onPriceRangeChange,
+    onClearFilters,
+}: ProductFiltersProps) => {
+    return (
+        <Card size="small" title="Bộ lọc">
+            <Space wrap style={{ width: '100%' }}>
+                <Input
+                    placeholder="Tìm theo tên hoặc barcode"
+                    allowClear
+                    style={{ width: 240 }}
+                    value={searchText}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                />
+                <DropDownWithFilter
+                    style={{ width: 220 }}
+                    placeholder="Chọn danh mục"
+                    fetchOptions={fetchCategoryOptions}
+                    queryKeyPrefix="category-filter"
+                    fetchOnEmpty={true}
+                    value={categoryId}
+                    onChange={(v) => onCategoryChange(v as number | undefined)}
+                />
+                <DropDownWithFilter
+                    style={{ width: 220 }}
+                    placeholder="Chọn nhà cung cấp"
+                    fetchOptions={fetchSupplierOptions}
+                    queryKeyPrefix="supplier-filter"
+                    fetchOnEmpty={true}
+                    value={supplierId}
+                    onChange={(v) => onSupplierChange(v as number | undefined)}
+                />
+                <InputNumber
+                    placeholder="Giá từ"
+                    style={{ width: 140 }}
+                    value={minPrice}
+                    min={0}
+                    onChange={(value) => onPriceRangeChange(value ?? undefined, maxPrice)}
+                />
+                <InputNumber
+                    placeholder="Giá đến"
+                    style={{ width: 140 }}
+                    value={maxPrice}
+                    min={0}
+                    onChange={(value) => onPriceRangeChange(minPrice, value ?? undefined)}
+                />
+                <a onClick={onClearFilters}>Xóa lọc</a>
+            </Space>
+        </Card>
+    )
+}
+
+const ProductStatistics = ({ total, lowStock }: { total: number; lowStock: string | number }) => (
+    <Space wrap>
+        <Card size="small" title="Tổng sản phẩm">
+            <Title level={4} style={{ margin: 0 }}>
+                {total}
+            </Title>
+        </Card>
+        <Card size="small" title="Tồn kho thấp">
+            <Title level={4} style={{ margin: 0 }}>
+                {lowStock}
+            </Title>
+        </Card>
+    </Space>
+)
 
 export function ProductManagementPage() {
-    const { products } = routeApi.useLoaderData();
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [form] = Form.useForm();
-    const params = routeApi.useParams();
+    const {
+        products,
+        total,
+        placeholderStats,
 
-    console.log('Products:', products);
-    console.log('Route params:', params);
+        searchText,
+        sortField,
+        sortOrder,
+        page,
+        pageSize,
+        categoryId,
+        supplierId,
+        minPrice,
+        maxPrice,
 
-    const showModal = () => {
-        setIsModalVisible(true);
-    };
+        handleSearch,
+        handleCategoryFilter,
+        handleSupplierFilter,
+        handlePriceRangeChange,
+        handleSort,
+        handlePageChange,
+        clearFilters,
 
-    const handleOk = () => {
-        form
-            .validateFields()
-            .then((values) => {
-                console.log('Form Values: ', values);
-                // Here you would typically call a service to add the product
-                form.resetFields();
-                setIsModalVisible(false);
-            })
-            .catch((info) => {
-                console.log('Validate Failed:', info);
-            });
-    };
+        handleCreate,
+        handleUpdate,
+        handleDelete,
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-    };
-
-    const columns = [
-        { title: 'ID', dataIndex: 'id', key: 'id' },
-        { title: 'Product Name', dataIndex: 'productName', key: 'productName' },
-        { title: 'Barcode', dataIndex: 'barcode', key: 'barcode' },
-        { title: 'Price', dataIndex: 'price', key: 'price' },
-        { title: 'Unit', dataIndex: 'unit', key: 'unit' },
-        {
-            title: 'Action',
-            key: 'action',
-            render: () => (
-                <span>
-           <Button type="link">Edit</Button>
-           <Button type="link" danger>Delete</Button>
-         </span>
-            ),
-        },
-    ];
+        createProduct,
+        updateProduct,
+        deleteProduct,
+        pageErrorMessage,
+        formErrorMessage,
+        clearPageError,
+        clearFormError,
+    } = useProductManagementPage()
 
     return (
-        <div>
-            <div style={{ marginBottom: 16 }}>
-                <Button type="primary" onClick={showModal}>
-                    Add Product
-                </Button>
-            </div>
-            <Table dataSource={products} columns={columns} rowKey="id" />
-            <Modal
-                title="Add New Product"
-                visible={isModalVisible}
-                onOk={handleOk}
-                onCancel={handleCancel}
-            >
-                <ProductForm form={form} />
-            </Modal>
+        <div style={{ padding: '24px' }}>
+            <GenericPage<ProductEntity, CreateProductRequest, UpdateProductRequest>
+                config={productPageConfig}
+                data={products}
+                total={total}
+                loading={createProduct.isPending || updateProduct.isPending || deleteProduct.isPending}
+                page={page}
+                pageSize={pageSize}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onPageChange={handlePageChange}
+                onSortChange={handleSort}
+                onCreate={handleCreate}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+                createLoading={createProduct.isPending}
+                updateLoading={updateProduct.isPending}
+                deleteLoading={deleteProduct.isPending}
+                pageErrorMessage={pageErrorMessage}
+                onClearPageError={clearPageError}
+                formErrorMessage={formErrorMessage}
+                onClearFormError={clearFormError}
+                renderHeader={() => (
+                    <Title level={3} style={{ margin: 0 }}>
+                        Quản lý sản phẩm
+                    </Title>
+                )}
+                statisticsSlot={
+                    <ProductStatistics
+                        total={total}
+                        lowStock={placeholderStats.lowStock}
+                    />
+                }
+                filtersSlot={
+                    <ProductFilters
+                        searchText={searchText}
+                        categoryId={categoryId}
+                        supplierId={supplierId}
+                        minPrice={minPrice}
+                        maxPrice={maxPrice}
+                        onSearchChange={handleSearch}
+                        onCategoryChange={handleCategoryFilter}
+                        onSupplierChange={handleSupplierFilter}
+                        onPriceRangeChange={handlePriceRangeChange}
+                        onClearFilters={clearFilters}
+                    />
+                }
+            />
         </div>
-    );
+    )
 }

@@ -47,10 +47,8 @@ async function fetchProducts(ctx: LoaderContext<Record<string, never>, ProductSe
     params,
   );
 
-  // ensure data in cache
   const data = await context.queryClient.ensureQueryData(productsQueryOptions);
 
-  // filter client-side if needed already in params; no extra filter
   return {
     products: data.items || [],
     total: data.totalCount || (data.items ? data.items.length : 0),
@@ -70,3 +68,8 @@ export const productAdminDefinition: ManagementRouteDefinition<
   searchSchema: productSearchSchema,
   loader: (ctx) => fetchProducts(ctx),
 };
+
+export function createProductsQueryOptions(search: ProductSearch) {
+  const params = buildPagedRequest(search);
+  return createPaginatedQueryOptions<ProductEntity>('products', productApiService, params);
+}
