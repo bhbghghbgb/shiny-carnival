@@ -1,9 +1,9 @@
 // frontend/src/app/routes/routeTree.ts
 import { createRoute, createRouter, type AnyRoute } from '@tanstack/react-router';
 import { rootRoute } from './__root';
-import { adminLayoutRoute } from './modules/layout/admin.layout';
-import { authLayoutRoute } from './modules/layout/auth.layout';
-import { mainLayoutRoute } from './modules/layout/main.layout';
+import { authLayoutRoute } from './layout/auth.layout';
+import { mainLayoutRoute } from './layout/main.layout';
+import { createAdminLayoutRoute } from './layout/admin.layout';
 import { homeRoutes } from './modules/home.routes';
 import { authRoutes } from './modules/auth.routes';
 // ... import các module routes khác như trong file gốc
@@ -107,6 +107,9 @@ const homeRoutesBuilt = buildRoutesFromConfig(
   mainLayoutRoute,
 );
 
+// Tạo adminLayoutRoute với mainLayoutRoute làm parent để đảm bảo sidebar hiển thị
+const adminLayoutRoute = createAdminLayoutRoute(mainLayoutRoute);
+
 // Build admin routes với adminLayoutRoute
 const adminRoutes = buildRoutesFromConfig(
   adminModuleRoutes.flatMap(m => m.routes as HierarchicalModuleRouteConfig[]),
@@ -122,7 +125,7 @@ mainLayoutRoute.addChildren(homeRoutesBuilt);
 // 5. Gắn các route admin đã tạo vào adminLayoutRoute
 adminLayoutRoute.addChildren(adminRoutes);
 
-// 6. Gắn adminLayoutRoute vào mainLayoutRoute (thêm trực tiếp để tránh duplicate)
+// 6. Gắn adminLayoutRoute vào mainLayoutRoute để có sidebar
 mainLayoutRoute.addChildren([adminLayoutRoute]);
 
 // 7. Xây dựng cây routing cuối cùng
