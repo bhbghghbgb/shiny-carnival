@@ -195,12 +195,311 @@ public class ReportService : IReportService
                 .OrderByDescending(c => c.TotalSpent);
 
             var pagedResult = await PagedList<TopCustomerDto>.CreateAsync(query, request.Page, request.PageSize);
-            
+
             return ApiResponse<PagedList<TopCustomerDto>>.Success(pagedResult);
         }
         catch (Exception ex)
         {
             return ApiResponse<PagedList<TopCustomerDto>>.Error(ex.Message);
         }
+    }
+
+    public async Task<ApiResponse<PromotionReportDto>> GetPromotionReportAsync(PromotionReportRequest request)
+    {
+        try
+        {
+            var promotionsQuery = _unitOfWork.Promotions.GetQueryable();
+
+            if (request.PromoId.HasValue)
+            {
+                promotionsQuery = promotionsQuery.Where(p => p.Id == request.PromoId.Value);
+            }
+
+            var promotions = await promotionsQuery.ToListAsync();
+
+            var promotionEffectiveness = new List<PromotionEffectivenessDto>();
+
+            foreach (var promotion in promotions)
+            {
+                var ordersQuery = _unitOfWork.Orders.GetQueryable()
+                    .Where(o => o.PromoId == promotion.Id && o.Status == OrderStatus.Paid);
+
+                if (request.StartDate.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.OrderDate >= request.StartDate.Value);
+                }
+                if (request.EndDate.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.OrderDate <= request.EndDate.Value);
+                }
+
+                var orders = await ordersQuery.ToListAsync();
+
+                var totalRevenue = orders.Sum(o => o.TotalAmount - o.DiscountAmount);
+                var totalDiscount = orders.Sum(o => o.DiscountAmount);
+                var totalOrders = orders.Count;
+
+                var allOrdersInPeriod = _unitOfWork.Orders.GetQueryable()
+                    .Where(o => o.Status == OrderStatus.Paid);
+
+                if (request.StartDate.HasValue)
+                {
+                    allOrdersInPeriod = allOrdersInPeriod.Where(o => o.OrderDate >= request.StartDate.Value);
+                }
+                if (request.EndDate.HasValue)
+                {
+                    allOrdersInPeriod = allOrdersInPeriod.Where(o => o.OrderDate <= request.EndDate.Value);
+                }
+
+                var totalOrdersInPeriod = await allOrdersInPeriod.CountAsync();
+                var conversionRate = totalOrdersInPeriod > 0 ? (decimal)totalOrders / totalOrdersInPeriod * 100 : 0;
+
+                var averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+                promotionEffectiveness.Add(new PromotionEffectivenessDto
+                {
+                    PromoId = promotion.Id,
+                    PromoCode = promotion.PromoCode,
+                    Description = promotion.Description ?? string.Empty,
+                    DiscountType = promotion.DiscountType.ToString(),
+                    DiscountValue = promotion.DiscountValue,
+                    StartDate = promotion.StartDate,
+                    EndDate = promotion.EndDate,
+                    Status = promotion.Status,
+                    UsedCount = promotion.UsedCount,
+                    UsageLimit = promotion.UsageLimit,
+                    TotalRevenue = totalRevenue,
+                    TotalDiscountAmount = totalDiscount,
+                    ConversionRate = conversionRate,
+                    TotalOrders = totalOrders,
+                    AverageOrderValue = averageOrderValue
+                });
+            }
+
+            var ordersWithPromotion = new List<OrderWithPromotionDto>();
+
+            if (request.IncludeOrderDetails)
+            {
+                var ordersQuery = _unitOfWork.Orders.GetQueryable()
+                    .Include(o => o.Promotion)
+                    .Include(o => o.Customer)
+                    .Where(o => o.PromoId != null && o.Status == OrderStatus.Paid);
+
+                if (request.StartDate.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.OrderDate >= request.StartDate.Value);
+                }
+                if (request.EndDate.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.OrderDate <= request.EndDate.Value);
+                }
+                if (request.PromoId.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.PromoId == request.PromoId.Value);
+                }
+
+                ordersWithPromotion = await ordersQuery
+                    .OrderByDescending(o => o.OrderDate)
+                    .Select(o => new OrderWithPromotionDto
+                    {
+                        OrderId = o.Id,
+                        OrderDate = o.OrderDate,
+                        OrderStatus = o.Status.ToString(),
+                        TotalAmount = o.TotalAmount,
+                        DiscountAmount = o.DiscountAmount,
+                        FinalAmount = o.TotalAmount - o.DiscountAmount,
+                        PromoId = o.PromoId,
+                        PromoCode = o.Promotion != null ? o.Promotion.PromoCode : string.Empty,
+                        DiscountType = o.Promotion != null ? o.Promotion.DiscountType.ToString() : string.Empty,
+                        DiscountValue = o.Promotion != null ? o.Promotion.DiscountValue : 0,
+                        CustomerId = o.CustomerId,
+                        CustomerName = o.Customer != null ? o.Customer.Name : null
+                    })
+                    .ToListAsync();
+            }
+
+            var activePromotions = promotions.Count(p => p.Status == PromotionStatus.Active);
+            var totalOrdersWithPromotion = promotionEffectiveness.Sum(p => p.TotalOrders);
+            var totalRevenueFromPromotions = promotionEffectiveness.Sum(p => p.TotalRevenue);
+            var totalDiscountGiven = promotionEffectiveness.Sum(p => p.TotalDiscountAmount);
+
+            var averageDiscountRate = totalRevenueFromPromotions > 0
+                ? (totalDiscountGiven / totalRevenueFromPromotions) * 100
+                : 0;
+
+            var summary = new PromotionReportSummaryDto
+            {
+                TotalPromotions = promotions.Count,
+                ActivePromotions = activePromotions,
+                TotalOrdersWithPromotion = totalOrdersWithPromotion,
+                TotalRevenueFromPromotions = totalRevenueFromPromotions,
+                TotalDiscountGiven = totalDiscountGiven,
+                AverageDiscountRate = averageDiscountRate
+            };
+
+            var report = new PromotionReportDto
+            {
+                PromotionEffectiveness = promotionEffectiveness
+                    .OrderByDescending(p => p.TotalRevenue)
+                    .ToList(),
+                OrdersWithPromotion = ordersWithPromotion,
+                Summary = summary
+            };
+
+            return ApiResponse<PromotionReportDto>.Success(report);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<PromotionReportDto>.Error(ex.Message);
+        }
+    }
+
+    public async Task<ApiResponse<InventoryForecastReportDto>> GetInventoryForecastAsync(InventoryForecastRequest request)
+    {
+        try
+        {
+            var endDate = DateTime.UtcNow;
+            var startDate = endDate.AddMonths(-request.LookbackMonths);
+
+            IQueryable<ProductEntity> productsQuery = _unitOfWork.Products.GetQueryable();
+
+            if (request.ProductId.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Id == request.ProductId.Value);
+            }
+
+            if (request.CategoryId.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.CategoryId == request.CategoryId.Value);
+            }
+
+            productsQuery = productsQuery
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
+                .Include(p => p.Inventory);
+
+            var products = await productsQuery.ToListAsync();
+
+            var forecasts = new List<InventoryForecastDto>();
+
+            foreach (var product in products)
+            {
+                var currentQuantity = product.Inventory?.Quantity ?? 0;
+
+                var soldItems = await _unitOfWork.OrderItems.GetQueryable()
+                    .Include(oi => oi.Order)
+                    .Where(oi => oi.ProductId == product.Id &&
+                                oi.Order.Status == OrderStatus.Paid &&
+                                oi.Order.OrderDate >= startDate &&
+                                oi.Order.OrderDate <= endDate)
+                    .SumAsync(oi => (int?)oi.Quantity) ?? 0;
+
+                var averageMonthlySales = request.LookbackMonths > 0
+                    ? (decimal)soldItems / request.LookbackMonths
+                    : 0;
+
+                var daysInPeriod = (endDate - startDate).Days;
+                var averageDailySales = daysInPeriod > 0
+                    ? (decimal)soldItems / daysInPeriod
+                    : 0;
+
+                var forecastedDaysRemaining = averageDailySales > 0
+                    ? (int)(currentQuantity / averageDailySales)
+                    : int.MaxValue;
+
+                var bufferDays = (int)Math.Ceiling(request.LeadTimeDays * (request.SafetyStockMultiplier - 1));
+                var daysToCover = request.LeadTimeDays + bufferDays;
+                var requiredQuantity = (int)Math.Ceiling(averageDailySales * daysToCover);
+                var recommendedOrderQuantity = Math.Max(0, requiredQuantity - currentQuantity);
+
+                var stockStatus = DetermineStockStatus(currentQuantity, averageDailySales, request.LeadTimeDays);
+                var needsReorder = recommendedOrderQuantity > 0 || currentQuantity == 0;
+                var estimatedCost = recommendedOrderQuantity * product.Price;
+                var recommendation = GenerateRecommendation(
+                    stockStatus,
+                    currentQuantity,
+                    recommendedOrderQuantity,
+                    forecastedDaysRemaining
+                );
+
+                forecasts.Add(new InventoryForecastDto
+                {
+                    ProductId = product.Id,
+                    ProductName = product.ProductName,
+                    CategoryName = product.Category.CategoryName,
+                    SupplierName = product.Supplier.Name,
+                    CurrentQuantity = currentQuantity,
+                    AverageMonthlySales = averageMonthlySales,
+                    AverageDailySales = averageDailySales,
+                    TotalSoldInPeriod = soldItems,
+                    MonthsAnalyzed = request.LookbackMonths,
+                    ForecastedDaysRemaining = forecastedDaysRemaining,
+                    RecommendedOrderQuantity = recommendedOrderQuantity,
+                    EstimatedCost = estimatedCost,
+                    StockStatus = stockStatus,
+                    NeedsReorder = needsReorder,
+                    Recommendation = recommendation
+                });
+            }
+
+            var summary = new InventoryForecastSummaryDto
+            {
+                TotalProducts = forecasts.Count,
+                ProductsNeedingReorder = forecasts.Count(f => f.NeedsReorder),
+                LowStockProducts = forecasts.Count(f => f.StockStatus == "low"),
+                CriticalStockProducts = forecasts.Count(f => f.StockStatus == "critical"),
+                OutOfStockProducts = forecasts.Count(f => f.StockStatus == "out_of_stock"),
+                TotalEstimatedCost = forecasts.Sum(f => f.EstimatedCost),
+                TotalRecommendedQuantity = forecasts.Sum(f => f.RecommendedOrderQuantity)
+            };
+
+            var report = new InventoryForecastReportDto
+            {
+                Forecasts = forecasts
+                    .OrderByDescending(f => f.NeedsReorder)
+                    .ThenBy(f => f.ForecastedDaysRemaining)
+                    .ToList(),
+                Summary = summary
+            };
+
+            return ApiResponse<InventoryForecastReportDto>.Success(report);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<InventoryForecastReportDto>.Error(ex.Message);
+        }
+    }
+
+    private string DetermineStockStatus(int currentQuantity, decimal averageDailySales, int leadTimeDays)
+    {
+        if (currentQuantity == 0)
+        {
+            return "out_of_stock";
+        }
+
+        var daysRemaining = averageDailySales > 0 ? (int)(currentQuantity / averageDailySales) : int.MaxValue;
+
+        if (daysRemaining <= leadTimeDays)
+        {
+            return "critical";
+        }
+
+        if (daysRemaining <= leadTimeDays * 2)
+        {
+            return "low";
+        }
+
+        return "sufficient";
+    }
+
+    private string GenerateRecommendation(string stockStatus, int currentQuantity, int recommendedQuantity, int daysRemaining)
+    {
+        return stockStatus switch
+        {
+            "out_of_stock" => $"Hết hàng. Cần nhập ngay {recommendedQuantity} sản phẩm.",
+            "critical" => $"Tồn kho nguy hiểm (còn {daysRemaining} ngày). Cần nhập ngay {recommendedQuantity} sản phẩm.",
+            "low" => $"Tồn kho thấp (còn {daysRemaining} ngày). Nên nhập {recommendedQuantity} sản phẩm trong {Math.Max(daysRemaining - 7, 0)} ngày tới.",
+            _ => $"Tồn kho đủ dùng (còn {daysRemaining} ngày). Không cần nhập hàng ngay."
+        };
     }
 }
