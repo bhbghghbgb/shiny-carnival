@@ -200,5 +200,9 @@ public partial class App : Application
         services.AddTransient<ProductListViewModel>();
         services.AddTransient<CartViewModel>();
         // Add other ViewModels...
+        
+        // Configure ImageUrlConverter
+        var imageEndpoint = configuration.GetSection("ImageEndpoint")["Url"];
+        ProductImageUrlConverter.BaseImageUrl = imageEndpoint;
     }
 }
