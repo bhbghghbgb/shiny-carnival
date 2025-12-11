@@ -18,7 +18,6 @@
         <PackageReference Include="Newtonsoft.Json"/>
         <PackageReference Include="NUnit"/>
         <PackageReference Include="NUnit3TestAdapter"/>
-        <PackageReference Include="Refit.HttpClientFactory" />
         <PackageReference Include="Uno.UITest.Helpers"/>
         <PackageReference Include="Xamarin.UITest"/>
         <PackageReference Include="GitHubActionsTestLogger">

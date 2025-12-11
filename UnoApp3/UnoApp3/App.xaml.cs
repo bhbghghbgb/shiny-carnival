@@ -1,4 +1,3 @@
-using Uno.Resizetizer;
 using UnoApp3.Data;
 using UnoApp3.Helpers.Converters;
 using UnoApp3.Services;
@@ -75,6 +74,11 @@ public partial class App : Application
                     // DelegatingHandler will be automatically injected
                     services.AddTransient<DelegatingHandler, DebugHttpHandler>();
 #endif
+                    // API Clients with Refit using Uno.Extensions
+                    // These read from appsettings.json endpoints
+                    services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint");
+                    services.AddRefitClient<IProductApi>(context, name: "ProductEndpoint");
+                    services.AddRefitClient<IOrderApi>(context, name: "OrderEndpoint");
                 })
                 .UseAuthentication(auth =>
                     auth.AddWeb(name: "WebAuthentication")
@@ -99,7 +103,7 @@ public partial class App : Application
         {
             // Initialize database before any navigation
             await InitializeDatabaseAsync(services);
-            
+
             var auth = services.GetRequiredService<IAuthenticationService>();
             var authenticated = await auth.RefreshAsync();
             if (authenticated)
@@ -112,7 +116,7 @@ public partial class App : Application
             }
         });
     }
-    
+
     /// <summary>
     /// Register navigation routes
     /// </summary>
@@ -189,22 +193,17 @@ public partial class App : Application
         services.AddScoped<AuthService>();
         services.AddScoped<ProductService>();
         services.AddScoped<OrderService>();
-        
-        // API Clients with Refit using Uno.Extensions
-        // These read from appsettings.json endpoints
-        services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint");
-        services.AddRefitClient<IProductApi>(context, name: "ProductEndpoint");
-        services.AddRefitClient<IOrderApi>(context, name: "OrderEndpoint");
 
         // ViewModels
         services.AddTransient<LoginViewModel>();
         services.AddTransient<ProductListViewModel>();
         services.AddTransient<CartViewModel>();
         // Add other ViewModels...
-        
+
         // Configure ImageUrlConverter
         var imageEndpoint = context.Configuration.GetSection("ImageEndpoint")["Url"];
         // Assuming you have a static property for this
-        ProductImageUrlConverter.BaseImageUrl = !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://10.0.0.2";
+        ProductImageUrlConverter.BaseImageUrl =
+            !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://10.0.0.2";
     }
 }
