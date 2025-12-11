@@ -1,4 +1,4 @@
-import axiosClient from '../../../lib/axios';
+import axiosClient from '../../../lib/api/axios.ts';
 import { API_CONFIG } from '../../../config/api.config.ts';
 import type { LoginRequest, LoginResponse } from "../types/api.ts";
 import type { ApiResponse } from '../../../lib/api/types/api.types';

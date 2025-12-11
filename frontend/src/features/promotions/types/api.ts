@@ -1,4 +1,4 @@
-import type { PagedRequest } from '../../../lib/axios';
+import type { PagedRequest } from '../../../lib/api/axios.ts';
 import type { DiscountType, PromotionStatus } from '../../../config/api.config.ts';
 import type { PromotionEntity } from './entity.ts';
 
