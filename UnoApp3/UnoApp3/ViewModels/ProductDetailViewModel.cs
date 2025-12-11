@@ -14,8 +14,16 @@ public partial class ProductDetailViewModel : BaseViewModel
     private readonly ICartRepository _cartRepository;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PriceFormatted))]
+    [NotifyPropertyChangedFor(nameof(UnitFormatted))]
+    [NotifyPropertyChangedFor(nameof(CreatedAtFormatted))]
     private ProductResponseDto _product;
-
+    
+    // Computed properties - no [ObservableProperty] needed
+    public string PriceFormatted => $"Giá: {Product.Price:N0} đ";
+    public string UnitFormatted => $"/ {Product.Unit}";
+    public string CreatedAtFormatted => $"{Product.CreatedAt:dd/MM/yyyy HH:mm}";
+    
     [ObservableProperty]
     private string _productImageUrl;
 

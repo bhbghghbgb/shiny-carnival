@@ -17,7 +17,11 @@ public partial class ProductListViewModel : BaseViewModel
     private string _searchText;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasProducts))]
     private ObservableCollection<ProductListDto> _products;
+    
+    // Computed property
+    public bool HasProducts => Products?.Any() ?? false;
 
     [ObservableProperty]
     private bool _isRefreshing;

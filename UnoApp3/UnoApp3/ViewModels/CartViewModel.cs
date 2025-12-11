@@ -14,30 +14,30 @@ public partial class CartViewModel : BaseViewModel
     private readonly ICartRepository _cartRepository;
     private readonly ProductService _productService;
 
-    [ObservableProperty]
-    private ObservableCollection<CartItem> _cartItems;
-    
-    [ObservableProperty]
-    private bool _hasItems;
+    [ObservableProperty] private ObservableCollection<CartItemDisplay> _cartItems;
+
+    [ObservableProperty] private bool _hasItems;
+
+    [ObservableProperty] private Dictionary<int, ProductListDto> _productCache;
 
     [ObservableProperty]
-    private Dictionary<int, ProductListDto> _productCache;
-
-    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TotalAmountFormatted))]
     private decimal _totalAmount;
+
+    public string TotalAmountFormatted => $"{TotalAmount:N0} đ";
 
     public CartViewModel(
         INavigator navigator,
         ICartRepository cartRepository,
-        ProductService productService) 
+        ProductService productService)
         : base(navigator)
     {
         _cartRepository = cartRepository;
         _productService = productService;
         Title = "Giỏ hàng";
-        CartItems = new ObservableCollection<CartItem>();
+        CartItems = new ObservableCollection<CartItemDisplay>();
         ProductCache = new Dictionary<int, ProductListDto>();
-        
+
         LoadCartCommand.Execute(null);
     }
 
@@ -45,25 +45,32 @@ public partial class CartViewModel : BaseViewModel
     private async Task LoadCart()
     {
         if (IsBusy) return;
-    
+
         IsBusy = true;
-    
+
         try
         {
             CartItems.Clear();
             ProductCache.Clear();
             TotalAmount = 0;
-        
+
             var items = await _cartRepository.GetCartItemsAsync();
-        
+
             foreach (var item in items)
             {
-                CartItems.Add(item);
-            
                 // Fetch product details
                 var product = await _productService.GetProductAsync(item.ProductId);
                 if (product != null)
                 {
+                    CartItems.Add(new CartItemDisplay
+                    {
+                        Id = item.Id,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        ProductName = product.ProductName,
+                        Price = product.Price
+                    });
+
                     var productDto = new ProductListDto
                     {
                         Id = product.Id,
@@ -71,12 +78,12 @@ public partial class CartViewModel : BaseViewModel
                         Price = product.Price,
                         Unit = product.Unit
                     };
-                
+
                     ProductCache[item.ProductId] = productDto;
                     TotalAmount += product.Price * item.Quantity;
                 }
             }
-        
+
             HasItems = CartItems.Any();
         }
         finally
@@ -90,7 +97,7 @@ public partial class CartViewModel : BaseViewModel
     private async Task IncreaseQuantity(CartItem item)
     {
         if (item == null) return;
-        
+
         await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity + 1);
         await LoadCart();
     }
@@ -99,7 +106,7 @@ public partial class CartViewModel : BaseViewModel
     private async Task DecreaseQuantity(CartItem item)
     {
         if (item == null || item.Quantity <= 1) return;
-        
+
         await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity - 1);
         await LoadCart();
     }
@@ -109,7 +116,7 @@ public partial class CartViewModel : BaseViewModel
     private async Task SetQuantity(CartItem item)
     {
         if (item == null || item.Quantity < 1) return;
-        
+
         await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity);
         await LoadCart();
     }
@@ -118,7 +125,7 @@ public partial class CartViewModel : BaseViewModel
     private async Task RemoveItem(CartItem item)
     {
         if (item == null) return;
-        
+
         await _cartRepository.RemoveFromCartAsync(item.ProductId);
         await LoadCart();
     }
@@ -127,7 +134,7 @@ public partial class CartViewModel : BaseViewModel
     private async Task Checkout()
     {
         if (!CartItems.Any()) return;
-        
+
         // Fixed: Added 'this' as first parameter
         await Navigator.NavigateRouteAsync(this, "OrderConfirmation");
     }

@@ -25,4 +25,17 @@ public partial class BaseViewModel : ObservableObject
         // Changed: Use NavigateBackAsync() instead of GoBackAsync()
         await Navigator.NavigateBackAsync(this);
     }
+    
+    // Virtual method for navigation lifecycle
+    // Override this in derived ViewModels to handle navigation parameters
+    public virtual Task OnNavigatedTo(IReadOnlyDictionary<string, object>? data = null)
+    {
+        return Task.CompletedTask;
+    }
+
+    // Optional: Handle navigation from
+    public virtual Task OnNavigatedFrom()
+    {
+        return Task.CompletedTask;
+    }
 }

@@ -4,25 +4,20 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:utu="using:Uno.Toolkit.UI"
+      xmlns:vm="using:UnoApp3.ViewModels"
       mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance Type=vm:ProductDetailViewModel}"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Navigation Bar -->
-        <utu:NavigationBar Title="Chi tiết sản phẩm"
-                            Grid.Row="0">
-            <utu:NavigationBar.LeadingContent>
-                <Button Command="{Binding GoBackCommand}">
-                    <SymbolIcon Symbol="Back"/>
-                </Button>
-            </utu:NavigationBar.LeadingContent>
-        </utu:NavigationBar>
+        <utu:NavigationBar Content="Chi tiết sản phẩm" />
 
         <!-- Product Details -->
         <ScrollViewer Grid.Row="1">
@@ -32,66 +27,66 @@
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         CornerRadius="12">
                     <Image Source="{Binding ProductImageUrl}"
-                           Stretch="Uniform"/>
+                           Stretch="Uniform" />
                 </Border>
 
                 <!-- Product Name -->
                 <TextBlock Text="{Binding Product.ProductName}"
-                           Style="{StaticResource TitleTextBlockStyle}"/>
+                           Style="{StaticResource TitleTextBlockStyle}" />
 
                 <!-- Price -->
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="{Binding Product.Price, StringFormat='Giá: {0:C}'}"
+                    <TextBlock Text="{Binding PriceFormatted}"
                                Style="{StaticResource BodyTextBlockStyle}"
                                FontWeight="SemiBold"
-                               Foreground="{ThemeResource SystemAccentColor}"/>
-                    <TextBlock Text="{Binding Product.Unit, StringFormat='/ {0}'}"
+                               Foreground="{ThemeResource SystemAccentColor}" />
+                    <TextBlock Text="{Binding UnitFormatted}"
                                Style="{StaticResource CaptionTextBlockStyle}"
-                               VerticalAlignment="Bottom"/>
+                               VerticalAlignment="Bottom" />
                 </StackPanel>
 
                 <!-- Category and Supplier -->
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="Danh mục"
-                                   Style="{StaticResource CaptionTextBlockStyle}"/>
+                                   Style="{StaticResource CaptionTextBlockStyle}" />
                         <TextBlock Text="{Binding Product.CategoryName}"
-                                   Style="{StaticResource BodyTextBlockStyle}"/>
+                                   Style="{StaticResource BodyTextBlockStyle}" />
                     </StackPanel>
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="Nhà cung cấp"
-                                   Style="{StaticResource CaptionTextBlockStyle}"/>
+                                   Style="{StaticResource CaptionTextBlockStyle}" />
                         <TextBlock Text="{Binding Product.SupplierName}"
-                                   Style="{StaticResource BodyTextBlockStyle}"/>
+                                   Style="{StaticResource BodyTextBlockStyle}" />
                     </StackPanel>
                 </Grid>
 
                 <!-- Inventory -->
                 <StackPanel>
                     <TextBlock Text="Tồn kho"
-                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                               Style="{StaticResource CaptionTextBlockStyle}" />
                     <TextBlock Text="{Binding Product.InventoryQuantity}"
-                               Style="{StaticResource BodyTextBlockStyle}"/>
+                               Style="{StaticResource BodyTextBlockStyle}" />
                 </StackPanel>
 
                 <!-- Barcode -->
                 <StackPanel>
                     <TextBlock Text="Mã vạch"
-                               Style="{StaticResource CaptionTextBlockStyle}"/>
+                               Style="{StaticResource CaptionTextBlockStyle}" />
                     <TextBlock Text="{Binding Product.Barcode}"
-                               Style="{StaticResource BodyTextBlockStyle}"/>
+                               Style="{StaticResource BodyTextBlockStyle}" />
                 </StackPanel>
 
                 <!-- Created Date -->
                 <StackPanel>
                     <TextBlock Text="Ngày tạo"
-                               Style="{StaticResource CaptionTextBlockStyle}"/>
-                    <TextBlock Text="{Binding Product.CreatedAt, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}"
-                               Style="{StaticResource BodyTextBlockStyle}"/>
+                               Style="{StaticResource CaptionTextBlockStyle}" />
+                    <TextBlock Text="{Binding CreatedAtFormatted}"
+                               Style="{StaticResource BodyTextBlockStyle}" />
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
@@ -101,6 +96,6 @@
                 Content="Thêm vào giỏ hàng"
                 Command="{Binding AddToCartCommand}"
                 Margin="20"
-                HorizontalAlignment="Stretch"/>
+                HorizontalAlignment="Stretch" />
     </Grid>
 </Page>

@@ -4,46 +4,40 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:utu="using:Uno.Toolkit.UI"
+      xmlns:vm="using:UnoApp3.ViewModels"
       mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance Type=vm:CartViewModel}"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Navigation Bar -->
-        <utu:NavigationBar Title="Giỏ hàng"
-                            Grid.Row="0">
-            <utu:NavigationBar.LeadingContent>
-                <Button Command="{Binding GoBackCommand}">
-                    <SymbolIcon Symbol="Back"/>
-                </Button>
-            </utu:NavigationBar.LeadingContent>
-        </utu:NavigationBar>
+        <utu:NavigationBar Content="Giỏ hàng" />
 
         <!-- Cart Items List -->
         <ListView Grid.Row="1"
                   ItemsSource="{Binding CartItems}"
                   SelectionMode="None"
-                  ItemTemplate="{StaticResource CartItemTemplate}"/>
+                  ItemTemplate="{StaticResource CartItemTemplate}" />
 
         <!-- Empty State -->
         <StackPanel Grid.Row="1"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-            <SymbolIcon Symbol="ShoppingCart"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        FontSize="48"/>
+            <!-- OR use FontIcon with Segoe MDL2 Assets -->
+            <FontIcon Glyph="&#xE7BF;" FontSize="48" FontFamily="Segoe MDL2 Assets" />
             <TextBlock Text="Giỏ hàng trống"
                        Style="{StaticResource TitleTextBlockStyle}"
-                       Margin="0,12,0,0"/>
+                       Margin="0,12,0,0" />
             <TextBlock Text="Hãy thêm sản phẩm vào giỏ hàng"
                        Style="{StaticResource BodyTextBlockStyle}"
-                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
         </StackPanel>
 
         <!-- Total and Checkout Button -->
@@ -53,21 +47,21 @@
             <StackPanel Spacing="12">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Tổng tiền:"
-                               Style="{StaticResource BodyTextBlockStyle}"/>
+                               Style="{StaticResource BodyTextBlockStyle}" />
                     <TextBlock Grid.Column="1"
-                               Text="{Binding TotalAmount, StringFormat='{}{0:C}'}"
+                               Text="{Binding TotalAmountFormatted}"
                                Style="{StaticResource TitleTextBlockStyle}"
-                               Foreground="{ThemeResource SystemAccentColor}"/>
+                               Foreground="{ThemeResource SystemAccentColor}" />
                 </Grid>
 
                 <Button Content="Đặt hàng"
                         Command="{Binding CheckoutCommand}"
                         IsEnabled="{Binding HasItems}"
-                        HorizontalAlignment="Stretch"/>
+                        HorizontalAlignment="Stretch" />
             </StackPanel>
         </Border>
     </Grid>

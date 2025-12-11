@@ -203,7 +203,8 @@ public partial class App : Application
         // Add other ViewModels...
         
         // Configure ImageUrlConverter
-        var imageEndpoint = configuration.GetSection("ImageEndpoint")["Url"];
-        ProductImageUrlConverter.BaseImageUrl = imageEndpoint;
+        var imageEndpoint = context.Configuration.GetSection("ImageEndpoint")["Url"];
+        // Assuming you have a static property for this
+        ProductImageUrlConverter.BaseImageUrl = !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://10.0.0.2";
     }
 }

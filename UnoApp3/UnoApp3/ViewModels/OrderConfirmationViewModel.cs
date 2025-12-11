@@ -16,10 +16,16 @@ public partial class OrderConfirmationViewModel : BaseViewModel
     private string _orderId;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(OrderDateFormatted))]
     private DateTime _orderDate;
 
+    public string OrderDateFormatted => $"{OrderDate:dd/MM/yyyy HH:mm}";
+
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TotalAmountFormatted))]
     private decimal _totalAmount;
+    
+    public string TotalAmountFormatted => $"{TotalAmount:N0} đ";
 
     public OrderConfirmationViewModel(
         INavigator navigator,
