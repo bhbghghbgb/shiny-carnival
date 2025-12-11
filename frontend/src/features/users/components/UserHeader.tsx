@@ -1,13 +1,57 @@
-import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, TeamOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePdfOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Row, Space, Typography } from 'antd';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import type { UserNoPass } from '../types/entity';
 
 const { Title, Text } = Typography
+pdfMake.vfs = pdfFonts.vfs;
+
 
 interface UserHeaderProps {
-    onAddUser: () => void
+    onAddUser: () => void;
+    users: UserNoPass[];
 }
 
-export const UserHeader = ({ onAddUser }: UserHeaderProps) => {
+export const UserHeader = ({ onAddUser, users }: UserHeaderProps) => {
+    const safeUsers = Array.isArray(users) ? users : [];
+
+    const exportPDF = () => {
+        const docDefinition = {
+            content: [
+                { text: "Danh sách người dùng", style: "header" },
+    
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ["auto", "auto", "*", "auto"],
+                        body: [
+                            ["ID","UserName" ,"Họ và Tên", "Vai trò"],
+                            ...safeUsers.map((u) => [
+                                u.id,
+                                u.username,
+                                u.fullName,
+                                u.role,
+                            ]),
+                        ],
+                    },
+                },
+            ],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 20],
+                },
+            },
+        };
+    
+        pdfMake.createPdf(docDefinition).download("users.pdf");
+    };
+    const importExcel = () =>{
+
+    }
+
     return (
         <Card
             style={{
@@ -34,6 +78,38 @@ export const UserHeader = ({ onAddUser }: UserHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                    <Button
+                            type="primary"
+                            size="large"
+                            icon={<FileExcelOutlined />}
+                            onClick={importExcel}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#4caf50',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Import Excel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FilePdfOutlined />}
+                            onClick={exportPDF}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#d9534f',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Export PDF
+                        </Button>
                         <Button
                             type="primary"
                             size="large"

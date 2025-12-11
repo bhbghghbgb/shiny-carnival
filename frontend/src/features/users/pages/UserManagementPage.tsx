@@ -1,9 +1,9 @@
-import { UserHeader } from '../components/UserHeader'
-import { UserStatistics } from '../components/UserStatistics'
-import { UserSearchFilter } from '../components/UserSearchFilter'
-import { useUserManagementPage } from '../hooks/useUserManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { UserHeader } from '../components/UserHeader'
+import { UserSearchFilter } from '../components/UserSearchFilter'
+import { UserStatistics } from '../components/UserStatistics'
 import { userPageConfig } from '../config/userPageConfig'
+import { useUserManagementPage } from '../hooks/useUserManagementPage'
 import type { CreateUserRequest, UpdateUserRequest } from '../types/api'
 import type { UserNoPass } from '../types/entity'
 
@@ -72,7 +72,7 @@ export function UserManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <UserHeader onAddUser={openCreate} />}
+                renderHeader={({ openCreate }) => <UserHeader onAddUser={openCreate} users={users}/>}
                 statisticsSlot={
                     <UserStatistics
                         totalUsers={totalUsers}
