@@ -1,14 +1,30 @@
 import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
 import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
+import { createUsersQueryOptions } from '../../../app/routes/modules/management/definition/users.definition'
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
 import type { UserNoPass } from '../types/entity'
 
 export const useUserManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.USERS)
-    const { users: usersData, total: totalUsers } = routeApi.useLoaderData() || { users: [], total: 0 }
     const search = routeApi.useSearch()
+
+    // Sử dụng useSuspenseQuery để lấy data từ TanStack Query cache
+    // Loader đã ensure data có trong cache, nên useSuspenseQuery sẽ không fetch lại
+    const usersQueryOptions = createUsersQueryOptions(search as UserSearch)
+    const { data: pagedList } = useSuspenseQuery(usersQueryOptions)
+
+    // Extract data từ PagedList
+    let usersData: UserNoPass[] = pagedList.items || []
+    const totalUsers = pagedList.totalCount || 0
+
+    // Filter theo role ở client-side (backend không hỗ trợ role filter trong query params)
+    const roleFilter = (search as UserSearch | undefined)?.role
+    if (roleFilter !== undefined) {
+        usersData = usersData.filter((user: UserNoPass) => user.role === roleFilter)
+    }
     const navigate = useNavigate({ from: ENDPOINTS.ADMIN.USERS })
     const router = useRouter()
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
@@ -56,7 +72,6 @@ export const useUserManagementPage = () => {
     })
 
     const searchText = search?.search || ''
-    const roleFilter = (search as UserSearch | undefined)?.role
     const sortField = (search as UserSearch | undefined)?.sortField || 'createdAt'
     const sortOrder = (search as UserSearch | undefined)?.sortOrder || 'descend'
     const page = (search as UserSearch | undefined)?.page || 1

@@ -1,6 +1,7 @@
 // frontend/src/app/routes/routeTree.ts
 import { createRoute, createRouter, type AnyRoute } from '@tanstack/react-router';
 import { rootRoute } from './__root';
+import { queryClient } from '../../lib/query/queryClient';
 import { authLayoutRoute } from './layout/auth.layout';
 import { mainLayoutRoute } from './layout/main.layout';
 import { createAdminLayoutRoute } from './layout/admin.layout';
@@ -134,9 +135,12 @@ const routeTree = rootRoute.addChildren([
   mainLayoutRoute, // Main layout (có sidebar) - chứa home và admin routes
 ]);
 
-// 5. Khởi tạo router
+// 5. Khởi tạo router với context
 export const router = createRouter({
   routeTree,
+  context: () => ({
+    queryClient: queryClient,
+  }),
 });
 
 // 6. Khai báo router cho type-safety

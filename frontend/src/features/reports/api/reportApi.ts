@@ -1,4 +1,4 @@
-import axiosClient from '../../../lib/axios';
+import axiosClient from '../../../lib/api/axios.ts';
 import type { ApiResponse, PagedList } from '../../../lib/api/types/api.types';
 import { API_CONFIG } from '../../../config/api.config.ts';
 import type { RevenueReportDto } from '../types/entity.ts';

@@ -8,40 +8,12 @@ import {
 } from '@tanstack/react-query';
 import type { BaseApiService, QueryParams } from '../lib/api/base';
 import type { PagedList, PagedRequest } from '../lib/api/types/api.types';
-
-// ==================== Query Key Factory ====================
-/**
- * Query Key Factory - Tạo cấu trúc query keys phân cấp cho TanStack Query
- * 
- * Cấu trúc phân cấp:
- * [entity]                           // all: Base key cho toàn bộ entity
- *   ├── [entity, 'list']             // lists: Base cho tất cả list queries
- *   │   └── [entity, 'list', params] // list: List query với params cụ thể
- *   └── [entity, 'detail']            // details: Base cho tất cả detail queries
- *       └── [entity, 'detail', id]   // detail: Detail query với id cụ thể
- * 
- * @param entity - Tên entity (ví dụ: 'products', 'users')
- * @returns Object chứa các hàm tạo query keys
- * 
- * @example
- * ```typescript
- * const productKeys = createQueryKeys('products');
- * productKeys.all                    // ['products']
- * productKeys.lists()                 // ['products', 'list']
- * productKeys.list({ search: 'laptop' })  // ['products', 'list', { search: 'laptop' }]
- * productKeys.details()               // ['products', 'detail']
- * productKeys.detail(123)            // ['products', 'detail', 123]
- * ```
- */
-export const createQueryKeys = (entity: string) => ({
-  all: [entity] as const,
-  lists: () => [...createQueryKeys(entity).all, 'list'] as const,
-  list: (params?: QueryParams) =>
-    [...createQueryKeys(entity).lists(), params] as const,
-  details: () => [...createQueryKeys(entity).all, 'detail'] as const,
-  detail: (id: string | number) =>
-    [...createQueryKeys(entity).details(), id] as const,
-});
+import {
+  createQueryKeys,
+  createDetailQueryOptions,
+  createListQueryOptions,
+  createPaginatedQueryOptions,
+} from '../lib/query/queryOptionsFactory';
 
 // ==================== Hook Configuration Types ====================
 export interface UseApiListConfig<TData, TError = Error> {
@@ -87,19 +59,19 @@ export interface UseApiMutationConfig<TData, TVariables, TError = Error> {
  * 
  * @returns Query result từ useQuery với data là TData[]
  */
-export function useApiList<TData = any, TError = Error>({
+export function useApiList<TData = unknown, TError = Error>({
   apiService,
   entity,
   params,
   options,
 }: UseApiListConfig<TData, TError>) {
-  const queryKeys = createQueryKeys(entity);
+  const queryOpts = createListQueryOptions<TData>(entity, apiService, params);
+  const mergedOptions = {
+    ...queryOpts,
+    ...(options ?? {}),
+  } as UseQueryOptions<TData[], TError, TData[], QueryKey>;
 
-  return useQuery<TData[], TError>({
-    queryKey: queryKeys.list(params),
-    queryFn: () => apiService.getAll(params),
-    ...options,
-  });
+  return useQuery<TData[], TError>(mergedOptions);
 }
 
 // ==================== GET PAGINATED Hook ====================
@@ -111,20 +83,19 @@ export function useApiList<TData = any, TError = Error>({
  * 
  * @returns Query result từ useQuery với data là PagedList<TData>
  */
-export function useApiPaginated<TData = any, TError = Error>({
+export function useApiPaginated<TData = unknown, TError = Error>({
   apiService,
   entity,
   params,
   options,
 }: UseApiPaginatedConfig<TData, TError>) {
-  const queryKeys = createQueryKeys(entity);
+  const queryOpts = createPaginatedQueryOptions<TData>(entity, apiService, params);
+  const mergedOptions = {
+    ...queryOpts,
+    ...(options ?? {}),
+  } as UseQueryOptions<PagedList<TData>, TError, PagedList<TData>, QueryKey>;
 
-  return useQuery<PagedList<TData>, TError>({
-    queryKey: [...queryKeys.lists(), 'paginated', params],
-    queryFn: () => apiService.getPaginated(params),
-    placeholderData: (previousData) => previousData, // Giữ data cũ khi fetch trang mới
-    ...options,
-  });
+  return useQuery<PagedList<TData>, TError>(mergedOptions);
 }
 
 // ==================== GET BY ID Hook ====================
@@ -135,20 +106,19 @@ export function useApiPaginated<TData = any, TError = Error>({
  * 
  * @returns Query result từ useQuery với data là TData
  */
-export function useApiDetail<TData = any, TError = Error>({
+export function useApiDetail<TData = unknown, TError = Error>({
   apiService,
   entity,
   id,
   options,
 }: UseApiDetailConfig<TData, TError>) {
-  const queryKeys = createQueryKeys(entity);
+  const queryOpts = createDetailQueryOptions<TData>(entity, apiService, id);
+  const mergedOptions = {
+    ...queryOpts,
+    ...(options ?? {}),
+  } as UseQueryOptions<TData, TError, TData, QueryKey>;
 
-  return useQuery<TData, TError>({
-    queryKey: queryKeys.detail(id),
-    queryFn: () => apiService.getById(id),
-    enabled: !!id,
-    ...options,
-  });
+  return useQuery<TData, TError>(mergedOptions);
 }
 
 // ==================== CREATE Hook ====================
@@ -160,8 +130,8 @@ export function useApiDetail<TData = any, TError = Error>({
  * @returns Mutation result từ useMutation
  */
 export function useApiCreate<
-  TData = any,
-  TCreate = any,
+  TData = unknown,
+  TCreate = unknown,
   TError = Error
 >({
   apiService,
@@ -207,8 +177,8 @@ export function useApiCreate<
  * @returns Mutation result từ useMutation
  */
 export function useApiUpdate<
-  TData = any,
-  TUpdate = any,
+  TData = unknown,
+  TUpdate = unknown,
   TError = Error
 >({
   apiService,
@@ -254,8 +224,8 @@ export function useApiUpdate<
  * @returns Mutation result từ useMutation
  */
 export function useApiPatch<
-  TData = any,
-  TUpdate = any,
+  TData = unknown,
+  TUpdate = unknown,
   TError = Error
 >({
   apiService,
@@ -300,7 +270,7 @@ export function useApiPatch<
  * 
  * @returns Mutation result từ useMutation
  */
-export function useApiDelete<TData = any, TError = Error>({
+export function useApiDelete<TData = unknown, TError = Error>({
   apiService,
   entity,
   invalidateQueries = [],
@@ -347,15 +317,12 @@ export function useApiDelete<TData = any, TError = Error>({
  * @param options - TanStack Query options
  * @returns Query result từ useQuery
  */
-export function useApiCustomQuery<TData = any, TError = Error>({
-  apiService,
+export function useApiCustomQuery<TData = unknown, TError = Error>({
   entity,
   queryKey,
   queryFn,
   options,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  apiService: BaseApiService<any>;
   entity: string;
   queryKey: unknown[];
   queryFn: () => Promise<TData>;
@@ -385,17 +352,15 @@ export function useApiCustomQuery<TData = any, TError = Error>({
  * @returns Mutation result từ useMutation
  */
 export function useApiCustomMutation<
-  TData = any,
-  TVariables = any,
+  TData = unknown,
+  TVariables = unknown,
   TError = Error
 >({
-  apiService,
   entity,
   mutationFn,
   invalidateQueries = [],
   options,
 }: {
-  apiService: BaseApiService<TData>;
   entity: string;
   mutationFn: (variables: TVariables) => Promise<TData>;
   invalidateQueries?: string[];

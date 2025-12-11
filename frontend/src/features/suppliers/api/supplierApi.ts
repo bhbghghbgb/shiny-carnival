@@ -1,4 +1,4 @@
-import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/api/axios.ts';
 import { API_CONFIG } from '../../../config/api.config.ts';
 import type { SupplierEntity } from '../types/entity.ts';
 import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api.ts';

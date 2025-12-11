@@ -1,10 +1,10 @@
 import axios from 'axios';
 import type { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import type { LoginResponse } from "../features/auth/types/api.ts";
-import { ENDPOINTS } from "../app/routes/type/routes.endpoint.ts";
-import { API_CONFIG } from "../config/api.config";
-import type { ApiResponse } from './api/types/api.types';
-import { useAuthStore } from "../features/auth/store/authStore";
+import type { LoginResponse } from "../../features/auth/types/api.ts";
+import { ENDPOINTS } from "../../app/routes/type/routes.endpoint.ts";
+import { API_CONFIG } from "../../config/api.config.ts";
+import type { ApiResponse } from './types/api.types.ts';
+import { useAuthStore } from "../../features/auth/store/authStore.ts";
 
 // Token utils không còn dùng do BE đọc cookie trực tiếp
 export const tokenUtils = {

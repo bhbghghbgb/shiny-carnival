@@ -2,15 +2,11 @@ import { z } from 'zod';
 import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { UserManagementPage } from '../../../../../features/users/pages/UserManagementPage.tsx';
 import { userApiService } from '../../../../../features/users/api';
-import type { UserNoPass } from '../../../../../features/users/types/entity.ts';
 import type { PagedRequest } from '../../../../../lib/api/types/api.types';
+import { createPaginatedQueryOptions } from '../../../../../lib/query/queryOptionsFactory';
+import type { QueryClient } from '@tanstack/react-query';
 
 // 1. Định nghĩa Types và API
-
-interface UserLoaderData {
-  users: UserNoPass[];
-  total: number;
-}
 
 const userSearchSchema = baseSearchSchema.extend({
   role: z.number().optional(), // Filter theo role (client-side, backend không hỗ trợ)
@@ -20,45 +16,52 @@ const userSearchSchema = baseSearchSchema.extend({
 
 export type UserSearch = z.infer<typeof userSearchSchema>;
 
-async function fetchUsers(ctx: LoaderContext<Record<string, never>, UserSearch, { apiClient: never }>): Promise<UserLoaderData> {
-  const search = ctx.search;
+/**
+ * Convert search params sang PagedRequest format cho backend
+ */
+function buildPagedRequest(search: UserSearch): PagedRequest {
+  return {
+    page: search.page || 1,
+    pageSize: search.pageSize || 10,
+    search: search.search,
+    // Convert sortField sang SortBy format của backend
+    sortBy: search.sortField === 'createdAt' ? 'CreatedAt' :
+      search.sortField === 'username' ? 'Username' :
+        search.sortField === 'fullName' ? 'FullName' : 'Id',
+    sortDesc: search.sortOrder === 'descend',
+  };
+}
+
+/**
+ * Loader sử dụng TanStack Query để đảm bảo data có trong cache
+ * 
+ * Loader không trả về data trực tiếp, mà đảm bảo data đã được load vào cache.
+ * Component sẽ sử dụng useSuspenseQuery để lấy data từ cache.
+ */
+async function fetchUsers(
+  ctx: LoaderContext<Record<string, never>, UserSearch, { queryClient: QueryClient }>
+): Promise<void> {
+  const { search, context } = ctx;
   console.log('🔍 [Loader] Fetching users with filters:', search);
 
   try {
-    // Convert search params sang PagedRequest format (theo swagger.json)
-    // Backend expect: Page, PageSize, Search, SortBy, SortDesc (PascalCase)
-    const params: PagedRequest = {
-      page: search.page || 1,
-      pageSize: search.pageSize || 10,
-      search: search.search,
-      // Convert sortField sang SortBy format của backend
-      sortBy: search.sortField === 'createdAt' ? 'CreatedAt' :
-        search.sortField === 'username' ? 'Username' :
-          search.sortField === 'fullName' ? 'FullName' : 'Id',
-      sortDesc: search.sortOrder === 'descend',
-    };
+    // Convert search params sang PagedRequest format
+    const params = buildPagedRequest(search);
 
     console.log('📤 [Loader] Calling API with params:', params);
 
-    // Gọi API thật từ backend (userApiService.getPaginated tự động unwrap ApiResponse)
-    const pagedList = await userApiService.getPaginated(params);
+    // Tạo query options sử dụng factory từ useApi logic
+    const usersQueryOptions = createPaginatedQueryOptions(
+      'users',
+      userApiService,
+      params
+    );
 
-    console.log('📥 [Loader] PagedList:', pagedList);
+    // Đảm bảo data có trong cache trước khi render
+    // ensureQueryData sẽ fetch nếu chưa có trong cache, hoặc return cached data nếu đã có
+    await context.queryClient.ensureQueryData(usersQueryOptions);
 
-    // Backend đã trả về UserNoPass (không có password)
-    let users: UserNoPass[] = pagedList.items || [];
-
-    // Filter theo role ở client-side (backend không hỗ trợ role filter trong query params)
-    if (search.role !== undefined) {
-      users = users.filter((user: UserNoPass) => user.role === search.role);
-    }
-
-    console.log('✅ [Loader] Successfully loaded users:', users.length, 'total:', pagedList.totalCount);
-
-    return {
-      users,
-      total: pagedList.totalCount || users.length,
-    };
+    console.log('✅ [Loader] Users data ensured in cache');
   } catch (error: unknown) {
     console.error('❌ [Loader] Exception caught:', error);
 
@@ -77,10 +80,8 @@ async function fetchUsers(ctx: LoaderContext<Record<string, never>, UserSearch, 
       }
     }
 
-    return {
-      users: [],
-      total: 0,
-    };
+    // Re-throw error để TanStack Router xử lý
+    throw error;
   }
 }
 
@@ -88,9 +89,9 @@ async function fetchUsers(ctx: LoaderContext<Record<string, never>, UserSearch, 
 // ----------------------------------------
 
 export const userAdminDefinition: ManagementRouteDefinition<
-  UserLoaderData,     // Kiểu loader data
-  UserSearch,         // Kiểu search params
-  { apiClient: never }  // Kiểu router context (ví dụ)
+  void,                // Loader không trả về data, chỉ ensure cache
+  UserSearch,          // Kiểu search params
+  { queryClient: QueryClient }  // Router context với queryClient
 > = {
   entityName: 'Người dùng',
   path: 'users',
@@ -98,3 +99,9 @@ export const userAdminDefinition: ManagementRouteDefinition<
   searchSchema: userSearchSchema,
   loader: (ctx) => fetchUsers(ctx),
 };
+
+// Export helper để component có thể tạo query options tương tự
+export function createUsersQueryOptions(search: UserSearch) {
+  const params = buildPagedRequest(search);
+  return createPaginatedQueryOptions('users', userApiService, params);
+}
