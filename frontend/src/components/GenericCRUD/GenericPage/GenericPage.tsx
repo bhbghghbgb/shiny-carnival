@@ -109,7 +109,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                     )}
                     {actions.includes('delete') && (
                         <Popconfirm
-                            title="Xóa người dùng?"
+                            title="Xác nhận xóa"
                             okText="Xóa"
                             cancelText="Hủy"
                             onConfirm={() => handleDelete(record)}
