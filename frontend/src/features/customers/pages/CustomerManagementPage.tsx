@@ -1,15 +1,15 @@
-import { CategoryHeader } from '../components/CategoryHeader'
-import { CategoryStatistics } from '../components/CategoryStatistics'
-import { CategorySearchFilter } from '../components/CategorySearchFilter'
-import { useCategoryManagementPage } from '../hooks/useCategoryManagementPage'
+import { CustomerHeader } from '../components/CustomerHeader'
+import { CustomerStatistics } from '../components/CustomerStatistics'
+import { CustomerSearchFilter } from '../components/CustomerSearchFilter'
+import { useCustomerManagementPage } from '../hooks/useCustomerManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
-import { categoryPageConfig } from '../config/categoryPageConfig'
-import type { CategoryEntity } from '../types/entity'
-import type { CreateCategoryRequest, UpdateCategoryRequest } from '../types/api'
+import { customerPageConfig } from '../config/customerPageConfig'
+import type { CustomerEntity } from '../types/entity'
+import type { CreateCustomerRequest, UpdateCustomerRequest } from '../types/api'
 
-export function CategoryManagementPage() {
+export function CustomerManagementPage() {
     const {
-        categories,
+        customers,
         total,
 
         searchText,
@@ -27,22 +27,22 @@ export function CategoryManagementPage() {
         handleUpdate,
         handleDelete,
 
-        createCategory,
-        updateCategory,
-        deleteCategory,
+        createCustomer,
+        updateCustomer,
+        deleteCustomer,
         pageErrorMessage,
         formErrorMessage,
         clearPageError,
         clearFormError,
-    } = useCategoryManagementPage()
+    } = useCustomerManagementPage()
 
     return (
         <div style={{ padding: '24px' }}>
-            <GenericPage<CategoryEntity, CreateCategoryRequest, UpdateCategoryRequest>
-                config={categoryPageConfig}
-                data={categories}
+            <GenericPage<CustomerEntity, CreateCustomerRequest, UpdateCustomerRequest>
+                config={customerPageConfig}
+                data={customers}
                 total={total}
-                loading={createCategory.isPending || updateCategory.isPending || deleteCategory.isPending}
+                loading={createCustomer.isPending || updateCustomer.isPending || deleteCustomer.isPending}
                 page={page}
                 pageSize={pageSize}
                 sortField={sortField}
@@ -52,21 +52,21 @@ export function CategoryManagementPage() {
                 onCreate={handleCreate}
                 onUpdate={handleUpdate}
                 onDelete={handleDelete}
-                createLoading={createCategory.isPending}
-                updateLoading={updateCategory.isPending}
-                deleteLoading={deleteCategory.isPending}
+                createLoading={createCustomer.isPending}
+                updateLoading={updateCustomer.isPending}
+                deleteLoading={deleteCustomer.isPending}
                 pageErrorMessage={pageErrorMessage}
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <CategoryHeader onAddCategory={openCreate} />}
+                renderHeader={({ openCreate }) => <CustomerHeader onAddCustomer={openCreate} />}
                 statisticsSlot={
-                    <CategoryStatistics
-                        totalCategories={total}
+                    <CustomerStatistics
+                        totalCustomers={total}
                     />
                 }
                 filtersSlot={
-                    <CategorySearchFilter
+                    <CustomerSearchFilter
                         searchText={searchText}
                         sortField={sortField}
                         sortOrder={sortOrder}
@@ -79,3 +79,4 @@ export function CategoryManagementPage() {
         </div>
     )
 }
+

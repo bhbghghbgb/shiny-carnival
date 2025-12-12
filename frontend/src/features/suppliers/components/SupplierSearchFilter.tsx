@@ -20,9 +20,7 @@ interface SupplierSearchFilterProps {
   searchText: string;
   sortField: string;
   sortOrder: "ascend" | "descend";
-  regionFilter: string | undefined;
   onSearchChange: (value: string) => void;
-  onRegionFilterChange: (value: string | undefined) => void;
   onSortChange: (field: string, order: "ascend" | "descend") => void;
   onClearFilters: () => void;
 }
@@ -31,9 +29,7 @@ export const SupplierSearchFilter = ({
   searchText,
   sortField,
   sortOrder,
-  regionFilter,
   onSearchChange,
-  onRegionFilterChange,
   onSortChange,
   onClearFilters,
 }: SupplierSearchFilterProps) => {
@@ -51,7 +47,7 @@ export const SupplierSearchFilter = ({
       }}
     >
       <Row gutter={16} align="middle">
-        <Col span={8}>
+        <Col span={12}>
           <Space>
             <SearchOutlined style={{ color: "#1890ff" }} />
             <Text strong>Tìm kiếm:</Text>
@@ -65,25 +61,7 @@ export const SupplierSearchFilter = ({
           />
         </Col>
 
-        <Col span={6}>
-          <Space>
-            <FilterOutlined style={{ color: "#1890ff" }} />
-            <Text strong>Khu vực:</Text>
-          </Space>
-          <Select
-            placeholder="Tất cả khu vực"
-            value={regionFilter}
-            onChange={onRegionFilterChange}
-            style={{ width: "100%", marginTop: "8px" }}
-            allowClear
-          >
-            <Select.Option value="TP.HCM">TP.HCM</Select.Option>
-            <Select.Option value="Hà Nội">Hà Nội</Select.Option>
-            <Select.Option value="Đà Nẵng">Đà Nẵng</Select.Option>
-          </Select>
-        </Col>
-
-        <Col span={6}>
+        <Col span={8}>
           <Space>
             <SortAscendingOutlined style={{ color: "#1890ff" }} />
             <Text strong>Sắp xếp:</Text>
@@ -93,10 +71,10 @@ export const SupplierSearchFilter = ({
             onChange={handleSortChange}
             style={{ width: "100%", marginTop: "8px" }}
           >
+            <Select.Option value="id-descend">Mới nhất</Select.Option>
+            <Select.Option value="id-ascend">Cũ nhất</Select.Option>
             <Select.Option value="name-ascend">Tên A-Z</Select.Option>
             <Select.Option value="name-descend">Tên Z-A</Select.Option>
-            <Select.Option value="createdAt-descend">Mới nhất</Select.Option>
-            <Select.Option value="createdAt-ascend">Cũ nhất</Select.Option>
           </Select>
         </Col>
 

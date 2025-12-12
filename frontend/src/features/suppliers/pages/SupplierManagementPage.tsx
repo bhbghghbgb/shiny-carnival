@@ -1,133 +1,84 @@
-import React, {useState} from 'react';
-import {getRouteApi} from '@tanstack/react-router';
-import {useSupplierManagement} from "../hooks/useSupplierManagement.ts";
-import {SupplierHeader} from "../components/SupplierHeader.tsx";
-import {SupplierStatistics} from "../components/SupplierStatistics.tsx";
-import {message} from "antd";
-import {SupplierSearchFilter} from "../components/SupplierSearchFilter.tsx";
-import {SupplierTable} from "../components/SupplierTable.tsx";
-import {SupplierModals} from "../components/SupplierModals.tsx";
+import { SupplierHeader } from '../components/SupplierHeader'
+import { SupplierStatistics } from '../components/SupplierStatistics'
+import { SupplierSearchFilter } from '../components/SupplierSearchFilter'
+import { useSupplierManagementPage } from '../hooks/useSupplierManagementPage'
+import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { supplierPageConfig } from '../config/supplierPageConfig'
+import type { SupplierEntity } from '../types/entity'
+import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api'
 
-
-const routeApi = getRouteApi('/admin/suppliers');
-
-export const SupplierManagementPage: React.FC = () => {
+export function SupplierManagementPage() {
     const {
-        addSupplier,
-        editSupplier,
+        suppliers,
+        total,
+
+        searchText,
+        sortField,
+        sortOrder,
+        page,
+        pageSize,
+
+        handleSearch,
+        handleSort,
+        handlePageChange,
+        clearFilters,
+
+        handleCreate,
+        handleUpdate,
+        handleDelete,
+
+        createSupplier,
+        updateSupplier,
         deleteSupplier,
-        selected,
-        setSelected,
-        modalVisible,
-        setModalVisible,
-        isEditing,
-        setIsEditing,
-    } = useSupplierManagement();
-
-    const [searchText, setSearchText] = useState("");
-    const [sortField, setSortField] = useState("name");
-    const [sortOrder, setSortOrder] = useState<"ascend" | "descend">("ascend");
-    const [regionFilter, setRegionFilter] = useState<string | undefined>(undefined);
-
-    const {suppliers} = routeApi.useLoaderData();
-    const params = routeApi.useParams();
-
-    console.log('Suppliers:', suppliers);
-    console.log('Route params:', params);
-
-    // ✅ Lọc dữ liệu theo search + filter
-    const filteredSuppliers = suppliers
-        .filter((s: { name: string; }) => s.name.toLowerCase().includes(searchText.toLowerCase()))
-        .filter((s: { address: string; }) =>
-            regionFilter ? s.address?.toLowerCase().includes(regionFilter.toLowerCase()) : true
-        )
-        .sort((a: { [x: string]: { toString: () => any; }; }, b: { [x: string]: { toString: () => string; }; }) =>
-            sortOrder === "ascend"
-                ? a[sortField as keyof typeof a]?.toString().localeCompare(
-                    b[sortField as keyof typeof b]?.toString()
-                )
-                : b[sortField as keyof typeof b]?.toString().localeCompare(
-                    a[sortField as keyof typeof a]?.toString()
-                )
-        );
-
-    const handleAdd = () => {
-        setIsEditing(false);
-        setSelected(null);
-        setModalVisible(true);
-    };
-    const handleSubmit = (data: any) => {
-        try {
-            if (isEditing && selected) {
-                editSupplier({...selected, ...data});
-                message.success("Cập nhật nhà cung cấp thành công!");
-            } else {
-                addSupplier(data);
-                message.success("Thêm nhà cung cấp mới thành công!");
-            }
-
-            // ✅ Đóng modal sau khi lưu
-            setModalVisible(false);
-            setSelected(null);
-        } catch (error) {
-            console.error(error);
-            message.error("Đã xảy ra lỗi, vui lòng thử lại!");
-        }
-    };
+        pageErrorMessage,
+        formErrorMessage,
+        clearPageError,
+        clearFormError,
+    } = useSupplierManagementPage()
 
     return (
-        <div style={{padding: 24}}>
-            <SupplierHeader onAddSupplier={handleAdd}/>
-
-            <div style={{marginTop: 16}}>
-                <SupplierStatistics
-                    totalSuppliers={suppliers.length}
-                    filteredCount={filteredSuppliers.length} // ✅ thêm dòng này
-                    activeSuppliers={suppliers.length}
-                    productCount={120}
-                />
-            </div>
-
-            <div style={{marginTop: 16}}>
-                <SupplierSearchFilter
-                    searchText={searchText}
-                    sortField={sortField}
-                    sortOrder={sortOrder}
-                    regionFilter={regionFilter}
-                    onSearchChange={setSearchText}
-                    onRegionFilterChange={setRegionFilter}
-                    onSortChange={(f, o) => {
-                        setSortField(f);
-                        setSortOrder(o);
-                    }}
-                    onClearFilters={() => {
-                        setSearchText("");
-                        setRegionFilter(undefined);
-                        setSortField("name");
-                        setSortOrder("ascend");
-                    }}
-                />
-            </div>
-
-            <div style={{marginTop: 16}}>
-                <SupplierTable
-                    suppliers={filteredSuppliers}
-                    onEdit={(s) => {
-                        setIsEditing(true);
-                        setSelected(s);
-                        setModalVisible(true);
-                    }}
-                    onDelete={deleteSupplier}
-                />
-            </div>
-
-            <SupplierModals
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onSubmit={handleSubmit}
-                initialValues={selected}
-                isEditing={isEditing}
+        <div style={{ padding: '24px' }}>
+            <GenericPage<SupplierEntity, CreateSupplierRequest, UpdateSupplierRequest>
+                config={supplierPageConfig}
+                data={suppliers}
+                total={total}
+                loading={createSupplier.isPending || updateSupplier.isPending || deleteSupplier.isPending}
+                page={page}
+                pageSize={pageSize}
+                sortField={sortField}
+                sortOrder={sortOrder}
+                onPageChange={handlePageChange}
+                onSortChange={handleSort}
+                onCreate={handleCreate}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+                createLoading={createSupplier.isPending}
+                updateLoading={updateSupplier.isPending}
+                deleteLoading={deleteSupplier.isPending}
+                pageErrorMessage={pageErrorMessage}
+                onClearPageError={clearPageError}
+                formErrorMessage={formErrorMessage}
+                onClearFormError={clearFormError}
+                renderHeader={({ openCreate }) => <SupplierHeader onAddSupplier={openCreate} />}
+                statisticsSlot={
+                    <SupplierStatistics
+                        totalSuppliers={total}
+                        filteredCount={total}
+                        activeSuppliers={total}
+                        productCount={0}
+                    />
+                }
+                filtersSlot={
+                    <SupplierSearchFilter
+                        searchText={searchText}
+                        sortField={sortField}
+                        sortOrder={sortOrder}
+                        onSearchChange={handleSearch}
+                        onSortChange={handleSort}
+                        onClearFilters={clearFilters}
+                    />
+                }
             />
         </div>
-    );
+    )
 }
