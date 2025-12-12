@@ -33,6 +33,13 @@ public class ProductsController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+    [HttpPost("by-ids")]
+    public async Task<IActionResult> GetProductsByIds([FromBody] List<int> ids)
+    {
+        var result = await _productService.GetProductsByIdsAsync(ids);
+        return StatusCode(result.StatusCode, result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductRequest request)
     {

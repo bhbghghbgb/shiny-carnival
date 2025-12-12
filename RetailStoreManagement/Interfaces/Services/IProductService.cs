@@ -8,6 +8,7 @@ public interface IProductService
 {
     Task<ApiResponse<PagedList<ProductListDto>>> GetProductsAsync(ProductSearchRequest request);
     Task<ApiResponse<ProductResponseDto>> GetProductByIdAsync(int id);
+    Task<ApiResponse<List<ProductResponseDto>>> GetProductsByIdsAsync(List<int> ids);
     Task<ApiResponse<ProductResponseDto>> CreateProductAsync(CreateProductRequest request);
     Task<ApiResponse<ProductResponseDto>> UpdateProductAsync(int id, UpdateProductRequest request);
     Task<ApiResponse<bool>> DeleteProductAsync(int id);
