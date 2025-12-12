@@ -63,10 +63,11 @@ export const useProduct = (id: string | number) => {
  * 
  * @returns Mutation result
  */
-export const useCreateProduct = () => {
+export const useCreateProduct = (options?: Parameters<typeof useApiCreate<ProductEntity, CreateProductRequest>>[0]['options']) => {
   return useApiCreate<ProductEntity, CreateProductRequest>({
     apiService: productApiService,
     entity: ENTITY,
+    options,
   });
 };
 
@@ -75,10 +76,11 @@ export const useCreateProduct = () => {
  * 
  * @returns Mutation result
  */
-export const useUpdateProduct = () => {
+export const useUpdateProduct = (options?: Parameters<typeof useApiUpdate<ProductEntity, UpdateProductRequest>>[0]['options']) => {
   return useApiUpdate<ProductEntity, UpdateProductRequest>({
     apiService: productApiService,
     entity: ENTITY,
+    options,
   });
 };
 
@@ -99,10 +101,11 @@ export const usePatchProduct = () => {
  * 
  * @returns Mutation result
  */
-export const useDeleteProduct = () => {
+export const useDeleteProduct = (options?: Parameters<typeof useApiDelete<ProductEntity>>[0]['options']) => {
   return useApiDelete<ProductEntity>({
     apiService: productApiService,
     entity: ENTITY,
+    options,
   });
 };
 

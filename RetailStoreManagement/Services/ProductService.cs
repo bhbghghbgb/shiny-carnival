@@ -113,6 +113,31 @@ public class ProductService : IProductService
         }
     }
 
+    public async Task<ApiResponse<List<ProductResponseDto>>> GetProductsByIdsAsync(List<int> ids)
+    {
+        try
+        {
+            if (ids == null || ids.Count == 0)
+            {
+                return ApiResponse<List<ProductResponseDto>>.Error("Ids list cannot be empty", 400);
+            }
+
+            var products = await _unitOfWork.Products.GetQueryable()
+                .Include(p => p.Category)
+                .Include(p => p.Supplier)
+                .Include(p => p.Inventory)
+                .Where(p => ids.Contains(p.Id))
+                .ToListAsync();
+
+            var productDtos = _mapper.Map<List<ProductResponseDto>>(products);
+            return ApiResponse<List<ProductResponseDto>>.Success(productDtos);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<List<ProductResponseDto>>.Error(ex.Message);
+        }
+    }
+
     public async Task<ApiResponse<ProductResponseDto>> CreateProductAsync(CreateProductRequest request)
     {
         try

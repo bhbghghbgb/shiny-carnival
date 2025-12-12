@@ -63,7 +63,7 @@ public class AuthController : ControllerBase
         if (!result.IsError && result.Data != null)
         {
             // Set httpOnly cookies cho tokens mới
-            SetTokenCookies(result.Data.Token, result.Data.RefreshToken);
+            SetTokenCookies(result.Data.Token, request.RefreshToken);
         }
 
         return StatusCode(result.StatusCode, result);
@@ -92,8 +92,8 @@ public class AuthController : ControllerBase
     private void SetTokenCookies(string accessToken, string refreshToken)
     {
         var jwtSettings = _configuration.GetSection("JwtSettings");
-        var accessTokenExpiry = int.Parse(jwtSettings["ExpirationInMinutes"] ?? "15");
-        var refreshTokenExpiry = 7; // 7 ngày
+        var accessTokenExpiry = int.Parse(jwtSettings["AccessTokenExpirationInMinutes"] ?? "15");
+        var refreshTokenExpiry = int.Parse(jwtSettings["RefreshTokenExpirationInMinutes"] ?? "1"); // 1 ngày
 
         // Trong development, không set Domain để cookies hoạt động với localhost:port khác nhau
         // Trong production, có thể cần set Domain nếu frontend và backend cùng domain
@@ -107,29 +107,30 @@ public class AuthController : ControllerBase
             // Domain chỉ cần set nếu frontend và backend ở subdomain khác nhau
         };
 
-        // Set access token cookie (15 phút)
-        // Lưu ý: Với localhost và port khác nhau, cookies vẫn hoạt động nếu không set Domain
-        // SameSite=Lax cho phép cookies được gửi trong top-level navigation và same-site requests
-        Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+        var accessTokenOptions = new CookieOptions
         {
-            HttpOnly = true,
-            Secure = false, // Trong development dùng HTTP, production sẽ dùng HTTPS
-            SameSite = SameSiteMode.Lax, // Cho phép cookies với same-site requests
-            Path = "/",
+            HttpOnly = cookieOptions.HttpOnly,
+            Secure = cookieOptions.Secure,
+            SameSite = cookieOptions.SameSite,
+            Path = cookieOptions.Path,
             MaxAge = TimeSpan.FromMinutes(accessTokenExpiry)
-            // Không set Domain - để cookies hoạt động với localhost:port khác nhau
-        });
+        };
+        
+        Response.Cookies.Append("accessToken", accessToken, accessTokenOptions);
 
-        // Set refresh token cookie (7 ngày)
-        Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+        if (!string.IsNullOrEmpty(refreshToken))
         {
-            HttpOnly = true,
-            Secure = false, // Trong development dùng HTTP, production sẽ dùng HTTPS
-            SameSite = SameSiteMode.Lax, // Cho phép cookies với same-site requests
-            Path = "/",
-            MaxAge = TimeSpan.FromDays(refreshTokenExpiry)
-            // Không set Domain - để cookies hoạt động với localhost:port khác nhau
-        });
+            var refreshTokenOptions = new CookieOptions
+            {
+                HttpOnly = cookieOptions.HttpOnly,
+                Secure = cookieOptions.Secure,
+                SameSite = cookieOptions.SameSite,
+                Path = cookieOptions.Path,
+                MaxAge = TimeSpan.FromDays(refreshTokenExpiry)
+            };
+            
+            Response.Cookies.Append("refreshToken", refreshToken, refreshTokenOptions);
+        }
     }
 
     private void ClearTokenCookies()

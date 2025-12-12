@@ -2,45 +2,56 @@ import { z } from 'zod';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
 import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { PromotionManagementPage } from '../../../../../features/promotions/pages/PromotionManagementPage';
-import { promotions as mockPromotions } from '../../../../../_mocks/promotions';
-import { createQueryKeys } from '../../../../../lib/query/queryOptionsFactory';
+import { promotionApiService } from '../../../../../features/promotions/api/PromotionApiService';
+import type { PromotionEntity } from '../../../../../features/promotions/types/entity';
+import type { PagedRequest } from '../../../../../lib/api/types/api.types';
+import { createPaginatedQueryOptions } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
-// --------------------------
 
 const promotionSearchSchema = baseSearchSchema.extend({
-  // type: z.enum(['discount', 'coupon', 'special_offer']).optional(),
-  // status: z.enum(['active', 'expired', 'scheduled']).optional(),
-  // startDate: z.string().optional(),
-  // endDate: z.string().optional(),
+  sortField: z.string().catch('id'),
+  sortOrder: z.enum(['ascend', 'descend']).catch('descend'),
 });
 
 export type PromotionSearch = z.infer<typeof promotionSearchSchema>;
 
-async function fetchPromotions(ctx: LoaderContext<Record<string, never>, PromotionSearch, { queryClient: QueryClient }>): Promise<{ promotions: typeof mockPromotions; total: number }> {
-  const { search, context } = ctx;
-  const queryKeys = createQueryKeys('promotions');
-  const queryOpts = queryOptions<{ promotions: typeof mockPromotions; total: number }>({
-    queryKey: [...queryKeys.lists(), 'mock', search],
-    queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      return {
-        promotions: mockPromotions,
-        total: mockPromotions.length,
-      };
-    },
-  });
+function buildPagedRequest(search: PromotionSearch): PagedRequest {
+  return {
+    page: search.page || 1,
+    pageSize: search.pageSize || 10,
+    search: search.search,
+    sortBy: search.sortField === 'promoCode' ? 'PromoCode' :
+      search.sortField === 'startDate' ? 'StartDate' : 'Id',
+    sortDesc: search.sortOrder === 'descend',
+  };
+}
 
-  return context.queryClient.ensureQueryData(queryOpts);
+async function fetchPromotions(ctx: LoaderContext<Record<string, never>, PromotionSearch, { queryClient: QueryClient }>): Promise<{ promotions: PromotionEntity[]; total: number }> {
+  const { search, context } = ctx;
+  const params = buildPagedRequest(search);
+
+  const promotionsQueryOptions = createPaginatedQueryOptions<PromotionEntity>(
+    'promotions',
+    promotionApiService,
+    params,
+  );
+
+  const data = await context.queryClient.ensureQueryData(promotionsQueryOptions);
+
+  return {
+    promotions: data.items || [],
+    total: data.totalCount || (data.items ? data.items.length : 0),
+  };
 }
 
 // 2. Tạo "Bản thiết kế" cho trang quản trị
 // ----------------------------------------
 
 export const promotionAdminDefinition: ManagementRouteDefinition<
-  { promotions: typeof mockPromotions; total: number },     // Kiểu loader data
-  PromotionSearch,         // Kiểu search params
-  { queryClient: QueryClient }       // Kiểu router context
+  { promotions: PromotionEntity[]; total: number },
+  PromotionSearch,
+  { queryClient: QueryClient }
 > = {
   entityName: 'Khuyến mãi',
   path: 'promotions',
@@ -48,3 +59,8 @@ export const promotionAdminDefinition: ManagementRouteDefinition<
   searchSchema: promotionSearchSchema,
   loader: (ctx) => fetchPromotions(ctx),
 };
+
+export function createPromotionsQueryOptions(search: PromotionSearch) {
+  const params = buildPagedRequest(search);
+  return createPaginatedQueryOptions<PromotionEntity>('promotions', promotionApiService, params);
+}

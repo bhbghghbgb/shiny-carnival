@@ -1,7 +1,8 @@
 import type { ColumnsType } from 'antd/es/table'
 import type { Rule } from 'antd/es/form'
+import type { DropDownWithFilterOption } from '../../common/DropDownWithFilter'
 
-export type GenericFieldType = 'text' | 'password' | 'select'
+export type GenericFieldType = 'text' | 'password' | 'select' | 'number' | 'remote-select'
 
 export interface GenericSelectOption {
     label: string
@@ -15,6 +16,10 @@ export interface GenericFormField<TValues> {
     rules?: Rule[]
     placeholder?: string
     options?: GenericSelectOption[]
+    // Remote select
+    fetchOptions?: (keyword: string) => Promise<DropDownWithFilterOption[]>
+    queryKeyPrefix?: string
+    fetchOnEmpty?: boolean
 }
 
 export interface GenericPageConfig<TData, TCreate, TUpdate> {
