@@ -222,6 +222,27 @@ public class PromotionService : IPromotionService
         }
     }
 
+    public async Task<ApiResponse<int>> GetActivePromotionCountAsync()
+    {
+        try
+        {
+            // Convert DateTime.UtcNow to DateOnly to avoid timezone issues with PostgreSQL
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var count = await _unitOfWork.Promotions.GetQueryable()
+                .Where(p => p.Status == PromotionStatus.Active
+                            && today >= p.StartDate
+                            && today <= p.EndDate
+                            && (p.UsageLimit == 0 || p.UsedCount < p.UsageLimit))
+                .CountAsync();
+
+            return ApiResponse<int>.Success(count);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<int>.Error(ex.Message);
+        }
+    }
+
     private (bool isValid, string message) ValidatePromotion(PromotionEntity promotion, decimal orderTotal)
     {
         if (promotion.Status != PromotionStatus.Active)

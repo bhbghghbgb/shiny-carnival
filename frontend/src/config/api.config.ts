@@ -53,6 +53,7 @@ export const API_CONFIG = {
       PROMOTIONS: '/api/admin/promotions',
       PROMOTION_BY_ID: (id: number) => `/api/admin/promotions/${id}`,
       PROMOTION_VALIDATE: '/api/admin/promotions/validate',
+      PROMOTION_ACTIVE_COUNT: '/api/admin/promotions/active-count',
       
       // Inventory
       INVENTORY: '/api/admin/inventory',

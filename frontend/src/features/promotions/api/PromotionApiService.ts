@@ -30,6 +30,18 @@ export class PromotionApiService extends BaseApiService<
     )
     return unwrapResponse(response.data)
   }
+
+  /**
+   * GET active promotion count
+   * Backend endpoint: GET /api/admin/promotions/active-count
+   * Returns the count of active promotions (status=active, within date range, not exceeded usage limit)
+   */
+  async getActivePromotionCount(): Promise<number> {
+    const response = await this.axios.get<ApiResponse<number>>(
+      API_CONFIG.ENDPOINTS.ADMIN.PROMOTION_ACTIVE_COUNT
+    ) as unknown as ApiResponse<number>
+    return unwrapResponse(response)
+  }
 }
 
 export const promotionApiService = new PromotionApiService()

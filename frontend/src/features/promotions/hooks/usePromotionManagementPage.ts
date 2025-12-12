@@ -1,5 +1,5 @@
 import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
 import type { PromotionSearch } from '../../../app/routes/modules/management/definition/promotions.definition'
@@ -8,6 +8,7 @@ import { useCreatePromotion, useUpdatePromotion, useDeletePromotion } from './us
 import type { PromotionEntity } from '../types/entity'
 import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
 import { parseApiError } from '../../../lib/api/utils/parseApiError'
+import { promotionApiService } from '../api/PromotionApiService'
 
 export const usePromotionManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.PROMOTIONS)
@@ -16,11 +17,18 @@ export const usePromotionManagementPage = () => {
     const promotionsQueryOptions = createPromotionsQueryOptions(search)
     const { data: pagedList } = useSuspenseQuery(promotionsQueryOptions)
 
+    // Fetch active promotion count from API
+    const { data: activePromotionCount } = useSuspenseQuery<number>({
+        queryKey: ['promotions', 'active-count'],
+        queryFn: () => promotionApiService.getActivePromotionCount(),
+    })
+
     const promotions: PromotionEntity[] = pagedList.items || []
     const total = pagedList.totalCount || promotions.length
 
     const navigate = useNavigate({ from: ENDPOINTS.ADMIN.PROMOTIONS })
     const router = useRouter()
+    const queryClient = useQueryClient()
 
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
@@ -28,6 +36,8 @@ export const usePromotionManagementPage = () => {
     const createPromotion = useCreatePromotion({
         onSuccess: () => {
             router.invalidate()
+            // Invalidate active-count query after creating promotion
+            queryClient.invalidateQueries({ queryKey: ['promotions', 'active-count'] })
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
@@ -38,6 +48,8 @@ export const usePromotionManagementPage = () => {
     const updatePromotion = useUpdatePromotion({
         onSuccess: () => {
             router.invalidate()
+            // Invalidate active-count query after updating promotion
+            queryClient.invalidateQueries({ queryKey: ['promotions', 'active-count'] })
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
@@ -48,6 +60,8 @@ export const usePromotionManagementPage = () => {
     const deletePromotion = useDeletePromotion({
         onSuccess: () => {
             router.invalidate()
+            // Invalidate active-count query after deleting promotion
+            queryClient.invalidateQueries({ queryKey: ['promotions', 'active-count'] })
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
@@ -116,6 +130,7 @@ export const usePromotionManagementPage = () => {
     return {
         promotions,
         total,
+        activePromotionCount: activePromotionCount ?? 0,
 
         searchText,
         sortField,
