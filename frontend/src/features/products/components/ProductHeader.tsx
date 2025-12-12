@@ -1,13 +1,24 @@
-import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, ShoppingOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePdfOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Row, Space, Typography } from 'antd';
+import { exportTablePdf } from '../../../utils/exportPdf';
+import type { ProductEntity } from '../api';
+import { productPageConfig } from '../config/productPageConfig';
 
 const { Title, Text } = Typography
 
 interface ProductHeaderProps {
-    onAddProduct: () => void
+    products : ProductEntity[];
+
 }
 
-export const ProductHeader = ({ onAddProduct }: ProductHeaderProps) => {
+export const ProductHeader = ({ products }: ProductHeaderProps) => {
+    const exportPDF = () => {
+        exportTablePdf(productPageConfig,products,"products");
+    };
+    const importExcel = () =>{
+
+    }
+
     return (
         <Card
             style={{
@@ -34,20 +45,37 @@ export const ProductHeader = ({ onAddProduct }: ProductHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
-                        <Button
+                    <Button
                             type="primary"
                             size="large"
-                            icon={<PlusOutlined />}
-                            onClick={onAddProduct}
+                            icon={<FileExcelOutlined />}
+                            onClick={importExcel}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
                                 paddingLeft: '20px',
                                 paddingRight: '20px',
+                                background: '#4caf50',
                                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
                             }}
                         >
-                            Thêm
+                            Import Excel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FilePdfOutlined />}
+                            onClick={exportPDF}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#d9534f',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Export PDF
                         </Button>
                     </Space>
                 </Col>

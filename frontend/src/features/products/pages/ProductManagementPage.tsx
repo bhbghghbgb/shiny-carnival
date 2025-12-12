@@ -67,7 +67,7 @@ export function ProductManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <ProductHeader onAddProduct={openCreate} />}
+                renderHeader={() => <ProductHeader products={products} />}
                 statisticsSlot={
                     <ProductStatistics
                         totalProducts={total}

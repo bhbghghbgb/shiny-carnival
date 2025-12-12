@@ -1,52 +1,18 @@
-import { FileExcelOutlined, FilePdfOutlined, PlusOutlined, TeamOutlined } from '@ant-design/icons';
+import { FileExcelOutlined, FilePdfOutlined, TeamOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from "pdfmake/build/vfs_fonts";
+import { exportTablePdf } from '../../../utils/exportPdf';
+import { userPageConfig } from '../config/userPageConfig';
 import type { UserNoPass } from '../types/entity';
 
 const { Title, Text } = Typography
-pdfMake.vfs = pdfFonts.vfs;
-
 
 interface UserHeaderProps {
-    onAddUser: () => void;
     users: UserNoPass[];
 }
 
-export const UserHeader = ({ onAddUser, users }: UserHeaderProps) => {
-    const safeUsers = Array.isArray(users) ? users : [];
-
+export const UserHeader = ({ users }: UserHeaderProps) => {
     const exportPDF = () => {
-        const docDefinition = {
-            content: [
-                { text: "Danh sách người dùng", style: "header" },
-    
-                {
-                    table: {
-                        headerRows: 1,
-                        widths: ["auto", "auto", "*", "auto"],
-                        body: [
-                            ["ID","UserName" ,"Họ và Tên", "Vai trò"],
-                            ...safeUsers.map((u) => [
-                                u.id,
-                                u.username,
-                                u.fullName,
-                                u.role,
-                            ]),
-                        ],
-                    },
-                },
-            ],
-            styles: {
-                header: {
-                    fontSize: 18,
-                    bold: true,
-                    margin: [0, 0, 0, 20],
-                },
-            },
-        };
-    
-        pdfMake.createPdf(docDefinition).download("users.pdf");
+        exportTablePdf(userPageConfig,users,"products");
     };
     const importExcel = () =>{
 
@@ -78,7 +44,7 @@ export const UserHeader = ({ onAddUser, users }: UserHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
-                    <Button
+                        <Button
                             type="primary"
                             size="large"
                             icon={<FileExcelOutlined />}
@@ -109,21 +75,6 @@ export const UserHeader = ({ onAddUser, users }: UserHeaderProps) => {
                             }}
                         >
                             Export PDF
-                        </Button>
-                        <Button
-                            type="primary"
-                            size="large"
-                            icon={<PlusOutlined />}
-                            onClick={onAddUser}
-                            style={{
-                                borderRadius: '8px',
-                                height: '40px',
-                                paddingLeft: '20px',
-                                paddingRight: '20px',
-                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
-                            }}
-                        >
-                            Thêm
                         </Button>
                     </Space>
                 </Col>

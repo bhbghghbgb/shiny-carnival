@@ -1,11 +1,11 @@
-import { OrderHeader } from '../components/OrderHeader'
-import { OrderStatistics } from '../components/OrderStatistics'
-import { OrderSearchFilter } from '../components/OrderSearchFilter'
-import { useOrderManagementPage } from '../hooks/useOrderManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { OrderHeader } from '../components/OrderHeader'
+import { OrderSearchFilter } from '../components/OrderSearchFilter'
+import { OrderStatistics } from '../components/OrderStatistics'
 import { orderPageConfig } from '../config/orderPageConfig'
-import type { OrderEntity } from '../types/entity'
+import { useOrderManagementPage } from '../hooks/useOrderManagementPage'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
+import type { OrderEntity } from '../types/entity'
 
 export function OrderManagementPage() {
     const {
@@ -70,7 +70,7 @@ export function OrderManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <OrderHeader onAddOrder={openCreate} />}
+                renderHeader={() => <OrderHeader orders={orders} />}
                 statisticsSlot={
                     <OrderStatistics
                         totalOrders={total}

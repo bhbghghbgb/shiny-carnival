@@ -1,13 +1,23 @@
-import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, UserOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePdfOutlined, UserOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Row, Space, Typography } from 'antd'
+import { exportTablePdf } from '../../../utils/exportPdf'
+import { customerPageConfig } from '../config/customerPageConfig'
+import type { CustomerEntity } from '../types/entity'
 
 const { Title, Text } = Typography
 
 interface CustomerHeaderProps {
-    onAddCustomer: () => void
+    customers: CustomerEntity[],
 }
 
-export const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
+export const CustomerHeader = ({ customers }: CustomerHeaderProps) => {
+
+    const exportPDF = () => {
+        exportTablePdf(customerPageConfig,customers,"customers");
+    };
+    const importExcel = () =>{
+
+    }
     return (
         <Card
             style={{
@@ -33,20 +43,37 @@ export const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
-                        <Button
+                    <Button
                             type="primary"
                             size="large"
-                            icon={<PlusOutlined />}
-                            onClick={onAddCustomer}
+                            icon={<FileExcelOutlined />}
+                            onClick={importExcel}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
                                 paddingLeft: '20px',
                                 paddingRight: '20px',
+                                background: '#4caf50',
                                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
                             }}
                         >
-                            Thêm
+                            Import Excel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FilePdfOutlined />}
+                            onClick={exportPDF}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#d9534f',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Export PDF
                         </Button>
                     </Space>
                 </Col>
@@ -54,4 +81,3 @@ export const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
         </Card>
     )
 }
-

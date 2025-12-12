@@ -1,11 +1,11 @@
-import { SupplierHeader } from '../components/SupplierHeader'
-import { SupplierStatistics } from '../components/SupplierStatistics'
-import { SupplierSearchFilter } from '../components/SupplierSearchFilter'
-import { useSupplierManagementPage } from '../hooks/useSupplierManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { SupplierHeader } from '../components/SupplierHeader'
+import { SupplierSearchFilter } from '../components/SupplierSearchFilter'
+import { SupplierStatistics } from '../components/SupplierStatistics'
 import { supplierPageConfig } from '../config/supplierPageConfig'
-import type { SupplierEntity } from '../types/entity'
+import { useSupplierManagementPage } from '../hooks/useSupplierManagementPage'
 import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api'
+import type { SupplierEntity } from '../types/entity'
 
 export function SupplierManagementPage() {
     const {
@@ -59,7 +59,7 @@ export function SupplierManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <SupplierHeader onAddSupplier={openCreate} />}
+                renderHeader={() => <SupplierHeader suppliers={suppliers} />}
                 statisticsSlot={
                     <SupplierStatistics
                         totalSuppliers={total}

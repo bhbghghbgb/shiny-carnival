@@ -1,12 +1,12 @@
-import { PromotionHeader } from '../components/PromotionHeader'
-import { PromotionStatistics } from '../components/PromotionStatistics'
-import { PromotionSearchFilter } from '../components/PromotionSearchFilter'
-import { usePromotionManagementPage } from '../hooks/usePromotionManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
-import { promotionPageConfig } from '../config/promotionPageConfig'
-import type { PromotionEntity } from '../types/entity'
-import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
 import { API_CONFIG } from '../../../config/api.config'
+import { PromotionHeader } from '../components/PromotionHeader'
+import { PromotionSearchFilter } from '../components/PromotionSearchFilter'
+import { PromotionStatistics } from '../components/PromotionStatistics'
+import { promotionPageConfig } from '../config/promotionPageConfig'
+import { usePromotionManagementPage } from '../hooks/usePromotionManagementPage'
+import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
+import type { PromotionEntity } from '../types/entity'
 
 export function PromotionManagementPage() {
     const {
@@ -63,7 +63,7 @@ export function PromotionManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <PromotionHeader onAddPromotion={openCreate} />}
+                renderHeader={() => <PromotionHeader promotions={promotions} />}
                 statisticsSlot={
                     <PromotionStatistics
                         totalPromotions={total}

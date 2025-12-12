@@ -72,7 +72,7 @@ export function UserManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <UserHeader onAddUser={openCreate} users={users}/>}
+                renderHeader={() => <UserHeader users={users}/>}
                 statisticsSlot={
                     <UserStatistics
                         totalUsers={totalUsers}
