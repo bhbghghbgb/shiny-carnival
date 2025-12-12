@@ -7,6 +7,8 @@ import { Tag } from 'antd'
 import { API_CONFIG } from '../../../config/api.config'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import type { CustomerEntity } from '../../customers/types/entity'
+import { productApiService } from '../../products/api/ProductApiService'
+import type { ProductEntity } from '../../products/types/entity'
 
 const columns: ColumnsType<OrderEntity> = [
     {
@@ -84,6 +86,37 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
                 fetchOnEmpty: true,
             },
             {
+                name: 'productId',
+                label: 'Sản phẩm',
+                type: 'remote-select',
+                rules: [{ required: true, message: 'Vui lòng chọn sản phẩm' }],
+                placeholder: 'Chọn sản phẩm',
+                fetchOptions: async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+                    const paged = await productApiService.getPaginated({
+                        search: keyword || undefined,
+                        page: 1,
+                        pageSize: 20,
+                    })
+                    const items = paged.items ?? []
+                    return items.map((p: ProductEntity) => ({ 
+                        label: `${p.productName ?? `#${p.id}`} - ${p.price?.toLocaleString()} đ`, 
+                        value: p.id 
+                    }))
+                },
+                queryKeyPrefix: 'product-order-select',
+                fetchOnEmpty: true,
+            },
+            {
+                name: 'quantity',
+                label: 'Số lượng',
+                type: 'number',
+                rules: [
+                    { required: true, message: 'Vui lòng nhập số lượng' },
+                    { type: 'number', min: 1, message: 'Số lượng phải lớn hơn 0' }
+                ],
+                placeholder: 'Nhập số lượng',
+            },
+            {
                 name: 'promoCode',
                 label: 'Mã khuyến mãi',
                 type: 'text',
@@ -103,7 +136,23 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
                 ],
             },
         ],
-        getCreateInitialValues: () => ({}),
+        getCreateInitialValues: () => ({
+            quantity: 1,
+        }),
+        mapCreatePayload: (values: any): CreateOrderRequest => {
+            // Transform form values to CreateOrderRequest
+            const { customerId, productId, quantity, promoCode } = values
+            return {
+                customerId: customerId as number,
+                promoCode: promoCode || undefined,
+                orderItems: [
+                    {
+                        productId: productId as number,
+                        quantity: quantity as number,
+                    }
+                ]
+            }
+        },
         getUpdateInitialValues: (record) => ({
             status: record.status,
         }),

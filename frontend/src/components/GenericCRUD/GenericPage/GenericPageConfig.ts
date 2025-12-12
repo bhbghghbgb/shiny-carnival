@@ -37,6 +37,7 @@ export interface GenericPageConfig<TData, TCreate, TUpdate> {
         update: GenericFormField<TUpdate>[]
         getCreateInitialValues?: () => Partial<TCreate>
         getUpdateInitialValues?: (record: TData) => Partial<TUpdate>
+        mapCreatePayload?: (values: any) => TCreate
         mapUpdatePayload?: (values: TUpdate, record: TData) => TUpdate
     }
     features?: {

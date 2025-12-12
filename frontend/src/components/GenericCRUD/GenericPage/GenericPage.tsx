@@ -191,7 +191,10 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 message.success(`${config.entity.displayName} đã được cập nhật`)
             } else {
                 if (!onCreate) return
-                await onCreate(values)
+                const payload = config.form.mapCreatePayload
+                    ? config.form.mapCreatePayload(values)
+                    : values
+                await onCreate(payload)
                 message.success(`${config.entity.displayName} đã được tạo`)
             }
             form.resetFields()

@@ -7,6 +7,7 @@ import { createProductsQueryOptions } from '../../../app/routes/modules/manageme
 import { useCreateProduct, useUpdateProduct, useDeleteProduct } from './useProducts'
 import type { ProductEntity } from '../types/entity'
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useProductManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.PRODUCTS)
@@ -24,19 +25,13 @@ export const useProductManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const createProduct = useCreateProduct({
         onSuccess: () => {
             router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Tạo sản phẩm thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo sản phẩm thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -46,7 +41,7 @@ export const useProductManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật sản phẩm thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật sản phẩm thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -56,7 +51,7 @@ export const useProductManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa sản phẩm thất bại: ${parseErrorMessage(error)}`)
+            setPageErrorMessage(`Xóa sản phẩm thất bại: ${parseApiError(error)}`)
         },
     })
 

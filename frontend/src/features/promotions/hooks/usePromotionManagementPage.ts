@@ -7,6 +7,7 @@ import { createPromotionsQueryOptions } from '../../../app/routes/modules/manage
 import { useCreatePromotion, useUpdatePromotion, useDeletePromotion } from './usePromotions'
 import type { PromotionEntity } from '../types/entity'
 import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const usePromotionManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.PROMOTIONS)
@@ -24,19 +25,13 @@ export const usePromotionManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const createPromotion = useCreatePromotion({
         onSuccess: () => {
             router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Tạo khuyến mãi thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo khuyến mãi thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -46,7 +41,7 @@ export const usePromotionManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật khuyến mãi thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật khuyến mãi thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -56,7 +51,7 @@ export const usePromotionManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa khuyến mãi thất bại: ${parseErrorMessage(error)}`)
+            setPageErrorMessage(`Xóa khuyến mãi thất bại: ${parseApiError(error)}`)
         },
     })
 

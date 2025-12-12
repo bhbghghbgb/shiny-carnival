@@ -6,6 +6,7 @@ import type { UserSearch } from '../../../app/routes/modules/management/definiti
 import { createUsersQueryOptions } from '../../../app/routes/modules/management/definition/users.definition'
 import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
 import type { UserNoPass } from '../types/entity'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useUserManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.USERS)
@@ -30,12 +31,6 @@ export const useUserManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const createUser = useCreateUser({
         onSuccess: (data) => {
             console.log('✅ [CreateUser] Success:', data)
@@ -44,7 +39,7 @@ export const useUserManagementPage = () => {
         },
         onError: (error: Error) => {
             console.error('❌ [CreateUser] Error:', error)
-            setFormErrorMessage(`Tạo user thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo user thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -56,7 +51,7 @@ export const useUserManagementPage = () => {
         },
         onError: (error: Error) => {
             console.error('❌ [UpdateUser] Error:', error)
-            setFormErrorMessage(`Cập nhật user thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật user thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -67,7 +62,7 @@ export const useUserManagementPage = () => {
         },
         onError: (error: Error) => {
             console.error('❌ [DeleteUser] Error:', error)
-            setPageErrorMessage(`Xóa user thất bại: ${parseErrorMessage(error)}`)
+            setPageErrorMessage(`Xóa user thất bại: ${parseApiError(error)}`)
         },
     })
 

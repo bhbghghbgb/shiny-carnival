@@ -8,9 +8,12 @@ import { useCreateOrder, useUpdateOrderStatus } from './useOrders'
 import type { OrderEntity } from '../types/entity'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
 import type { OrderStatus } from '../../../config/api.config'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useOrderManagementPage = () => {
-    const routeApi = getRouteApi(ENDPOINTS.ADMIN.ORDERS.LIST)
+    // TanStack Router typing yêu cầu literal path, cast để đơn giản hóa
+    const ORDER_ROUTE = ENDPOINTS.ADMIN.ORDERS.LIST as '/admin/orders'
+    const routeApi = getRouteApi(ORDER_ROUTE as any)
     const search = routeApi.useSearch() as OrderSearch
 
     const ordersQueryOptions = createOrdersQueryOptions(search)
@@ -19,17 +22,11 @@ export const useOrderManagementPage = () => {
     const orders: OrderEntity[] = pagedList.items || []
     const total = pagedList.totalCount || orders.length
 
-    const navigate = useNavigate({ from: ENDPOINTS.ADMIN.ORDERS.LIST })
+    const navigate = useNavigate({ from: ORDER_ROUTE as any })
     const router = useRouter()
 
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
-
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
 
     const createOrder = useCreateOrder({
         onSuccess: () => {
@@ -37,7 +34,7 @@ export const useOrderManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Tạo đơn hàng thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo đơn hàng thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -47,7 +44,7 @@ export const useOrderManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật trạng thái đơn hàng thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật trạng thái đơn hàng thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -64,72 +61,72 @@ export const useOrderManagementPage = () => {
 
     const handleSearch = (value: string) => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 search: value || undefined,
                 page: 1,
-            }),
+            })) as any,
         })
     }
 
     const handleStatusFilter = (value?: OrderStatus) => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 status: value,
                 page: 1,
-            }),
+            })) as any,
         })
     }
 
     const handleCustomerFilter = (value?: number) => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 customerId: value,
                 page: 1,
-            }),
+            })) as any,
         })
     }
 
     const handleUserFilter = (value?: number) => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 userId: value,
                 page: 1,
-            }),
+            })) as any,
         })
     }
 
     const handleDateRangeChange = (start?: string, end?: string) => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 startDate: start,
                 endDate: end,
                 page: 1,
-            }),
+            })) as any,
         })
     }
 
     const handlePageChange = (nextPage: number, nextPageSize: number) => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 page: nextPage,
                 pageSize: nextPageSize,
-            }),
+            })) as any,
         })
     }
 
     const handleSort = (field: string, order: 'ascend' | 'descend') => {
         navigate({
-            search: (prev: OrderSearch) => ({
+            search: ((prev: OrderSearch) => ({
                 ...prev,
                 sortField: field,
                 sortOrder: order,
-            }),
+            })) as any,
         })
     }
 
@@ -146,7 +143,7 @@ export const useOrderManagementPage = () => {
                 endDate: undefined,
                 sortField: 'id',
                 sortOrder: 'descend',
-            },
+            } as any,
         })
     }
 
@@ -155,7 +152,7 @@ export const useOrderManagementPage = () => {
     }
 
     const handleUpdate = async (record: OrderEntity, values: UpdateOrderStatusRequest) => {
-        await updateOrderStatus.mutateAsync({ ...values, id: record.id })
+        await updateOrderStatus.mutateAsync({ id: record.id, data: values })
     }
 
     return {

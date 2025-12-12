@@ -7,6 +7,7 @@ import { createInventoriesQueryOptions } from '../../../app/routes/modules/manag
 import { useUpdateInventory } from './useInventory'
 import type { InventoryEntity } from '../types/inventoryEntity'
 import type { UpdateInventoryRequest } from '../types/api'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useInventoryManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.INVENTORY.LIST)
@@ -24,19 +25,13 @@ export const useInventoryManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const updateInventory = useUpdateInventory({
         onSuccess: () => {
             router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật tồn kho thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật tồn kho thất bại: ${parseApiError(error)}`)
         },
     })
 
