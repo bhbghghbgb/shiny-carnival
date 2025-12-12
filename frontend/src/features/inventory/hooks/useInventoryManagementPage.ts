@@ -6,8 +6,9 @@ import type { InventorySearch } from '../../../app/routes/modules/management/def
 import { createInventoriesQueryOptions } from '../../../app/routes/modules/management/definition/inventory.definition'
 import { useUpdateInventory } from './useInventory'
 import type { InventoryEntity } from '../types/inventoryEntity'
-import type { UpdateInventoryRequest } from '../types/api'
+import type { UpdateInventoryRequest, LowStockAlert } from '../types/api'
 import { parseApiError } from '../../../lib/api/utils/parseApiError'
+import { inventoryApiService } from '../api/InventoryApiService'
 
 export const useInventoryManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.INVENTORY.LIST)
@@ -16,8 +17,15 @@ export const useInventoryManagementPage = () => {
     const inventoriesQueryOptions = createInventoriesQueryOptions(search)
     const { data: pagedList } = useSuspenseQuery(inventoriesQueryOptions)
 
+    // Fetch low stock alerts from API
+    const { data: lowStockAlerts } = useSuspenseQuery<LowStockAlert[]>({
+        queryKey: ['inventory', 'low-stock'],
+        queryFn: () => inventoryApiService.getLowStockAlerts(),
+    })
+
     const inventories: InventoryEntity[] = pagedList.items || []
     const total = pagedList.totalCount || inventories.length
+    const lowStockCount = (lowStockAlerts?.length ?? 0)
 
     const navigate = useNavigate({ from: ENDPOINTS.ADMIN.INVENTORY.LIST })
     const router = useRouter()
@@ -117,6 +125,7 @@ export const useInventoryManagementPage = () => {
     return {
         inventories,
         total,
+        lowStockCount,
 
         searchText,
         productId,

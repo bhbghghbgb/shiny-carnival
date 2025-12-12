@@ -5,7 +5,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApiService } from '../api/InventoryApiService';
 import type { InventoryEntity } from '../types/inventoryEntity';
-import type { UpdateInventoryRequest } from '../types/api';
+import type { UpdateInventoryRequest, LowStockAlert } from '../types/api';
 import type { PagedList, PagedRequest } from '../../../lib/api/types/api.types';
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory';
 
@@ -67,6 +67,8 @@ export const useUpdateInventory = (options?: {
       queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
       // Invalidate specific detail
       queryClient.invalidateQueries({ queryKey: queryKeys.detail(variables.productId) });
+      // Invalidate low-stock alerts count
+      queryClient.invalidateQueries({ queryKey: ['inventory', 'low-stock'] });
       
       userOnSuccess?.(data);
     },

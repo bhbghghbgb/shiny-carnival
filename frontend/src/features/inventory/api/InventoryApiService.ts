@@ -2,7 +2,7 @@ import { BaseApiService } from '../../../lib/api/base'
 import axiosClient from '../../../lib/api/axios'
 import { API_CONFIG } from '../../../config/api.config'
 import type { InventoryEntity } from '../types/inventoryEntity'
-import type { UpdateInventoryRequest } from '../types/api'
+import type { UpdateInventoryRequest, LowStockAlert } from '../types/api'
 import type { ApiResponse } from '../../../lib/api/types/api.types'
 import { unwrapResponse } from '../../../lib/api/base/apiResponseAdapter'
 
@@ -41,6 +41,16 @@ export class InventoryApiService extends BaseApiService<
       data
     )
     return unwrapResponse(response)
+  }
+  /**
+   * GET low stock alerts
+   * Backend endpoint: GET /api/admin/inventory/low-stock
+   */
+  async getLowStockAlerts(): Promise<LowStockAlert[]> {
+    const response = await this.axios.get<ApiResponse<LowStockAlert[]>>(
+      API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_LOW_STOCK
+    );
+    return unwrapResponse(response);
   }
 }
 
