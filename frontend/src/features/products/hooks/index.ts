@@ -20,4 +20,5 @@ export {
 export { useProductsWithRouter } from './useProductsWithRouter';
 export { useProductsLocal } from './useProductsLocal';
 export type { ProductFilters } from './useProductsLocal';
+export { useProductManagementPage } from './useProductManagementPage';
 

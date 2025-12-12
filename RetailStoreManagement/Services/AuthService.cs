@@ -84,7 +84,7 @@ public class AuthService : IAuthService
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpirationInMinutes"]!)),
+            expires: DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["AccessTokenExpirationInMinutes"]!)),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -92,6 +92,8 @@ public class AuthService : IAuthService
 
     private async Task<Entities.UserRefreshToken> GenerateRefreshToken(UserEntity user)
     {
+        var jwtSettings = _configuration.GetSection("JwtSettings");
+        
         var randomNumber = new byte[32];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
@@ -101,7 +103,7 @@ public class AuthService : IAuthService
         {
             UserId = user.Id,
             Token = refreshToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(1),
+            ExpiresAt = DateTime.UtcNow.AddDays(int.Parse(jwtSettings["RefreshTokenExpirationInMinutes"]!)),
             IsRevoked = false
         };
 
@@ -138,19 +140,14 @@ public class AuthService : IAuthService
                 return ApiResponse<LoginResponse>.Error("Invalid client request", 400);
             }
 
-            // Revoke the old refresh token
-            refreshToken.IsRevoked = true;
-
             // Generate new tokens
             var newAccessToken = GenerateJwtToken(user);
-            var newRefreshToken = await GenerateRefreshToken(user);
 
             var userDto = _mapper.Map<UserDto>(user);
 
             var response = new LoginResponse
             {
                 Token = newAccessToken,
-                RefreshToken = newRefreshToken.Token,
                 User = userDto
             };
 

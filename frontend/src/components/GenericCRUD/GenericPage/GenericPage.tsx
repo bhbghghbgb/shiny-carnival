@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Alert, Button, Form, Input, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
+import { Alert, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { ColumnsType, TablePaginationConfig, TableProps, ColumnType, ColumnGroupType } from 'antd/es/table'
 import type { GenericPageConfig } from './GenericPageConfig'
+import { DropDownWithFilter } from '../../common/DropDownWithFilter'
 
 type Order = 'ascend' | 'descend' | undefined
 
@@ -108,7 +109,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                     )}
                     {actions.includes('delete') && (
                         <Popconfirm
-                            title="Xóa người dùng?"
+                            title="Xác nhận xóa"
                             okText="Xóa"
                             cancelText="Hủy"
                             onConfirm={() => handleDelete(record)}
@@ -242,6 +243,40 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                         rules={field.rules}
                     >
                         <Input.Password placeholder={field.placeholder} />
+                    </Form.Item>
+                )
+            }
+
+            if (field.type === 'number') {
+                return (
+                    <Form.Item
+                        key={field.name}
+                        label={field.label}
+                        name={fieldName}
+                        rules={field.rules}
+                    >
+                        <InputNumber
+                            style={{ width: '100%' }}
+                            placeholder={field.placeholder}
+                        />
+                    </Form.Item>
+                )
+            }
+
+            if (field.type === 'remote-select' && field.fetchOptions) {
+                return (
+                    <Form.Item
+                        key={field.name}
+                        label={field.label}
+                        name={fieldName}
+                        rules={field.rules}
+                    >
+                        <DropDownWithFilter
+                            placeholder={field.placeholder}
+                            fetchOptions={field.fetchOptions}
+                            queryKeyPrefix={field.queryKeyPrefix || field.name}
+                            fetchOnEmpty={field.fetchOnEmpty}
+                        />
                     </Form.Item>
                 )
             }

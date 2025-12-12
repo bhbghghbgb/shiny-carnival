@@ -2,46 +2,55 @@ import { z } from 'zod';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
 import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { CategoryManagementPage } from '../../../../../features/categories/pages/CategoryManagementPage';
-import { categories as mockCategories } from '../../../../../_mocks/categories';
+import { categoryApiService } from '../../../../../features/categories/api';
 import type { CategoryEntity } from '../../../../../features/categories/types/entity';
-import { createQueryKeys } from '../../../../../lib/query/queryOptionsFactory';
+import type { PagedRequest } from '../../../../../lib/api/types/api.types';
+import { createPaginatedQueryOptions } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
-// --------------------------
 
 const categorySearchSchema = baseSearchSchema.extend({
-  // parentId: z.string().optional(),
-  // level: z.number().optional(),
-  // isActive: z.boolean().optional(),
+  sortField: z.string().catch('id'),
+  sortOrder: z.enum(['ascend', 'descend']).catch('descend'),
 });
 
 export type CategorySearch = z.infer<typeof categorySearchSchema>;
 
+function buildPagedRequest(search: CategorySearch): PagedRequest {
+  return {
+    page: search.page || 1,
+    pageSize: search.pageSize || 10,
+    search: search.search,
+    sortBy: search.sortField === 'categoryName' ? 'CategoryName' : 'Id',
+    sortDesc: search.sortOrder === 'descend',
+  };
+}
+
 async function fetchCategories(ctx: LoaderContext<Record<string, never>, CategorySearch, { queryClient: QueryClient }>): Promise<{ categories: CategoryEntity[]; total: number }> {
   const { search, context } = ctx;
-  const queryKeys = createQueryKeys('categories');
-  const queryOpts = queryOptions<{ categories: CategoryEntity[]; total: number }>({
-    queryKey: [...queryKeys.lists(), 'mock', search],
-    queryFn: async () => {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      return {
-        categories: mockCategories,
-        total: mockCategories.length,
-      };
-    },
-  });
+  const params = buildPagedRequest(search);
 
-  const data = await context.queryClient.ensureQueryData(queryOpts);
-  return data;
+  const categoriesQueryOptions = createPaginatedQueryOptions<CategoryEntity>(
+    'categories',
+    categoryApiService,
+    params,
+  );
+
+  const data = await context.queryClient.ensureQueryData(categoriesQueryOptions);
+
+  return {
+    categories: data.items || [],
+    total: data.totalCount || (data.items ? data.items.length : 0),
+  };
 }
 
 // 2. Tạo "Bản thiết kế" cho trang quản trị
 // ----------------------------------------
 
 export const categoryAdminDefinition: ManagementRouteDefinition<
-  { categories: CategoryEntity[]; total: number },     // Kiểu loader data
-  CategorySearch,         // Kiểu search params
-  { queryClient: QueryClient }      // Kiểu router context
+  { categories: CategoryEntity[]; total: number },
+  CategorySearch,
+  { queryClient: QueryClient }
 > = {
   entityName: 'Danh mục',
   path: 'categories',
@@ -49,3 +58,8 @@ export const categoryAdminDefinition: ManagementRouteDefinition<
   searchSchema: categorySearchSchema,
   loader: (ctx) => fetchCategories(ctx),
 };
+
+export function createCategoriesQueryOptions(search: CategorySearch) {
+  const params = buildPagedRequest(search);
+  return createPaginatedQueryOptions<CategoryEntity>('categories', categoryApiService, params);
+}
