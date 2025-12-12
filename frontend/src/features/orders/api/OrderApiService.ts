@@ -15,6 +15,13 @@ export class OrderApiService extends BaseApiService<
       axiosInstance: axiosClient,
     })
   }
+
+  /**
+   * Update status với endpoint đặc biệt: PATCH /api/admin/orders/{id}/status
+   */
+  async updateStatus(id: number, data: UpdateOrderStatusRequest): Promise<OrderEntity> {
+    return this.custom<OrderEntity>('patch', `${id}/status`, data)
+  }
 }
 
 export const orderApiService = new OrderApiService()

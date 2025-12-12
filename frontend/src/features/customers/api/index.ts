@@ -1,4 +1,2 @@
-// Export tất cả API functions và types cho Customers feature
-export * from './customerApi';
+// Export API service (kiến trúc mới)
 export * from './CustomerApiService';
-export { default as customerApi } from './customerApi';

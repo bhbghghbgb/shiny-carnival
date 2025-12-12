@@ -1,4 +1,2 @@
-// Export tất cả API functions và types cho Inventory feature
-export * from './inventoryApi';
+// Export API service (kiến trúc mới)
 export * from './InventoryApiService';
-export { default as inventoryApi } from './inventoryApi';

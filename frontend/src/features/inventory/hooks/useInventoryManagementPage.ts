@@ -111,7 +111,7 @@ export const useInventoryManagementPage = () => {
     }
 
     const handleUpdate = async (record: InventoryEntity, values: UpdateInventoryRequest) => {
-        await updateInventory.mutateAsync({ id: record.productId, data: values })
+        await updateInventory.mutateAsync({ productId: record.productId, data: values })
     }
 
     return {

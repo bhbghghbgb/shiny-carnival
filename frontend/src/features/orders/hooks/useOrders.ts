@@ -3,12 +3,13 @@ import {
   useApiPaginated,
   useApiDetail,
   useApiCreate,
-  useApiUpdate,
 } from '../../../hooks/useApi';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderApiService } from '../api/OrderApiService';
 import type { OrderEntity } from '../types/entity';
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api';
-import type { PagedList, PagedRequest } from '../../../lib/api/types/api.types';
+import type { PagedRequest } from '../../../lib/api/types/api.types';
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory';
 
 const ENTITY = 'orders';
 
@@ -58,12 +59,34 @@ export const useCreateOrder = (options?: Parameters<typeof useApiCreate<OrderEnt
 
 /**
  * useUpdateOrderStatus - PATCH update order status
+ * Sử dụng custom endpoint: PATCH /api/admin/orders/{id}/status
  */
-export const useUpdateOrderStatus = (options?: Parameters<typeof useApiUpdate<OrderEntity, UpdateOrderStatusRequest>>[0]['options']) => {
-  return useApiUpdate<OrderEntity, UpdateOrderStatusRequest>({
-    apiService: orderApiService,
-    entity: ENTITY,
-    options,
+export const useUpdateOrderStatus = (options?: {
+  onSuccess?: (data: OrderEntity) => void;
+  onError?: (error: Error) => void;
+}) => {
+  const queryClient = useQueryClient();
+  const queryKeys = createQueryKeys(ENTITY);
+
+  const { onSuccess: userOnSuccess, onError: userOnError } = options || {};
+
+  return useMutation<OrderEntity, Error, { id: number; data: UpdateOrderStatusRequest }>({
+    mutationFn: async ({ id, data }) => {
+      // Sử dụng method đặc biệt của OrderApiService (dựa trên BaseApiService.custom)
+      return orderApiService.updateStatus(id, data);
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate list queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.list() });
+      // invalidate paginated (list() đã đủ cho pattern hiện tại)
+      // Invalidate detail query
+      queryClient.invalidateQueries({ queryKey: queryKeys.detail(variables.id) });
+      
+      userOnSuccess?.(data);
+    },
+    onError: (error) => {
+      userOnError?.(error);
+    },
   });
 };
 
