@@ -2,15 +2,47 @@
 import { type RouteComponent, type RouteOptions } from '@tanstack/react-router'
 // Import các kiểu dữ liệu cần thiết, bao gồm cả kiểu phân cấp mới
 import {
-    type ModuleRouteConfig,
-    type HierarchicalModuleRouteConfig, // Import kiểu mới
-    baseSearchSchema,
-    type BaseSearch,
-    type ManagementRouteDefinition,
-    type CrudModuleDefinition,
-} from '../type/types'
-import { PendingComponent } from '../../../components/feedback/PendingComponent'
-import { ErrorComponent } from '../../../components/feedback/ErrorComponent'
+  type ModuleRouteConfig,
+  type HierarchicalModuleRouteConfig, // Import kiểu mới
+  baseSearchSchema,
+  type BaseSearch,
+  type ManagementRouteDefinition,
+  type CrudModuleDefinition,
+} from '../type/types';
+import { PendingComponent } from '../../../components/feedback/PendingComponent';
+import { ErrorComponent } from '../../../components/feedback/ErrorComponent';
+
+/**
+ * Helper function để tự động thêm basePath vào path tương đối
+ * @param basePath - Base path của module (ví dụ: 'customers')
+ * @param relativePath - Path tương đối (ví dụ: 'create', '$id', '$id/edit')
+ * @returns Path đầy đủ
+ *
+ * @example
+ * resolvePath('customers', 'create') → 'customers/create'
+ * resolvePath('customers', '$id') → 'customers/$id'
+ * resolvePath('customers', '$id/edit') → 'customers/$id/edit'
+ * resolvePath('customers', 'customers') → 'customers' (không duplicate)
+ */
+function resolvePath(basePath: string, relativePath: string): string {
+  // Nếu relativePath là chính basePath → trả về nguyên
+  if (relativePath === basePath) {
+    return basePath;
+  }
+
+  // Nếu relativePath bắt đầu bằng '/' → absolute path, trả về nguyên
+  if (relativePath.startsWith('/')) {
+    return relativePath;
+  }
+
+  // Nếu relativePath đã chứa basePath → trả về nguyên (tránh duplicate)
+  if (relativePath.startsWith(`${basePath}/`)) {
+    return relativePath;
+  }
+
+  // Trường hợp còn lại: thêm basePath vào đầu
+  return `${basePath}/${relativePath}`;
+}
 
 // Hàm helper để tạo config, giờ đây trả về kiểu phân cấp
 function createHierarchicalRouteConfig<
@@ -47,86 +79,86 @@ function createHierarchicalRouteConfig<
 }
 
 /**
- * Tạo ra một cấu trúc config PHÂN CẤP cho một module CRUD.
- * Trả về một mảng chỉ chứa một config gốc (của trang list),
- * config này sẽ chứa các trang detail, create, edit bên trong thuộc tính `children`.
+ * Tạo ra một cấu trúc config FLAT (không nested) cho một module CRUD.
+ * Trả về một mảng chứa TẤT CẢ các routes ngang hàng nhau (list, create, detail, edit).
+ * Mỗi route là độc lập, không phụ thuộc vào route cha.
  */
-export function generateCRUDRoutes<
-    TListLoaderData,
-    TDetailLoaderData,
-    TListSearch extends BaseSearch,
-    TDetailParams extends { id: string },
-    TRouterContext,
+export function generateCRUDRoutesConfigs<
+  TListLoaderData,
+  TDetailLoaderData,
+  TListSearch extends BaseSearch,
+  TDetailParams extends { id: string },
+  TRouterContext
 >(
-    definition: CrudModuleDefinition<
-        TListLoaderData,
-        TDetailLoaderData,
-        TListSearch,
-        TDetailParams,
-        TRouterContext
-    >,
-    customRouteConfigs: {
-        list?: Partial<RouteOptions<any>>
-        detail?: Partial<RouteOptions<any>>
-        create?: Partial<RouteOptions<any>>
-        edit?: Partial<RouteOptions<any>>
-    } = {}
+  definition: CrudModuleDefinition<TListLoaderData, TDetailLoaderData, TListSearch, TDetailParams, TRouterContext>,
+  customRouteConfigs: {
+    list?: Partial<RouteOptions<any>>;
+    detail?: Partial<RouteOptions<any>>;
+    create?: Partial<RouteOptions<any>>;
+    edit?: Partial<RouteOptions<any>>;
+  } = {}
 ): HierarchicalModuleRouteConfig[] {
-    // Kiểu trả về là config phân cấp
-    const { entityName, basePath, components, loaders, searchSchemas } =
-        definition
+  const { entityName, basePath, components, loaders, searchSchemas } = definition;
 
-    // 1. Định nghĩa config cho từng trang - TẤT CẢ NGANG HÀNG NHAU
-    const listConfig = createHierarchicalRouteConfig(
-        {
-            path: basePath, // /orders
-            component: components.list,
-            searchSchema: searchSchemas.list,
-            loader: loaders.list,
-            meta: { title: `Quản lý ${entityName}`, requiresAuth: true },
-        },
-        customRouteConfigs.list
-    )
+  // 1. List Route - Độc lập
+  const listConfig = createHierarchicalRouteConfig(
+    {
+      path: basePath, // 'customers'
+      component: components.list,
+      searchSchema: searchSchemas.list,
+      loader: loaders.list,
+      meta: { title: `Quản lý ${entityName}`, requiresAuth: true },
+      // ✅ KHÔNG có children
+    },
+    customRouteConfigs.list
+  );
 
-    const createConfig = createHierarchicalRouteConfig(
-        {
-            path: `${basePath}/create`, // /orders/create
-            component: components.create,
-            meta: { title: `Tạo ${entityName} mới`, requiresAuth: true },
-        },
-        customRouteConfigs.create
-    )
+  // 2. Create Route - Độc lập, sử dụng resolvePath
+  const createConfig = createHierarchicalRouteConfig(
+    {
+      path: resolvePath(basePath, 'create'), // ✅ Tự động thành 'customers/create'
+      component: components.create,
+      meta: { title: `Tạo ${entityName} mới`, requiresAuth: true },
+      // ✅ KHÔNG có children
+    },
+    customRouteConfigs.create
+  );
 
-    const detailConfig = createHierarchicalRouteConfig(
-        {
-            path: `${basePath}/$id`, // /orders/$id
-            component: components.detail,
-            loader: loaders.detail,
-            meta: { title: `Chi tiết ${entityName}`, requiresAuth: true },
-        },
-        customRouteConfigs.detail
-    )
+  // 3. Detail Route - Độc lập, sử dụng resolvePath
+  const detailConfig = createHierarchicalRouteConfig(
+    {
+      path: resolvePath(basePath, '$id'), // ✅ Tự động thành 'customers/$id'
+      component: components.detail,
+      loader: loaders.detail,
+      meta: { title: `Chi tiết ${entityName}`, requiresAuth: true },
+      // ✅ KHÔNG có children
+    },
+    customRouteConfigs.detail
+  );
 
-    const editConfig = createHierarchicalRouteConfig(
-        {
-            path: `${basePath}/$id/edit`, // /orders/$id/edit
-            component: components.edit,
-            meta: { title: `Chỉnh sửa ${entityName}`, requiresAuth: true },
-        },
-        customRouteConfigs.edit
-    )
+  // 4. Edit Route - Độc lập, sử dụng resolvePath
+  const editConfig = createHierarchicalRouteConfig(
+    {
+      path: resolvePath(basePath, '$id/edit'), // ✅ Tự động thành 'customers/$id/edit'
+      component: components.edit,
+      loader: loaders.detail, // ✅ Có thể dùng lại loader của detail
+      meta: { title: `Chỉnh sửa ${entityName}`, requiresAuth: true },
+      // ✅ KHÔNG có children
+    },
+    customRouteConfigs.edit
+  );
 
-    // 2. Trả về TẤT CẢ routes ngang hàng nhau
-    return [listConfig, createConfig, detailConfig, editConfig]
+  // ✅ Trả về TẤT CẢ routes ngang hàng nhau
+  return [listConfig, createConfig, detailConfig, editConfig];
 }
 
 /**
  * Tạo ra config cho một trang quản lý đơn lẻ (không có trang con).
  */
-export function generateManagementRoute<
-    TLoaderData,
-    TSearch extends BaseSearch,
-    TRouterContext,
+export function generateManagementRouteConfigs<
+  TLoaderData,
+  TSearch extends BaseSearch,
+  TRouterContext
 >(
     definition: ManagementRouteDefinition<TLoaderData, TSearch, TRouterContext>,
     customRouteConfig: Partial<RouteOptions<any>> = {}
@@ -148,5 +180,18 @@ export function generateManagementRoute<
     return [adminConfig]
 }
 
-// Hàm `createLayoutRoute` trong kế hoạch cũ không còn cần thiết
-// trong kiến trúc này và có thể được xóa bỏ an toàn.
+// ============================================================================
+// Export Aliases - Để tương thích với code cũ
+// ============================================================================
+
+/**
+ * Alias cho generateCRUDRoutesConfigs
+ * @deprecated Sử dụng generateCRUDRoutesConfigs thay thế
+ */
+export const generateCRUDRoutes = generateCRUDRoutesConfigs;
+
+/**
+ * Alias cho generateManagementRouteConfigs
+ * @deprecated Sử dụng generateManagementRouteConfigs thay thế
+ */
+export const generateManagementRoute = generateManagementRouteConfigs;

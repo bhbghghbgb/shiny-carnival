@@ -1,27 +1,18 @@
 import { Card, Row, Col, Statistic } from 'antd'
-import {
-    ShoppingOutlined,
-    CheckCircleOutlined,
-    ClockCircleOutlined,
-    CloseCircleOutlined,
-} from '@ant-design/icons'
+import { ShoppingCartOutlined, DollarOutlined } from '@ant-design/icons'
 
 interface OrderStatisticsProps {
     totalOrders: number
-    pendingCount: number
-    paidCount: number
-    canceledCount: number
+    totalRevenue: number | string
 }
 
 export const OrderStatistics = ({
     totalOrders,
-    pendingCount,
-    paidCount,
-    canceledCount,
+    totalRevenue,
 }: OrderStatisticsProps) => {
     return (
         <Row gutter={16}>
-            <Col span={6}>
+            <Col span={12}>
                 <Card
                     style={{
                         borderRadius: '12px',
@@ -32,14 +23,12 @@ export const OrderStatistics = ({
                     <Statistic
                         title="Tổng đơn hàng (trên bảng)"
                         value={totalOrders}
-                        prefix={
-                            <ShoppingOutlined style={{ color: '#1890ff' }} />
-                        }
+                        prefix={<ShoppingCartOutlined style={{ color: '#1890ff' }} />}
                         valueStyle={{ color: '#1890ff' }}
                     />
                 </Card>
             </Col>
-            <Col span={6}>
+            <Col span={12}>
                 <Card
                     style={{
                         borderRadius: '12px',
@@ -48,51 +37,20 @@ export const OrderStatistics = ({
                     }}
                 >
                     <Statistic
-                        title="Chờ xử lý (trên bảng)"
-                        value={pendingCount}
-                        prefix={
-                            <ClockCircleOutlined style={{ color: '#faad14' }} />
-                        }
-                        valueStyle={{ color: '#faad14' }}
-                    />
-                </Card>
-            </Col>
-            <Col span={6}>
-                <Card
-                    style={{
-                        borderRadius: '12px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                        border: 'none',
-                    }}
-                >
-                    <Statistic
-                        title="Đã thanh toán (trên bảng)"
-                        value={paidCount}
-                        prefix={
-                            <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                        }
+                        title="Tổng doanh thu"
+                        value={typeof totalRevenue === 'number' ? totalRevenue : 'Chờ API'}
+                        prefix={<DollarOutlined style={{ color: '#52c41a' }} />}
                         valueStyle={{ color: '#52c41a' }}
-                    />
-                </Card>
-            </Col>
-            <Col span={6}>
-                <Card
-                    style={{
-                        borderRadius: '12px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                        border: 'none',
-                    }}
-                >
-                    <Statistic
-                        title="Đã hủy (trên bảng)"
-                        value={canceledCount}
-                        prefix={
-                            <CloseCircleOutlined style={{ color: '#ff4d4f' }} />
-                        }
-                        valueStyle={{ color: '#ff4d4f' }}
+                        formatter={(value) => {
+                            if (typeof value === 'number') {
+                                return `${value.toLocaleString()} đ`
+                            }
+                            return value
+                        }}
                     />
                 </Card>
             </Col>
         </Row>
     )
 }
+

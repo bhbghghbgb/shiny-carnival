@@ -1,6 +1,7 @@
-import axiosClient, { type ApiResponse, tokenUtils } from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
-import type {LoginRequest, LoginResponse} from "../types/api.ts";
+import axiosClient from '../../../lib/api/axios.ts';
+import { API_CONFIG } from '../../../config/api.config.ts';
+import type { LoginRequest, LoginResponse } from "../types/api.ts";
+import type { ApiResponse } from '../../../lib/api/types/api.types';
 
 // Auth API functions
 export const authApi = {
@@ -9,23 +10,18 @@ export const authApi = {
    */
   login: async (credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
+      // Interceptor đã unwrap response.data, nên response đã là ApiResponse
       const response = await axiosClient.post<ApiResponse<LoginResponse>>(
         API_CONFIG.ENDPOINTS.AUTH.LOGIN,
         credentials
-      );
+      ) as unknown as ApiResponse<LoginResponse>;
 
-      // Lưu tokens vào localStorage nếu đăng nhập thành công
-      if (!response.data.isError && response.data.data) {
-        tokenUtils.setToken(response.data.data.token);
-        // Note: Refresh token sẽ được implement khi backend hỗ trợ
-        // tokenUtils.setRefreshToken(response.data.data.refreshToken);
-      }
-
-      return response.data;
-    } catch (error: any) {
+      return response;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Đăng nhập thất bại';
       throw {
         isError: true,
-        message: error.message || 'Đăng nhập thất bại',
+        message: errorMessage,
         data: null,
         timestamp: new Date().toISOString()
       };
@@ -34,26 +30,22 @@ export const authApi = {
 
   /**
    * Refresh access token
+   * Gửi accessToken và refreshToken trong body theo swagger spec
    */
-  refreshToken: async (refreshToken: string): Promise<ApiResponse<LoginResponse>> => {
+  refreshToken: async (): Promise<ApiResponse<LoginResponse>> => {
     try {
+      // Backend đọc refresh token từ HttpOnly cookie
       const response = await axiosClient.post<ApiResponse<LoginResponse>>(
         API_CONFIG.ENDPOINTS.AUTH.REFRESH,
-        { refreshToken }
-      );
+        {}
+      ) as unknown as ApiResponse<LoginResponse>;
 
-      // Cập nhật token mới nếu refresh thành công
-      if (!response.data.isError && response.data.data) {
-        tokenUtils.setToken(response.data.data.token);
-      }
-
-      return response.data;
-    } catch (error: any) {
-      // Nếu refresh token thất bại, xóa tất cả tokens
-      tokenUtils.clearAllTokens();
+      return response;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Refresh token thất bại';
       throw {
         isError: true,
-        message: error.message || 'Refresh token thất bại',
+        message: errorMessage,
         data: null,
         timestamp: new Date().toISOString()
       };
@@ -62,59 +54,75 @@ export const authApi = {
 
   /**
    * Đăng xuất người dùng
+   * Backend sẽ đọc refresh token từ cookie và xóa cookies
    */
   logout: async (): Promise<void> => {
     try {
-      // Gọi API logout nếu backend hỗ trợ
-      await axiosClient.post(API_CONFIG.ENDPOINTS.AUTH.LOGOUT);
+      // Backend đọc refresh token từ HttpOnly cookie
+      await axiosClient.post(
+        API_CONFIG.ENDPOINTS.AUTH.LOGOUT,
+        {}
+      );
     } catch (error) {
       // Bỏ qua lỗi từ server khi logout
       console.warn('Logout API failed:', error);
     } finally {
-      // Luôn xóa tokens khỏi localStorage
-      tokenUtils.clearAllTokens();
+      // Không cần xử lý token client-side vì BE quản lý qua cookies
+    }
+    // Cookies được xóa bởi backend
+  },
+
+  /**
+   * Setup Admin đầu tiên (chỉ hoạt động khi chưa có Admin nào)
+   */
+  setupAdmin: async (userData: {
+    username: string;
+    password: string;
+    fullName: string;
+    role: number;
+  }): Promise<ApiResponse<LoginResponse['user']>> => {
+    try {
+      // Interceptor đã unwrap response.data, nên response đã là ApiResponse
+      const response = await axiosClient.post<ApiResponse<LoginResponse['user']>>(
+        API_CONFIG.ENDPOINTS.AUTH.SETUP_ADMIN,
+        userData
+      ) as unknown as ApiResponse<LoginResponse['user']>;
+      return response;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Không thể tạo tài khoản Admin';
+      throw {
+        isError: true,
+        message: errorMessage,
+        data: null,
+        timestamp: new Date().toISOString()
+      };
     }
   },
 
   /**
    * Kiểm tra trạng thái đăng nhập
+   * Với httpOnly cookies, không thể đọc token từ frontend
+   * Nên cần lưu user info trong memory/context sau khi login
+   * Hoặc gọi API /me để check auth status
    */
   isAuthenticated: (): boolean => {
-    const token = tokenUtils.getToken();
-    if (!token) return false;
-
-    try {
-      // Kiểm tra token có hết hạn không (decode JWT payload)
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const currentTime = Date.now() / 1000;
-      
-      return payload.exp > currentTime;
-    } catch (error) {
-      // Token không hợp lệ
-      tokenUtils.clearAllTokens();
-      return false;
-    }
+    // Với httpOnly cookies, không thể check token từ frontend
+    // Cần implement endpoint /me hoặc lưu user info trong context
+    // Tạm thời return true nếu có user info trong memory
+    // TODO: Implement proper auth check via API endpoint
+    return false; // Sẽ được implement sau với user context
   },
 
   /**
    * Lấy thông tin user từ token
+   * Với httpOnly cookies, không thể đọc token từ frontend
+   * Cần lưu user info trong memory/context sau khi login
    */
   getCurrentUser: (): LoginResponse['user'] | null => {
-    const token = tokenUtils.getToken();
-    if (!token) return null;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return {
-        id: payload.sub || payload.userId,
-        username: payload.username,
-        fullName: payload.fullName,
-        role: payload.role
-      };
-    } catch (error) {
-      console.error('Error parsing token:', error);
-      return null;
-    }
+    // Với httpOnly cookies, không thể đọc token từ frontend
+    // Cần lưu user info trong React Context/State sau khi login
+    // TODO: Implement user context/store
+    return null; // Sẽ được implement sau với user context
   },
 
   /**
@@ -126,7 +134,7 @@ export const authApi = {
 
     // Admin (role 0) có tất cả quyền
     if (user.role === API_CONFIG.USER_ROLES.ADMIN) return true;
-    
+
     // Kiểm tra role cụ thể
     return user.role === requiredRole;
   },

@@ -9,7 +9,7 @@ export const homeRoutes: ModuleRoutes<any> = {
   basePath: '/',
   routes: [
     {
-      path: '/',
+      path: '', // Index route - sẽ match path của parent (mainLayoutRoute có path '/')
       component: HomePage,
       pendingComponent: PendingComponent,
       errorComponent: ErrorComponent,

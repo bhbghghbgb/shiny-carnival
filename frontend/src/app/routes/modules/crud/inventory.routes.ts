@@ -1,4 +1,4 @@
-import { generateCRUDRoutes } from '../../utils/routeHelpers';
+import { generateCRUDRoutesConfigs } from '../../utils/routeHelpers';
 import { inventoryModuleDefinition } from './definition/inventory.definition';
 import type { ModuleRoutes } from '../../type/types';
 
@@ -10,7 +10,7 @@ export const inventoryRoutes: any = {};
 const generatedModule: ModuleRoutes<any> = {
   moduleName: 'inventory',
   basePath: '/inventory',
-  routes: generateCRUDRoutes(inventoryModuleDefinition),
+  routes: generateCRUDRoutesConfigs(inventoryModuleDefinition),
 };
 
 // Gán các thuộc tính từ config đã tạo vào object tạm thời

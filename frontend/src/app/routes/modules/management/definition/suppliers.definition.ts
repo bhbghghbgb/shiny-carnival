@@ -1,31 +1,46 @@
 import { z } from 'zod';
-import { baseSearchSchema, type ManagementRouteDefinition } from '../../../type/types';
+import { queryOptions, type QueryClient } from '@tanstack/react-query';
+import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { SupplierManagementPage } from '../../../../../features/suppliers/pages/SupplierManagementPage';
-import { suppliers as mockSuppliers } from '../../../../../_mocks/suppliers';
+import { supplierApiService } from '../../../../../features/suppliers/api';
+import type { SupplierEntity } from '../../../../../features/suppliers/types/entity';
+import type { PagedRequest } from '../../../../../lib/api/types/api.types';
+import { createPaginatedQueryOptions } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
-// --------------------------
-
-interface SupplierLoaderData {
-  suppliers: (typeof mockSuppliers);
-  total: number;
-}
 
 const supplierSearchSchema = baseSearchSchema.extend({
-  // country: z.string().optional(),
-  // rating: z.number().min(1).max(5).optional(),
-  // isVerified: z.boolean().optional(),
+  sortField: z.string().catch('id'),
+  sortOrder: z.enum(['ascend', 'descend']).catch('descend'),
 });
 
 export type SupplierSearch = z.infer<typeof supplierSearchSchema>;
 
-async function fetchSuppliers(search: SupplierSearch): Promise<SupplierLoaderData> {
-  console.log('Fetching suppliers with filters:', search);
-  // Giả lập gọi API
-  await new Promise(resolve => setTimeout(resolve, 200));
+function buildPagedRequest(search: SupplierSearch): PagedRequest {
   return {
-    suppliers: mockSuppliers,
-    total: mockSuppliers.length,
+    page: search.page || 1,
+    pageSize: search.pageSize || 10,
+    search: search.search,
+    sortBy: search.sortField === 'name' ? 'Name' : 'Id',
+    sortDesc: search.sortOrder === 'descend',
+  };
+}
+
+async function fetchSuppliers(ctx: LoaderContext<Record<string, never>, SupplierSearch, { queryClient: QueryClient }>): Promise<{ suppliers: SupplierEntity[]; total: number }> {
+  const { search, context } = ctx;
+  const params = buildPagedRequest(search);
+
+  const suppliersQueryOptions = createPaginatedQueryOptions<SupplierEntity>(
+    'suppliers',
+    supplierApiService,
+    params,
+  );
+
+  const data = await context.queryClient.ensureQueryData(suppliersQueryOptions);
+
+  return {
+    suppliers: data.items || [],
+    total: data.totalCount || (data.items ? data.items.length : 0),
   };
 }
 
@@ -33,13 +48,18 @@ async function fetchSuppliers(search: SupplierSearch): Promise<SupplierLoaderDat
 // ----------------------------------------
 
 export const supplierAdminDefinition: ManagementRouteDefinition<
-  SupplierLoaderData,     // Kiểu loader data
-  SupplierSearch,         // Kiểu search params
-  { apiClient: never }      // Kiểu router context (ví dụ)
+  { suppliers: SupplierEntity[]; total: number },
+  SupplierSearch,
+  { queryClient: QueryClient }
 > = {
   entityName: 'Nhà cung cấp',
   path: 'suppliers',
   component: SupplierManagementPage,
   searchSchema: supplierSearchSchema,
-  loader: ({ search }) => fetchSuppliers(search),
+  loader: (ctx) => fetchSuppliers(ctx),
 };
+
+export function createSuppliersQueryOptions(search: SupplierSearch) {
+  const params = buildPagedRequest(search);
+  return createPaginatedQueryOptions<SupplierEntity>('suppliers', supplierApiService, params);
+}

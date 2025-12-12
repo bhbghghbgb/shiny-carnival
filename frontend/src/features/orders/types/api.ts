@@ -1,5 +1,5 @@
-import type { PagedRequest } from '../../../lib/axios';
-import type { OrderStatus } from '../../../config/api';
+import type { PagedRequest } from '../../../lib/api/axios';
+import type { OrderStatus } from '../../../config/api.config';
 
 export interface CreateOrderRequest {
   customerId: number;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { userApi } from '../../users/api';
+import { userApiService } from '../../users/api';
 import type { CreateUserRequest } from '../../users/types/api';
 import RegisterForm from '../components/RegisterForm';
 
@@ -7,13 +7,12 @@ export const RegisterPage: React.FC = () => {
   // const { setSelectedUser } = useUserActions();
 
   const handleRegister = async (data: CreateUserRequest) => {
-    // Gọi API tạo user
-    const response = await userApi.createUser(data);
-    if (response.isError) throw new Error(response.message);
+    // Gọi API tạo user (userApiService.create tự động unwrap ApiResponse)
+    const user = await userApiService.create(data);
     // Lưu user vào store
-    // setSelectedUser(response.data);
+    // setSelectedUser(user);
     // TODO: Có thể redirect hoặc show toast thành công
-    console.log("Đăng ký thành công:", response.data);
+    console.log("Đăng ký thành công:", user);
   };
 
   const roles = [

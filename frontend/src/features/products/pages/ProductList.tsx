@@ -1,24 +1,25 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
 import { Row, Col, Typography } from 'antd';
 import ProductCard from '../components/ProductCard';
-import type {ProductEntity} from "../product.ts";
-import { productService } from '../api/productService';
+import type { ProductEntity } from '../types/entity';
+import { useProducts } from '../hooks';
 
 const { Title } = Typography;
 
 const ProductList: React.FC = () => {
-  const [products, setProducts] = useState<ProductEntity[]>([]);
+  const { data: products, isLoading } = useProducts();
 
-    useEffect(() => {
-        // Mock
-        const fetchProducts = async () => {
-            const data = await productService.getProducts() as ProductEntity[];
-            setProducts(data);
-            console.log("Products: " + data);
-        };
-        fetchProducts();
-    }, []);
+  if (isLoading) {
+    return (
+      <section style={{ marginTop: 24 }}>
+        <Title level={3} style={{ marginBottom: 24 }}>
+          Danh sách sản phẩm
+        </Title>
+        <div>Đang tải...</div>
+      </section>
+    );
+  }
+
   return (
     <section style={{ marginTop: 24 }}>
       <Title level={3} style={{ marginBottom: 24 }}>
@@ -26,7 +27,7 @@ const ProductList: React.FC = () => {
       </Title>
 
       <Row gutter={[16, 16]}>
-        {products.map((product) => (
+        {products?.map((product) => (
           <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
             <ProductCard product={product} />
           </Col>

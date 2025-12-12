@@ -1,7 +1,7 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import React from "react";
-import { useLoginPage } from "../hooks/loginPage";
+import { useLoginPage } from "../hooks/useloginPage";
 
 /**
  * Component form đăng nhập, dùng hook riêng để tách logic

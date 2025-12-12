@@ -1,7 +1,7 @@
-import type { UserRole } from '../../../config/api';
-import type {BaseEntity} from "../../../types/base.entity.ts";
+import type { UserRole } from '../../../config/api.config.ts';
+import type { BaseEntity } from "../../../types/base.entity.ts";
 
-interface User extends BaseEntity{
+interface User extends BaseEntity {
   id: number;
   username: string;
   password: string;

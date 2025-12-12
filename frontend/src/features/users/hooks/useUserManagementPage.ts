@@ -1,133 +1,85 @@
+import { getRouteApi, useNavigate, useRouter } from '@tanstack/react-router'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Form, message } from 'antd'
-import { userApi } from '../api/userApi'
-import { Route } from '../../../app/routes/users'
+import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
+import type { UserSearch } from '../../../app/routes/modules/management/definition/users.definition'
+import { createUsersQueryOptions } from '../../../app/routes/modules/management/definition/users.definition'
+import { useCreateUser, useUpdateUser, useDeleteUser } from './useUsers'
+import type { UserNoPass } from '../types/entity'
 
 export const useUserManagementPage = () => {
-    // Lấy dữ liệu và search params từ route context
-    const { data: usersData } = (Route.useLoaderData() || {}) as any
-    const { search } = (Route.useSearch() || {}) as any
-    const navigate = Route.useNavigate()
+    const routeApi = getRouteApi(ENDPOINTS.ADMIN.USERS)
+    const search = routeApi.useSearch()
 
-    const [isModalVisible, setIsModalVisible] = useState(false)
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false)
-    const [editingUser, setEditingUser] = useState<any>(null)
-    const [deletingUser, setDeletingUser] = useState<any>(null)
-    const [form] = Form.useForm()
+    // Sử dụng useSuspenseQuery để lấy data từ TanStack Query cache
+    // Loader đã ensure data có trong cache, nên useSuspenseQuery sẽ không fetch lại
+    const usersQueryOptions = createUsersQueryOptions(search as UserSearch)
+    const { data: pagedList } = useSuspenseQuery(usersQueryOptions)
 
-    // Search, Filter, Sort states (giống Mock page)
-    const [searchText, setSearchText] = useState(search || '')
-    const [roleFilter, setRoleFilter] = useState<number | undefined>(undefined)
-    const [sortField, setSortField] = useState<string>('createdAt')
-    const [sortOrder, setSortOrder] = useState<'ascend' | 'descend'>('descend')
+    // Extract data từ PagedList
+    let usersData: UserNoPass[] = pagedList.items || []
+    const totalUsers = pagedList.totalCount || 0
 
-    const showModal = () => {
-        setEditingUser(null)
-        setIsModalVisible(true)
-        // Reset form completely
-        setTimeout(() => {
-            form.resetFields()
-        }, 0)
+    // Filter theo role ở client-side (backend không hỗ trợ role filter trong query params)
+    const roleFilter = (search as UserSearch | undefined)?.role
+    if (roleFilter !== undefined) {
+        usersData = usersData.filter((user: UserNoPass) => user.role === roleFilter)
+    }
+    const navigate = useNavigate({ from: ENDPOINTS.ADMIN.USERS })
+    const router = useRouter()
+    const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
+    const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
+
+    const parseErrorMessage = (error: unknown) => {
+        if (error instanceof Error) return error.message
+        if (typeof error === 'string') return error
+        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
     }
 
-    const showEditModal = (user: any) => {
-        setEditingUser(user)
-        setIsModalVisible(true)
-        form.setFieldsValue(user)
-    }
+    const createUser = useCreateUser({
+        onSuccess: (data) => {
+            console.log('✅ [CreateUser] Success:', data)
+            router.invalidate()
+            setFormErrorMessage(null)
+        },
+        onError: (error: Error) => {
+            console.error('❌ [CreateUser] Error:', error)
+            setFormErrorMessage(`Tạo user thất bại: ${parseErrorMessage(error)}`)
+        },
+    })
 
-    const showDeleteModal = (user: any) => {
-        setDeletingUser(user)
-        setIsDeleteModalVisible(true)
-    }
+    const updateUser = useUpdateUser({
+        onSuccess: (data) => {
+            console.log('✅ [UpdateUser] Success:', data)
+            router.invalidate()
+            setFormErrorMessage(null)
+        },
+        onError: (error: Error) => {
+            console.error('❌ [UpdateUser] Error:', error)
+            setFormErrorMessage(`Cập nhật user thất bại: ${parseErrorMessage(error)}`)
+        },
+    })
 
-    const handleOk = async () => {
-        try {
-            const values = await form.validateFields()
-            console.log('Form Values: ', values)
+    const deleteUser = useDeleteUser({
+        onSuccess: () => {
+            router.invalidate()
+            setPageErrorMessage(null)
+        },
+        onError: (error: Error) => {
+            console.error('❌ [DeleteUser] Error:', error)
+            setPageErrorMessage(`Xóa user thất bại: ${parseErrorMessage(error)}`)
+        },
+    })
 
-            if (editingUser) {
-                // Update user
-                const response = await userApi.updateUser(
-                    editingUser.id,
-                    values
-                )
-                if (!response.isError && response.data) {
-                    message.success('Cập nhật người dùng thành công!')
-                    // Refresh data by navigating to current page
-                    navigate({ search: (prev) => ({ ...prev }) })
-                } else {
-                    message.error(
-                        response.message || 'Không thể cập nhật người dùng'
-                    )
-                }
-            } else {
-                // Add new user
-                const response = await userApi.createUser(values)
-                if (!response.isError && response.data) {
-                    message.success('Thêm người dùng thành công!')
-                    // Refresh data by navigating to current page
-                    navigate({ search: (prev) => ({ ...prev }) })
-                } else {
-                    message.error(
-                        response.message || 'Không thể tạo người dùng mới'
-                    )
-                }
-            }
-            form.resetFields()
-            setIsModalVisible(false)
-        } catch (error: any) {
-            if (error.errorFields) {
-                // Form validation errors
-                console.log('Validate Failed:', error)
-            } else {
-                // API errors
-                message.error(error.message || 'Có lỗi xảy ra')
-                console.error('API Error:', error)
-            }
-        }
-    }
+    const searchText = search?.search || ''
+    const sortField = (search as UserSearch | undefined)?.sortField || 'createdAt'
+    const sortOrder = (search as UserSearch | undefined)?.sortOrder || 'descend'
+    const page = (search as UserSearch | undefined)?.page || 1
+    const pageSize = (search as UserSearch | undefined)?.pageSize || 10
 
-    const handleDelete = async () => {
-        if (deletingUser) {
-            try {
-                const response = await userApi.deleteUser(deletingUser.id)
-                if (!response.isError && response.data) {
-                    message.success('Xóa người dùng thành công!')
-                    // Refresh data by navigating to current page
-                    navigate({ search: (prev) => ({ ...prev }) })
-                    setIsDeleteModalVisible(false)
-                    setDeletingUser(null)
-                } else {
-                    message.error(
-                        response.message || 'Không thể xóa người dùng'
-                    )
-                }
-            } catch (error: any) {
-                message.error(
-                    error.message || 'Có lỗi xảy ra khi xóa người dùng'
-                )
-                console.error('Delete error:', error)
-            }
-        }
-    }
-
-    const handleCancel = () => {
-        setIsModalVisible(false)
-        setEditingUser(null)
-        form.resetFields()
-    }
-
-    const handleDeleteCancel = () => {
-        setIsDeleteModalVisible(false)
-        setDeletingUser(null)
-    }
-
-    // Search, Filter, Sort handlers (giống Mock page)
     const handleSearch = (value: string) => {
-        setSearchText(value)
         navigate({
-            search: (prev) => ({
+            search: (prev: UserSearch) => ({
                 ...prev,
                 search: value || undefined,
                 page: 1,
@@ -136,64 +88,82 @@ export const useUserManagementPage = () => {
     }
 
     const handleRoleFilter = (value: number | undefined) => {
-        setRoleFilter(value)
-    }
-
-    const handleSort = (field: string, order: 'ascend' | 'descend') => {
-        setSortField(field)
-        setSortOrder(order)
-    }
-
-    const clearFilters = () => {
-        setSearchText('')
-        setRoleFilter(undefined)
-        setSortField('createdAt')
-        setSortOrder('descend')
         navigate({
-            search: (prev) => ({
+            search: (prev: UserSearch) => ({
                 ...prev,
-                search: undefined,
+                role: value,
                 page: 1,
             }),
         })
     }
 
-    // Statistics (tính từ API data)
-    const users = usersData?.items || []
-    const adminCount = users.filter((user: any) => user.role === 0).length
-    const staffCount = users.filter((user: any) => user.role === 1).length
+    const handlePageChange = (nextPage: number, nextPageSize: number) => {
+        navigate({
+            search: (prev: UserSearch) => ({
+                ...prev,
+                page: nextPage,
+                pageSize: nextPageSize,
+            }),
+        })
+    }
+
+    const handleSort = (field: string, order: 'ascend' | 'descend') => {
+        navigate({
+            search: (prev: UserSearch) => ({
+                ...prev,
+                sortField: field,
+                sortOrder: order,
+            }),
+        })
+    }
+
+    const clearFilters = () => {
+        navigate({
+            search: {
+                page: 1,
+                pageSize: 10,
+                search: undefined,
+                role: undefined,
+                sortField: 'createdAt',
+                sortOrder: 'descend',
+            },
+        })
+    }
+
+    // Statistics (tính từ API data - đã được filter/sort ở backend)
+    const users: UserNoPass[] = usersData || []
+    const adminCount = users.filter((user: UserNoPass) => user.role === 0).length
+    const staffCount = users.filter((user: UserNoPass) => user.role === 1).length
 
     return {
         // Data
         users,
-        totalUsers: users.length,
+        totalUsers: totalUsers ?? users.length,
         adminCount,
         staffCount,
-
-        // Modal states
-        isModalVisible,
-        isDeleteModalVisible,
-        editingUser,
-        deletingUser,
-        form,
 
         // Search/Filter states
         searchText,
         roleFilter,
         sortField,
         sortOrder,
+        page,
+        pageSize,
 
         // Handlers
-        showModal,
-        showEditModal,
-        showDeleteModal,
-        handleOk,
-        handleDelete,
-        handleCancel,
-        handleDeleteCancel,
         handleSearch,
         handleRoleFilter,
         handleSort,
+        handlePageChange,
         clearFilters,
+
+        // Mutations
+        createUser,
+        updateUser,
+        deleteUser,
+        pageErrorMessage,
+        formErrorMessage,
+        clearPageError: () => setPageErrorMessage(null),
+        clearFormError: () => setFormErrorMessage(null),
     }
 }

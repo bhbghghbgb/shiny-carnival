@@ -1,11 +1,19 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import MainLayout from '../../layouts/MainLayout'
+import { queryClient } from '../../lib/query/queryClient'
+import type { QueryClient } from '@tanstack/react-query'
 
 export const rootRoute = createRootRoute({
-  component: () => (
-    <MainLayout>
-      <Outlet />
-    </MainLayout>
-  ),
+  component: () => <Outlet />,
+  context: () => ({
+    queryClient,
+  }),
 })
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    routerContext: {
+      queryClient: QueryClient
+    }
+  }
+}
 

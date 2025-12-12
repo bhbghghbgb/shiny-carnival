@@ -1,7 +1,7 @@
-import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/axios';
-import { API_CONFIG } from '../../../config/api';
+import axiosClient, { type ApiResponse, type PagedRequest, type PagedList } from '../../../lib/api/axios.ts';
+import { API_CONFIG } from '../../../config/api.config.ts';
 import type { PromotionEntity } from '../types/entity.ts';
-import type { CreatePromotionRequest, UpdatePromotionRequest, PromotionFilterParams } from '../types/api.ts';
+import type { CreatePromotionRequest, UpdatePromotionRequest, PromotionFilterParams, ValidatePromoRequest } from '../types/api.ts';
 
 // Promotion API functions
 export const promotionApi = {
@@ -119,10 +119,10 @@ export const promotionApi = {
       );
 
       return {
-          isError: false,
-          message: "",
-          timestamp: "",
-          ...response,
+        isError: false,
+        message: "",
+        timestamp: "",
+        ...response,
         data: response.data?.data?.items || []
       };
     } catch (error: any) {
@@ -138,50 +138,13 @@ export const promotionApi = {
   /**
    * Kiểm tra mã khuyến mãi có hợp lệ không
    */
-  validatePromoCode: async (promoCode: string, orderAmount: number): Promise<ApiResponse<PromotionEntity>> => {
+  validatePromoCode: async (payload: ValidatePromoRequest): Promise<ApiResponse<PromotionEntity>> => {
     try {
-      // Tìm khuyến mãi theo mã
-      const response = await axiosClient.get<ApiResponse<PagedList<PromotionEntity>>>(
-        API_CONFIG.ENDPOINTS.ADMIN.PROMOTIONS,
-        {
-          params: {
-            search: promoCode,
-            status: API_CONFIG.PROMOTION_STATUS.ACTIVE,
-            pageSize: 1
-          }
-        }
+      const response = await axiosClient.post<ApiResponse<PromotionEntity>>(
+        API_CONFIG.ENDPOINTS.ADMIN.PROMOTION_VALIDATE,
+        payload
       );
-
-      const promotions = response.data?.data?.items || [];
-      if (promotions.length === 0) {
-        throw new Error('Mã khuyến mãi không tồn tại hoặc đã hết hạn');
-      }
-
-      const promotion = promotions[0];
-      
-      // Kiểm tra các điều kiện
-      const now = new Date();
-      const startDate = new Date(promotion.startDate);
-      const endDate = new Date(promotion.endDate);
-
-      if (now < startDate || now > endDate) {
-        throw new Error('Mã khuyến mãi chưa có hiệu lực hoặc đã hết hạn');
-      }
-
-      if (orderAmount < promotion.minOrderAmount) {
-        throw new Error(`Đơn hàng phải có giá trị tối thiểu ${promotion.minOrderAmount.toLocaleString('vi-VN')}đ`);
-      }
-
-      if (promotion.usedCount >= promotion.usageLimit) {
-        throw new Error('Mã khuyến mãi đã hết lượt sử dụng');
-      }
-
-      return {
-        isError: false,
-        message: 'Mã khuyến mãi hợp lệ',
-        data: promotion,
-        timestamp: new Date().toISOString()
-      };
+      return response.data;
     } catch (error: any) {
       throw {
         isError: true,

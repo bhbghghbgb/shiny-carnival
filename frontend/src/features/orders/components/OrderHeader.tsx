@@ -1,5 +1,5 @@
 import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, ShoppingOutlined } from '@ant-design/icons'
+import { PlusOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 
 const { Title, Text } = Typography
 
@@ -23,12 +23,11 @@ export const OrderHeader = ({ onAddOrder }: OrderHeaderProps) => {
                             level={2}
                             style={{ margin: 0, color: '#1890ff' }}
                         >
-                            <ShoppingOutlined style={{ marginRight: '8px' }} />
+                            <ShoppingCartOutlined style={{ marginRight: '8px' }} />
                             Quản lý đơn hàng
                         </Title>
                         <Text type="secondary">
-                            Quản lý thông tin và trạng thái của các đơn hàng
-                            trong hệ thống
+                            Quản lý đơn hàng, trạng thái và lịch sử giao dịch
                         </Text>
                     </Space>
                 </Col>
@@ -47,7 +46,7 @@ export const OrderHeader = ({ onAddOrder }: OrderHeaderProps) => {
                                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
                             }}
                         >
-                            Tạo đơn hàng
+                            Thêm
                         </Button>
                     </Space>
                 </Col>
@@ -55,3 +54,4 @@ export const OrderHeader = ({ onAddOrder }: OrderHeaderProps) => {
         </Card>
     )
 }
+

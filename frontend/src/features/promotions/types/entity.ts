@@ -1,4 +1,4 @@
-import type { DiscountType, PromotionStatus } from '../../../config/api';
+import type { DiscountType, PromotionStatus } from '../../../config/api.config';
 
 export interface PromotionEntity {
   id: number;
