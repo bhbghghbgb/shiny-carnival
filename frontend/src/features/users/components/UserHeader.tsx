@@ -1,7 +1,9 @@
 import { FileExcelOutlined, FilePdfOutlined, TeamOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
 import { exportTablePdf } from '../../../utils/exportPdf';
+import { importTableExcel } from '../../../utils/importExcel';
 import { userPageConfig } from '../config/userPageConfig';
+import { useUserManagementPage } from '../hooks/useUserManagementPage';
 import type { UserNoPass } from '../types/entity';
 
 const { Title, Text } = Typography
@@ -11,13 +13,17 @@ interface UserHeaderProps {
 }
 
 export const UserHeader = ({ users }: UserHeaderProps) => {
+    const {createUser} = useUserManagementPage()
     const exportPDF = () => {
         exportTablePdf(userPageConfig,users,"products");
     };
-    const importExcel = () =>{
-
-    }
-
+    const importExcel = async (file: File) => {
+        await importTableExcel(userPageConfig, file, payload =>
+            createUser.mutateAsync(payload)
+        );
+    };
+    
+    
     return (
         <Card
             style={{
@@ -44,11 +50,21 @@ export const UserHeader = ({ users }: UserHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                        <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
                         <Button
                             type="primary"
                             size="large"
                             icon={<FileExcelOutlined />}
-                            onClick={importExcel}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
