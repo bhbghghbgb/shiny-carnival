@@ -2,8 +2,11 @@ import type { ColumnsType } from 'antd/es/table'
 import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
 import type { OrderEntity } from '../types/entity'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
+import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { Tag } from 'antd'
 import { API_CONFIG } from '../../../config/api.config'
+import { customerApiService } from '../../customers/api/CustomerApiService'
+import type { CustomerEntity } from '../../customers/types/entity'
 
 const columns: ColumnsType<OrderEntity> = [
     {
@@ -62,9 +65,23 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
             {
                 name: 'customerId',
                 label: 'Khách hàng',
-                type: 'number',
+                type: 'remote-select',
                 rules: [{ required: true, message: 'Vui lòng chọn khách hàng' }],
-                placeholder: 'ID khách hàng',
+                placeholder: 'Chọn khách hàng',
+                fetchOptions: async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+                    const paged = await customerApiService.getPaginated({
+                        search: keyword || undefined,
+                        page: 1,
+                        pageSize: 20,
+                    })
+                    const items = paged.items ?? []
+                    return items.map((c: CustomerEntity) => ({ 
+                        label: c.name ?? `#${c.id}`, 
+                        value: c.id 
+                    }))
+                },
+                queryKeyPrefix: 'customer-order-select',
+                fetchOnEmpty: true,
             },
             {
                 name: 'promoCode',
