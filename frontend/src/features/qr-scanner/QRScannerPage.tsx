@@ -1,9 +1,8 @@
-import { Card, Typography, List, Button, Space, Empty, Table, InputNumber, Divider } from 'antd';
+import { Card, Typography, Button, Space, Empty, Table, InputNumber, Divider } from 'antd';
 import { DeleteOutlined, QrcodeOutlined } from '@ant-design/icons';
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { QRScanner } from './components/QRScanner';
-import type { ProductEntity } from '../products/types/entity';
-import { useDraftOrderItems, useOrderStore } from '../orders/store';
+import { useDraftOrderItems, useOrderStore } from '../orders/store/orderStore';
 import { useNavigate } from '@tanstack/react-router';
 import { ENDPOINTS } from '../../app/routes/type/routes.endpoint';
 
@@ -11,7 +10,6 @@ const { Title, Text } = Typography;
 
 export const QRScannerPage = () => {
     const navigate = useNavigate();
-    const [scannedProducts, setScannedProducts] = useState<ProductEntity[]>([]);
     const draftItems = useDraftOrderItems();
     const { total, count } = useMemo(() => {
         const totals = draftItems.reduce(
@@ -24,36 +22,9 @@ export const QRScannerPage = () => {
         );
         return totals;
     }, [draftItems]);
-    const updateDraftQuantity = useOrderStore((state) => state.updateDraftQuantity);
-    const removeDraftItem = useOrderStore((state) => state.removeDraftItem);
-    const clearDraftItems = useOrderStore((state) => state.clearDraftItems);
-
-    // Load từ localStorage khi component mount
-    useEffect(() => {
-        loadScannedProducts();
-    }, []);
-
-    const loadScannedProducts = () => {
-        const products = JSON.parse(
-            localStorage.getItem('scanned_products') || '[]'
-        ) as ProductEntity[];
-        setScannedProducts(products);
-    };
-
-    const handleScanSuccess = () => {
-        loadScannedProducts();
-    };
-
-    const clearHistory = () => {
-        localStorage.removeItem('scanned_products');
-        setScannedProducts([]);
-    };
-
-    const removeProduct = (productId: number) => {
-        const products = scannedProducts.filter((p) => p.id !== productId);
-        localStorage.setItem('scanned_products', JSON.stringify(products));
-        setScannedProducts(products);
-    };
+    const updateDraftQuantity = useOrderStore((state) => state.updateDraftOrderItemQuantity);
+    const removeDraftItem = useOrderStore((state) => state.removeDraftOrderItem);
+    const clearDraftItems = useOrderStore((state) => state.clearDraftOrder);
 
     return (
         <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
@@ -63,18 +34,18 @@ export const QRScannerPage = () => {
                         <QrcodeOutlined /> Quét mã QR sản phẩm
                     </Title>
                     <Text type="secondary">
-                        Sử dụng camera để quét mã QR trên sản phẩm và xem thông tin chi tiết
+                        Sử dụng camera để quét mã QR trên sản phẩm và thêm vào đơn hàng
                     </Text>
                 </div>
 
                 <Card>
-                    <QRScanner onScanSuccess={handleScanSuccess} />
+                    <QRScanner />
                 </Card>
 
                 <Card
                     title={
                         <Space>
-                            <span>Đơn hàng tạm thời</span>
+                            <span>Giỏ hàng tạm thời</span>
                             {count > 0 && <Typography.Text type="secondary">({count} sản phẩm)</Typography.Text>}
                         </Space>
                     }
@@ -94,7 +65,7 @@ export const QRScannerPage = () => {
                     {draftItems.length === 0 ? (
                         <Empty
                             image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            description="Chưa có sản phẩm trong đơn tạm"
+                            description="Chưa có sản phẩm trong giỏ hàng"
                         />
                     ) : (
                         <>
@@ -155,68 +126,6 @@ export const QRScannerPage = () => {
                                 </Typography.Title>
                             </Space>
                         </>
-                    )}
-                </Card>
-
-                <Card
-                    title={
-                        <Space>
-                            <span>Lịch sử quét</span>
-                            {scannedProducts.length > 0 && (
-                                <Text type="secondary">({scannedProducts.length} sản phẩm)</Text>
-                            )}
-                        </Space>
-                    }
-                    extra={
-                        scannedProducts.length > 0 && (
-                            <Button danger onClick={clearHistory} size="small">
-                                Xóa tất cả
-                            </Button>
-                        )
-                    }
-                >
-                    {scannedProducts.length === 0 ? (
-                        <Empty
-                            image={Empty.PRESENTED_IMAGE_SIMPLE}
-                            description="Chưa có sản phẩm nào được quét"
-                        />
-                    ) : (
-                        <List
-                            dataSource={scannedProducts}
-                            renderItem={(product: any) => (
-                                <List.Item
-                                    actions={[
-                                        <Button
-                                            key="delete"
-                                            type="text"
-                                            danger
-                                            icon={<DeleteOutlined />}
-                                            onClick={() => removeProduct(product.id)}
-                                        >
-                                            Xóa
-                                        </Button>,
-                                    ]}
-                                >
-                                    <List.Item.Meta
-                                        title={<strong>{product.name || product.productName}</strong>}
-                                        description={
-                                            <Space direction="vertical" size="small">
-                                                <Text>Mã: {product.barcode || 'N/A'}</Text>
-                                                <Text>
-                                                    Giá: <strong>{product.price?.toLocaleString('vi-VN')} đ</strong>
-                                                </Text>
-                                                <Text type="secondary">
-                                                    Tồn kho: {product.stockQuantity || 0}
-                                                </Text>
-                                                <Text type="secondary" style={{ fontSize: 12 }}>
-                                                    Quét lúc: {new Date(product.lastScanned).toLocaleString('vi-VN')}
-                                                </Text>
-                                            </Space>
-                                        }
-                                    />
-                                </List.Item>
-                            )}
-                        />
                     )}
                 </Card>
             </Space>

@@ -4,7 +4,7 @@ import { Button, message, Space, Alert } from 'antd';
 import { CameraOutlined, CloseOutlined } from '@ant-design/icons';
 import { productApiService } from '../../products/api/ProductApiService';
 import type { ProductEntity } from '../../products/types/entity';
-import { useOrderStore } from '../../orders/store';
+import { useOrderStore } from '../../orders/store/orderStore';
 
 interface QRScannerProps {
     onScanSuccess?: (product: ProductEntity) => void;
@@ -14,7 +14,7 @@ interface QRScannerProps {
 export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
     const [isScanning, setIsScanning] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
-    const addDraftItem = useOrderStore((state) => state.addDraftItem);
+    const addDraftItem = useOrderStore((state) => state.addDraftOrderItem);
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const isProcessingRef = useRef(false);
     const lastScannedRef = useRef<string>('');
@@ -49,7 +49,7 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
         isProcessingRef.current = true;
         lastScannedRef.current = decodedText;
 
-        console.log('🔍 QR Code detected:', decodedText);
+        console.log('QR Code detected:', decodedText);
         messageApi.info(`Đã quét được: ${decodedText}`, 2);
 
         try {
@@ -58,7 +58,7 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
 
             if (products.length === 0) {
                 messageApi.destroy();
-                messageApi.warning('Không tìm thấy sản phẩm');
+                messageApi.warning('Không tìm thấy sản phẩm với mã vạch này');
                 // Reset sau 2 giây
                 setTimeout(() => {
                     isProcessingRef.current = false;
@@ -68,16 +68,20 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
             }
 
             const product = products[0];
-            const scannedProducts = JSON.parse(localStorage.getItem('scanned_products') || '[]');
-            scannedProducts.unshift({ ...product, lastScanned: new Date().toISOString() });
-            if (scannedProducts.length > 50) scannedProducts.pop();
-            localStorage.setItem('scanned_products', JSON.stringify(scannedProducts));
-
             messageApi.destroy();
             messageApi.success(`Đã quét: ${product.productName}`);
 
+            // Tạo DraftOrderItem từ ProductEntity
+            const draftItem = {
+                productId: product.id,
+                productName: product.productName,
+                price: product.price,
+                quantity: 1, // Mặc định 1
+                subtotal: product.price * 1,
+            };
+
             // Lưu vào draft order (global state + localStorage via persist)
-            addDraftItem(product);
+            addDraftItem(draftItem);
 
             // Delay 1 giây trước khi dừng để hiển thị thông báo
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -86,27 +90,8 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
             await stopScanning();
         } catch (error) {
             messageApi.destroy();
-            const mockProduct = {
-                id: Date.now(),
-                productName: 'Sản phẩm mẫu - ' + decodedText,
-                barcode: decodedText,
-                price: 99000,
-                stockQuantity: 10,
-                lastScanned: new Date().toISOString(),
-            };
-            const scannedProducts = JSON.parse(localStorage.getItem('scanned_products') || '[]');
-            scannedProducts.unshift(mockProduct);
-            localStorage.setItem('scanned_products', JSON.stringify(scannedProducts));
-            messageApi.success('Đã lưu sản phẩm mẫu!');
-
-            // Lưu vào draft order (global state + localStorage via persist)
-            addDraftItem(mockProduct as any);
-
-            // Delay 1 giây trước khi dừng để hiển thị thông báo
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            onScanSuccess?.(mockProduct as any);
-            await stopScanning();
+            messageApi.error('Lỗi khi tìm kiếm sản phẩm. Vui lòng thử lại.');
+            console.error('Error searching product:', error);
         } finally {
             // Reset trạng thái sau 3 giây để có thể quét lại
             setTimeout(() => {

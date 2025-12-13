@@ -1,7 +1,6 @@
 import { generateManagementRouteConfigs } from '../../utils/routeHelpers';
 import { orderAdminDefinition } from './definition/orders.definition';
 import type { ModuleRoutes } from '../../type/types';
-import { OrderCreatePage } from '../../../../features/orders/pages/OrderCreatePage';
 
 // Export một object tạm thời để phá vỡ sự phụ thuộc vòng tròn
 export const ordersRoutes: object = {};
@@ -13,11 +12,6 @@ const generatedModule: ModuleRoutes<any> = {
   basePath: '/orders',
   routes: [
     ...generateManagementRouteConfigs(orderAdminDefinition),
-    {
-      path: 'orders/create',
-      component: OrderCreatePage,
-      meta: { title: 'Tạo đơn hàng mới', requiresAuth: true },
-    },
   ],
 };
 

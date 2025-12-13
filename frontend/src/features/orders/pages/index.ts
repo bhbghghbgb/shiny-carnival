@@ -1,5 +1,0 @@
-export { OrderListPage } from './OrderListPage'
-export { OrderDetailPage } from './OrderDetailPage'
-export { OrderCreatePage } from './OrderCreatePage'
-export { OrderEditPage } from './OrderEditPage'
-export { OrderTrackingPage } from './OrderTrackingPage'
