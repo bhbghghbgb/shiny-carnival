@@ -6,6 +6,8 @@ import type { OrderDetailsDto } from '../types/entity';
 export interface DraftOrderItem {
     productId: number;
     productName: string;
+    categoryName: string;
+    barcode: string;
     price: number;
     quantity: number;
     subtotal: number;
@@ -77,8 +79,23 @@ export const useOrderStore = create<OrderState>()(
                             (i) => i.productId === item.productId
                         );
                         if (existingIndex >= 0) {
-                            // Nếu đã tồn tại, không thêm lại (hoặc có thể update quantity)
-                            return state;
+                            // Nếu đã tồn tại, tăng số lượng
+                            const existing = state.draftOrder.orderItems[existingIndex];
+                            const newQuantity = existing.quantity + item.quantity;
+                            return {
+                                draftOrder: {
+                                    ...state.draftOrder,
+                                    orderItems: state.draftOrder.orderItems.map((i, idx) =>
+                                        idx === existingIndex
+                                            ? {
+                                                ...i,
+                                                quantity: newQuantity,
+                                                subtotal: i.price * newQuantity,
+                                            }
+                                            : i
+                                    ),
+                                },
+                            };
                         }
                         return {
                             draftOrder: {

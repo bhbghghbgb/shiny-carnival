@@ -75,6 +75,8 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
             const draftItem = {
                 productId: product.id,
                 productName: product.productName,
+                categoryName: (product as any).categoryName || '',
+                barcode: product.barcode,
                 price: product.price,
                 quantity: 1, // Mặc định 1
                 subtotal: product.price * 1,

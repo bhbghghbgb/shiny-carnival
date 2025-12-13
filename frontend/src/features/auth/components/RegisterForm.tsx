@@ -76,13 +76,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, roles }) => {
         </label>
         <select
           name="role"
-          value={values.role}
-          onChange={(e) =>
-            handleChange({
-              ...e,
-              target: { ...e.target, value: Number(e.target.value) },
-            } as any)
-          }
+          value={values.role ?? ""}
+          onChange={handleChange}
           required
           className="w-full h-12 border border-gray-300 rounded-xl px-4 text-gray-700 focus:ring-2 focus:ring-blue-400 focus:outline-none transition bg-white"
         >

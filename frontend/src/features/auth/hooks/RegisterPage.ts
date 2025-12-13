@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import type { CreateUserRequest } from "../../users/types/api";
+import type { UserRole } from "../../../config/api.config";
 
 export const useRegisterForm = (
   onSubmit: (data: CreateUserRequest) => Promise<void>
@@ -9,7 +10,7 @@ export const useRegisterForm = (
     username: "",
     password: "",
     fullName: "",
-    role: "" as any, 
+    role: undefined as UserRole,
   });
 
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,11 @@ export const useRegisterForm = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value }));
+    if (name === 'role') {
+      setValues((prev) => ({ ...prev, [name]: value ? Number(value) as UserRole : undefined }));
+    } else {
+      setValues((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,6 +32,9 @@ export const useRegisterForm = (
     setError(null);
     setLoading(true);
     try {
+      if (values.role === undefined) {
+        throw new Error("Vui lòng chọn vai trò");
+      }
       await onSubmit(values);
     } catch (err: any) {
       setError(err.message || "Đã xảy ra lỗi khi đăng ký");

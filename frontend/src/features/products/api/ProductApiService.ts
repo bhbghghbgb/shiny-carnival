@@ -29,7 +29,8 @@ export class ProductApiService extends BaseApiService<
    * @returns Promise<ProductEntity[]>
    */
   async searchByBarcode(barcode: string): Promise<ProductEntity[]> {
-    return this.getAll({ search: barcode });
+    const result = await this.getPaginated({ search: barcode, page: 1, pageSize: 100 });
+    return result.items;
   }
 
   /**

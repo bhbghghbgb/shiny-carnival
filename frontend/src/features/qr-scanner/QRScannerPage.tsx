@@ -52,7 +52,7 @@ export const QRScannerPage = () => {
                     extra={
                         count > 0 && (
                             <Space>
-                                <Button type="primary" size="small" onClick={() => navigate({ to: ENDPOINTS.ADMIN.ORDERS.CREATE as any })}>
+                                <Button type="primary" size="small" onClick={() => navigate({ to: ENDPOINTS.ADMIN.ORDERS.LIST as any })}>
                                     Tạo đơn hàng
                                 </Button>
                                 <Button danger size="small" onClick={clearDraftItems}>
@@ -74,6 +74,7 @@ export const QRScannerPage = () => {
                                 pagination={false}
                                 columns={[
                                     { title: 'Sản phẩm', dataIndex: 'productName', key: 'productName' },
+                                    { title: 'Danh mục', dataIndex: 'categoryName', key: 'categoryName' },
                                     { title: 'Mã vạch', dataIndex: 'barcode', key: 'barcode' },
                                     {
                                         title: 'Đơn giá',
