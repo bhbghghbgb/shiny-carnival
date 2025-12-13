@@ -3,6 +3,7 @@ import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Typography } f
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import { API_CONFIG } from '../../../config/api.config'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import { orderApiService } from '../api/OrderApiService'
 import type { OrderDetailsDto, OrderItemEntity } from '../types/entity'
 
@@ -15,8 +16,11 @@ interface OrderDetailModalProps {
 }
 
 export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalProps) {
+    // Sử dụng query key pattern giống với createQueryKeys để đảm bảo invalidate đúng
+    const queryKeys = createQueryKeys('orders')
+    
     const { data: orderDetails, isLoading } = useQuery<OrderDetailsDto>({
-        queryKey: ['order', 'details', orderId],
+        queryKey: queryKeys.detail(orderId!),
         queryFn: () => orderApiService.getOrderDetails(orderId!),
         enabled: open && orderId !== null,
     })

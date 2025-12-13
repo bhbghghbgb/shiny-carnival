@@ -32,7 +32,7 @@ public class OrderSearchRequestValidator : BasePaginationValidator<OrderSearchRe
 
         // Validation cho StartDate - cho phép date trong tương lai (có thể có pre-orders)
         // Không validate "cannot be in the future" vì có thể có use case hợp lệ
-        
+
         // Validation cho EndDate - cho phép date trong tương lai
         // Không validate "cannot be in the future" vì có thể có use case hợp lệ
 

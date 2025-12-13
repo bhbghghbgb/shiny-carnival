@@ -64,9 +64,14 @@ export const useOrderManagementPage = () => {
 
     const updateOrderStatus = useUpdateOrderStatus({
         onSuccess: () => {
-            router.invalidate()
+            // Invalidate orders list query với exact queryKey từ current search
+            queryClient.invalidateQueries({ 
+                queryKey: ordersQueryOptions.queryKey 
+            })
             // Invalidate total revenue query khi status thay đổi (có thể ảnh hưởng đến doanh thu)
             queryClient.invalidateQueries({ queryKey: ['orders', 'total-revenue'] })
+            // Invalidate router loader để trigger refetch
+            router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import type React from 'react'
 import { Alert, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { ColumnsType, TablePaginationConfig, TableProps, ColumnType, ColumnGroupType } from 'antd/es/table'
@@ -34,6 +35,16 @@ export interface GenericPageProps<TData, TCreate, TUpdate> {
     formErrorMessage?: string | null
     onClearFormError?: () => void
     renderCustomActions?: (record: TData) => React.ReactNode
+    renderCustomForm?: (props: {
+        mode: 'create' | 'update'
+        onSubmit: (values: TCreate | TUpdate) => Promise<void>
+        onCancel: () => void
+        loading: boolean
+        errorMessage: string | null
+        onClearError: () => void
+        initialValues?: Partial<TCreate | TUpdate>
+        record?: TData
+    }) => React.ReactNode
 }
 
 export function GenericPage<TData extends { id?: string | number }, TCreate, TUpdate>({
@@ -63,6 +74,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     formErrorMessage,
     onClearFormError,
     renderCustomActions,
+    renderCustomForm,
 }: GenericPageProps<TData, TCreate, TUpdate>) {
     const [form] = Form.useForm()
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -340,33 +352,83 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 onChange={handleTableChange}
             />
 
-            <Modal
-                title={
-                    editingRecord
-                        ? `Cập nhật ${config.entity.displayName}`
-                        : `Thêm ${config.entity.displayName}`
+            {(() => {
+                // Kiểm tra xem custom form có được render hay không
+                let hasCustomForm = false
+                let customFormContent: React.ReactNode = null
+
+                if (renderCustomForm) {
+                    customFormContent = renderCustomForm({
+                        mode: editingRecord ? 'update' : 'create',
+                        onSubmit: async (values: TCreate | TUpdate) => {
+                            try {
+                                if (editingRecord) {
+                                    if (!onUpdate) return
+                                    await onUpdate(editingRecord, values as TUpdate)
+                                    message.success(`${config.entity.displayName} đã được cập nhật`)
+                                } else {
+                                    if (!onCreate) return
+                                    await onCreate(values as TCreate)
+                                    message.success(`${config.entity.displayName} đã được tạo`)
+                                }
+                                form.resetFields()
+                                setIsModalVisible(false)
+                                setEditingRecord(null)
+                            } catch (error) {
+                                const msg = error instanceof Error ? error.message : 'Thao tác không thành công'
+                                message.error(msg)
+                            }
+                        },
+                        onCancel: closeModal,
+                        loading: editingRecord ? (updateLoading || false) : (createLoading || false),
+                        errorMessage: formErrorMessage || null,
+                        onClearError: onClearFormError || (() => {}),
+                        initialValues: editingRecord
+                            ? (config.form.getUpdateInitialValues?.(editingRecord) ?? (editingRecord as unknown as Partial<TUpdate>))
+                            : (config.form.getCreateInitialValues?.() ?? {}),
+                        record: editingRecord || undefined,
+                    })
+                    hasCustomForm = customFormContent !== null
                 }
-                open={isModalVisible}
-                onOk={handleSubmit}
-                onCancel={closeModal}
-                confirmLoading={editingRecord ? updateLoading : createLoading}
-                destroyOnClose
-                forceRender
-            >
-                {formErrorMessage && (
-                    <Alert
-                        style={{ marginBottom: 16 }}
-                        type="error"
-                        showIcon
-                        closable
-                        message={formErrorMessage}
-                        onClose={onClearFormError}
-                    />
-                )}
-                <Form form={form} layout="vertical">
-                    {renderFormFields}
-                </Form>
-            </Modal>
+
+                return (
+                    <Modal
+                        title={
+                            editingRecord
+                                ? `Cập nhật ${config.entity.displayName}`
+                                : `Thêm ${config.entity.displayName}`
+                        }
+                        open={isModalVisible}
+                        onOk={hasCustomForm ? undefined : (editingRecord ? handleSubmit : undefined)}
+                        onCancel={closeModal}
+                        confirmLoading={editingRecord ? updateLoading : createLoading}
+                        destroyOnClose
+                        forceRender
+                        width={hasCustomForm ? 1200 : undefined}
+                        footer={hasCustomForm ? null : undefined}
+                    >
+                        {hasCustomForm ? (
+                            customFormContent
+                        ) : (
+                            <>
+                                {formErrorMessage && (
+                                    <Alert
+                                        style={{ marginBottom: 16 }}
+                                        type="error"
+                                        showIcon
+                                        closable
+                                        message={formErrorMessage}
+                                        onClose={onClearFormError}
+                                    />
+                                )}
+                                <Form form={form} layout="vertical" onFinish={editingRecord ? handleSubmit : undefined}>
+                                    {renderFormFields}
+                                </Form>
+                            </>
+                        )}
+                    </Modal>
+                )
+            })()}
         </Space>
     )
 }

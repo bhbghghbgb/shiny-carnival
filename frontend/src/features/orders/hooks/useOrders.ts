@@ -76,9 +76,9 @@ export const useUpdateOrderStatus = (options?: {
       return orderApiService.updateStatus(id, data);
     },
     onSuccess: (data, variables) => {
-      // Invalidate list queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.list() });
-      // invalidate paginated (list() đã đủ cho pattern hiện tại)
+      // Invalidate tất cả list queries (bao gồm cả paginated)
+      // queryKeys.lists() = ['orders', 'list'] sẽ match tất cả queries có prefix này
+      queryClient.invalidateQueries({ queryKey: queryKeys.lists() });
       // Invalidate detail query
       queryClient.invalidateQueries({ queryKey: queryKeys.detail(variables.id) });
       

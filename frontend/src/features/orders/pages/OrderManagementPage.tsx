@@ -1,7 +1,6 @@
 import { EyeOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
-import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { CreateOrderForm } from '../components/CreateOrderForm'
 import { OrderDetailModal } from '../components/OrderDetailModal'
 import { OrderHeader } from '../components/OrderHeader'
 import { OrderSearchFilter } from '../components/OrderSearchFilter'
@@ -120,6 +119,22 @@ export function OrderManagementPage() {
                         Chi tiết
                     </Button>
                 )}
+                renderCustomForm={({ mode, onSubmit, onCancel, loading, errorMessage, onClearError }) => {
+                    // Chỉ render custom form cho create mode
+                    if (mode === 'create') {
+                        return (
+                            <CreateOrderForm
+                                onSubmit={onSubmit as (values: CreateOrderRequest) => Promise<void>}
+                                onCancel={onCancel}
+                                loading={loading}
+                                errorMessage={errorMessage}
+                                onClearError={onClearError}
+                            />
+                        )
+                    }
+                    // Update mode vẫn dùng generic form
+                    return null
+                }}
             />
             <OrderDetailModal
                 orderId={selectedOrderId}
