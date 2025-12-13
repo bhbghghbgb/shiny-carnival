@@ -123,9 +123,8 @@ export const userPageConfig: GenericPageConfig<UserNoPass, CreateUserRequest, Up
             role: record.role,
             password: undefined,
         }),
-        mapUpdatePayload: (values, record) => ({
+        mapUpdatePayload: (values) => ({
             ...values,
-            id: record.id as number,
             password:
                 values.password === undefined || values.password === ''
                     ? null

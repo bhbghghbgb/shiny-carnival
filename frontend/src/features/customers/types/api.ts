@@ -8,7 +8,6 @@ export interface CreateCustomerRequest {
 }
 
 export interface UpdateCustomerRequest {
-    id: number;
     name: string;
     phone: string;
     email?: string | null;

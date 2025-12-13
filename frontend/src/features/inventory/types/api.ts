@@ -21,3 +21,11 @@ export interface InventoryHistoryEntry {
     reason: string;
     createdAt?: string;
 }
+
+export interface LowStockAlert {
+    productId: number;
+    productName: string;
+    barcode: string;
+    currentQuantity: number;
+    threshold: number;
+}

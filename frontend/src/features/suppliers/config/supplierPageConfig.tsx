@@ -99,10 +99,7 @@ export const supplierPageConfig: GenericPageConfig<SupplierEntity, CreateSupplie
             email: record.email,
             address: record.address,
         }),
-        mapUpdatePayload: (values, record) => ({
-            ...values,
-            id: record.id,
-        }),
+        mapUpdatePayload: (values) => values,
     },
     features: {
         enableCreate: true,

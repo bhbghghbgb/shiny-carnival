@@ -33,8 +33,10 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore());
 
         CreateMap<UpdateUserRequest, UserEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => (UserRole)src.Role))
             .ForMember(dest => dest.Password, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Password)))
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore());
 
@@ -60,6 +62,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.OrderItems, opt => opt.Ignore());
 
         CreateMap<UpdateProductRequest, ProductEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
             .ForMember(dest => dest.Category, opt => opt.Ignore())
@@ -79,6 +83,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Products, opt => opt.Ignore());
 
         CreateMap<UpdateCategoryRequest, CategoryEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
@@ -96,6 +101,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Products, opt => opt.Ignore());
 
         CreateMap<UpdateSupplierRequest, SupplierEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
@@ -117,6 +123,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Orders, opt => opt.Ignore());
 
         CreateMap<UpdateCustomerRequest, CustomerEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
@@ -194,6 +201,8 @@ public class MappingProfile : Profile
         CreateMap<PromotionEntity, PromotionResponseDto>()
             .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType.ToString().ToLower()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString().ToLower()))
+            .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate.ToDateTime(TimeOnly.MinValue)))
+            .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate.ToDateTime(TimeOnly.MaxValue)))
             .ForMember(dest => dest.RemainingUsage, opt => opt.MapFrom(src => src.UsageLimit - src.UsedCount))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.Status == PromotionStatus.Active &&
                 DateTime.UtcNow >= src.StartDate.ToDateTime(TimeOnly.MinValue) &&
@@ -217,10 +226,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Orders, opt => opt.Ignore());
 
         CreateMap<UpdatePromotionRequest, PromotionEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType == "percent" ? DiscountType.Percent : DiscountType.Fixed))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == "active" ? PromotionStatus.Active : PromotionStatus.Inactive))
             .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.StartDate)))
             .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.EndDate)))
+            .ForMember(dest => dest.UsedCount, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
@@ -233,7 +244,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Barcode, opt => opt.MapFrom(src => src.Product.Barcode))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src =>
                 src.Quantity == 0 ? "out_of_stock" :
-                src.Quantity <= 10 ? "low_stock" : "in_stock"));
+                src.Quantity < 10 ? "low_stock" : "in_stock"));
 
         CreateMap<InventoryHistoryEntity, InventoryHistoryDto>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName))

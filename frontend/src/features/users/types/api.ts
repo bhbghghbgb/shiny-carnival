@@ -9,7 +9,6 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateUserRequest {
-  id: number;                // Required, integer
   username: string;          // Required, min 1, max 50 chars
   password?: string | null;   // Optional, nullable, max 255 chars - null = không đổi password
   fullName: string;          // Required, min 1, max 100 chars
