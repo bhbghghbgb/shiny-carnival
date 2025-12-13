@@ -44,10 +44,7 @@ export const categoryPageConfig: GenericPageConfig<CategoryEntity, CreateCategor
         getUpdateInitialValues: (record) => ({
             categoryName: record.categoryName,
         }),
-        mapUpdatePayload: (values, record) => ({
-            ...values,
-            id: record.id,
-        }),
+        mapUpdatePayload: (values) => values,
     },
     features: {
         enableCreate: true,

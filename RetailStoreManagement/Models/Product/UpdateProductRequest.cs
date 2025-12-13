@@ -5,9 +5,6 @@ namespace RetailStoreManagement.Models.Product;
 public class UpdateProductRequest
 {
     [Required]
-    public int Id { get; set; }
-
-    [Required]
     public int CategoryId { get; set; }
 
     [Required]

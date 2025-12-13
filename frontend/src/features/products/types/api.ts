@@ -9,6 +9,4 @@ export interface CreateProductRequest {
     unit: string;
 }
 
-export interface UpdateProductRequest extends CreateProductRequest {
-    id: number;
-}
+export type UpdateProductRequest = CreateProductRequest;

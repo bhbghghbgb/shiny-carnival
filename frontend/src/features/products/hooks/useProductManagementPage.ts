@@ -152,7 +152,7 @@ export const useProductManagementPage = () => {
     }
 
     const handleUpdate = async (record: ProductEntity, values: UpdateProductRequest) => {
-        await updateProduct.mutateAsync({ ...values, id: record.id })
+        await updateProduct.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: ProductEntity) => deleteProduct.mutateAsync(record.id)

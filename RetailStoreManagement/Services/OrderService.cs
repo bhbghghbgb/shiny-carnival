@@ -341,6 +341,11 @@ public class OrderService : IOrderService
                 {
                     if (orderItem.Product.Inventory != null)
                     {
+                        // Check if sufficient stock before decreasing
+                        if (orderItem.Product.Inventory.Quantity < orderItem.Quantity)
+                        {
+                            return ApiResponse<OrderResponseDto>.Error($"Insufficient stock for product {orderItem.Product.ProductName}", 400);
+                        }
                         orderItem.Product.Inventory.Quantity -= orderItem.Quantity;
                         await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
                     }
@@ -363,8 +368,14 @@ public class OrderService : IOrderService
                 {
                     if (orderItem.Product.Inventory != null)
                     {
-                        orderItem.Product.Inventory.Quantity += orderItem.Quantity;
-                        await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
+                        // Reload inventory from database to ensure we have the latest quantity
+                        var inventory = await _unitOfWork.Inventory.GetByIdAsync(orderItem.Product.Inventory.Id);
+                        if (inventory != null)
+                        {
+                            // Restore inventory: current quantity + order item quantity
+                            inventory.Quantity = inventory.Quantity + orderItem.Quantity;
+                            await _unitOfWork.Inventory.UpdateAsync(inventory);
+                        }
                     }
                 }
 
@@ -399,8 +410,14 @@ public class OrderService : IOrderService
                 {
                     if (orderItem.Product.Inventory != null)
                     {
-                        orderItem.Product.Inventory.Quantity += orderItem.Quantity;
-                        await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
+                        // Reload inventory from database to ensure we have the latest quantity
+                        var inventory = await _unitOfWork.Inventory.GetByIdAsync(orderItem.Product.Inventory.Id);
+                        if (inventory != null)
+                        {
+                            // Restore inventory: current quantity + order item quantity
+                            inventory.Quantity = inventory.Quantity + orderItem.Quantity;
+                            await _unitOfWork.Inventory.UpdateAsync(inventory);
+                        }
                     }
                 }
 
@@ -419,10 +436,48 @@ public class OrderService : IOrderService
                     await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
                 }
             }
-            else if (order.Status == OrderStatus.Canceled)
+            else if (order.Status == OrderStatus.Canceled && newStatus == OrderStatus.Paid)
             {
-                // Cannot change status from Canceled
-                return ApiResponse<OrderResponseDto>.Error("Cannot change status of canceled orders", 400);
+                // Canceled → Paid: Decrease inventory and create payment
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.Product.Inventory != null)
+                    {
+                        // Check if sufficient stock before decreasing
+                        if (orderItem.Product.Inventory.Quantity < orderItem.Quantity)
+                        {
+                            return ApiResponse<OrderResponseDto>.Error($"Insufficient stock for product {orderItem.Product.ProductName}", 400);
+                        }
+                        orderItem.Product.Inventory.Quantity -= orderItem.Quantity;
+                        await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
+                    }
+                }
+
+                // Create payment record
+                var payment = new PaymentEntity
+                {
+                    OrderId = order.Id,
+                    Amount = order.TotalAmount - order.DiscountAmount,
+                    PaymentMethod = PaymentMethod.Cash,
+                    PaymentDate = DateTime.UtcNow
+                };
+                await _unitOfWork.Payments.AddAsync(payment);
+
+                // Increment promotion usedCount if was applied
+                if (order.Promotion != null && order.DiscountAmount > 0)
+                {
+                    order.Promotion.UsedCount++;
+                    await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+                }
+            }
+            else if (order.Status == OrderStatus.Canceled && newStatus == OrderStatus.Pending)
+            {
+                // Canceled → Pending: Increment promotion usedCount if was applied (no inventory change needed)
+                if (order.Promotion != null && order.DiscountAmount > 0)
+                {
+                    order.Promotion.UsedCount++;
+                    await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+                }
             }
 
             order.Status = newStatus;

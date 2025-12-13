@@ -33,8 +33,10 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore());
 
         CreateMap<UpdateUserRequest, UserEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => (UserRole)src.Role))
             .ForMember(dest => dest.Password, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Password)))
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore());
 
@@ -60,6 +62,8 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.OrderItems, opt => opt.Ignore());
 
         CreateMap<UpdateProductRequest, ProductEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
             .ForMember(dest => dest.Category, opt => opt.Ignore())
@@ -79,6 +83,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Products, opt => opt.Ignore());
 
         CreateMap<UpdateCategoryRequest, CategoryEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
@@ -96,6 +101,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Products, opt => opt.Ignore());
 
         CreateMap<UpdateSupplierRequest, SupplierEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
@@ -117,6 +123,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Orders, opt => opt.Ignore());
 
         CreateMap<UpdateCustomerRequest, CustomerEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())

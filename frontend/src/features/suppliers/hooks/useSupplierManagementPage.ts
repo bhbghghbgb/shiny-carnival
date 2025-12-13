@@ -108,7 +108,7 @@ export const useSupplierManagementPage = () => {
     }
 
     const handleUpdate = async (record: SupplierEntity, values: UpdateSupplierRequest) => {
-        await updateSupplier.mutateAsync({ ...values, id: record.id })
+        await updateSupplier.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: SupplierEntity) => deleteSupplier.mutateAsync(record.id)

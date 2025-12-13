@@ -16,7 +16,6 @@ export interface CreatePromotionRequest {
 
 // UpdatePromotionRequest based on swagger.json - does NOT include usedCount
 export interface UpdatePromotionRequest {
-  id: number;
   promoCode: string;
   description?: string | null;
   discountType: DiscountType;

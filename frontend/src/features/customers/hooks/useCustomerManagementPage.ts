@@ -108,7 +108,7 @@ export const useCustomerManagementPage = () => {
     }
 
     const handleUpdate = async (record: CustomerEntity, values: UpdateCustomerRequest) => {
-        await updateCustomer.mutateAsync({ ...values, id: record.id })
+        await updateCustomer.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: CustomerEntity) => deleteCustomer.mutateAsync(record.id)

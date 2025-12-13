@@ -243,7 +243,7 @@ export const promotionPageConfig: GenericPageConfig<PromotionEntity, CreatePromo
                 status: values.status,
             } as CreatePromotionRequest
         },
-        mapUpdatePayload: (values: any, record) => {
+        mapUpdatePayload: (values: any) => {
             // Map to UpdatePromotionRequest format (camelCase)
             // Based on swagger.json: UpdatePromotionRequest does NOT include usedCount
             // Backend will automatically map camelCase to PascalCase properties via JSON serialization
@@ -263,7 +263,6 @@ export const promotionPageConfig: GenericPageConfig<PromotionEntity, CreatePromo
             // - usageLimit: optional but has minimum: 1, maximum: 2147483647
             // - description: nullable, optional
             return {
-                id: record.id,
                 promoCode: values.promoCode,
                 description: values.description || null, // nullable according to swagger
                 discountType: values.discountType,

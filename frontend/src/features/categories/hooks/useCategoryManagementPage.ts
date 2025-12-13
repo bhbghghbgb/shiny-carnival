@@ -108,7 +108,7 @@ export const useCategoryManagementPage = () => {
     }
 
     const handleUpdate = async (record: CategoryEntity, values: UpdateCategoryRequest) => {
-        await updateCategory.mutateAsync({ ...values, id: record.id })
+        await updateCategory.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: CategoryEntity) => deleteCategory.mutateAsync(record.id)
