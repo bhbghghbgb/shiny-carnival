@@ -194,6 +194,8 @@ public class MappingProfile : Profile
         CreateMap<PromotionEntity, PromotionResponseDto>()
             .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType.ToString().ToLower()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString().ToLower()))
+            .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate.ToDateTime(TimeOnly.MinValue)))
+            .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate.ToDateTime(TimeOnly.MaxValue)))
             .ForMember(dest => dest.RemainingUsage, opt => opt.MapFrom(src => src.UsageLimit - src.UsedCount))
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.Status == PromotionStatus.Active &&
                 DateTime.UtcNow >= src.StartDate.ToDateTime(TimeOnly.MinValue) &&
@@ -217,10 +219,12 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Orders, opt => opt.Ignore());
 
         CreateMap<UpdatePromotionRequest, PromotionEntity>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType == "percent" ? DiscountType.Percent : DiscountType.Fixed))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status == "active" ? PromotionStatus.Active : PromotionStatus.Inactive))
             .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.StartDate)))
             .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => DateOnly.FromDateTime(src.EndDate)))
+            .ForMember(dest => dest.UsedCount, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())

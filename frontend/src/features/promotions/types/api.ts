@@ -14,7 +14,19 @@ export interface CreatePromotionRequest {
   status: PromotionStatus;
 }
 
-export type UpdatePromotionRequest = PromotionEntity
+// UpdatePromotionRequest based on swagger.json - does NOT include usedCount
+export interface UpdatePromotionRequest {
+  id: number;
+  promoCode: string;
+  description?: string | null;
+  discountType: DiscountType;
+  discountValue: number;
+  startDate: string;
+  endDate: string;
+  minOrderAmount?: number;
+  usageLimit: number;
+  status: PromotionStatus;
+}
 
 export interface PromotionFilterParams extends PagedRequest {
   status?: PromotionStatus;
