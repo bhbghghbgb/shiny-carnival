@@ -11,6 +11,7 @@ export function InventoryManagementPage() {
     const {
         inventories,
         total,
+        lowStockCount,
 
         searchText,
         productId,
@@ -37,8 +38,7 @@ export function InventoryManagementPage() {
         clearFormError,
     } = useInventoryManagementPage()
 
-    // Tính số sản phẩm tồn kho thấp (giả sử < 10)
-    const lowStockCount = inventories.filter(inv => inv.quantity < 10).length
+    // lowStockCount lấy từ API /api/admin/inventory/low-stock trong hook
 
     return (
         <div style={{ padding: '24px' }}>

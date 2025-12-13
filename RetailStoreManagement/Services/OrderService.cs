@@ -84,6 +84,7 @@ public class OrderService : IOrderService
                     StaffName = o.User.FullName ?? string.Empty,
                     Status = o.Status.ToString().ToLower(),
                     TotalAmount = o.TotalAmount,
+                    DiscountAmount = o.DiscountAmount,
                     FinalAmount = o.TotalAmount - o.DiscountAmount
                 });
 
@@ -168,11 +169,16 @@ public class OrderService : IOrderService
 
                 if (promotion != null)
                 {
-                    var validationResult = ValidatePromotion(promotion, 0); // We'll calculate total later
-                    if (!validationResult.isValid)
+                    // Validate basic promotion conditions (status, date, usage limit) - không cần totalAmount
+                    var basicValidationResult = ValidatePromotionBasic(promotion);
+                    if (!basicValidationResult.isValid)
                     {
-                        return ApiResponse<OrderDetailsDto>.Error(validationResult.message, 400);
+                        return ApiResponse<OrderDetailsDto>.Error(basicValidationResult.message, 400);
                     }
+                }
+                else
+                {
+                    return ApiResponse<OrderDetailsDto>.Error("Promotion code not found", 404);
                 }
             }
 
@@ -196,14 +202,15 @@ public class OrderService : IOrderService
                 orderItems.Add(orderItem);
             }
 
-            // Apply discount if promotion is valid
+            // Apply discount if promotion is valid - validate với totalAmount đã tính
             if (promotion != null)
             {
                 var validationResult = ValidatePromotion(promotion, totalAmount);
-                if (validationResult.isValid)
+                if (!validationResult.isValid)
                 {
-                    discountAmount = CalculateDiscount(promotion, totalAmount);
+                    return ApiResponse<OrderDetailsDto>.Error(validationResult.message, 400);
                 }
+                discountAmount = CalculateDiscount(promotion, totalAmount);
             }
 
             // 5. Create order
@@ -247,7 +254,10 @@ public class OrderService : IOrderService
         }
     }
 
-    private (bool isValid, string message) ValidatePromotion(PromotionEntity promotion, decimal orderTotal)
+    /// <summary>
+    /// Validate basic promotion conditions (status, date, usage limit) - không cần totalAmount
+    /// </summary>
+    private (bool isValid, string message) ValidatePromotionBasic(PromotionEntity promotion)
     {
         if (promotion.Status != PromotionStatus.Active)
             return (false, "Promotion is not active");
@@ -259,11 +269,25 @@ public class OrderService : IOrderService
         if (now < startDate || now > endDate)
             return (false, "Promotion is not valid for current date");
 
+        if (promotion.UsageLimit > 0 && promotion.UsedCount >= promotion.UsageLimit)
+            return (false, "Promotion usage limit exceeded");
+
+        return (true, "Valid");
+    }
+
+    /// <summary>
+    /// Validate promotion với totalAmount (bao gồm cả minOrderAmount check)
+    /// </summary>
+    private (bool isValid, string message) ValidatePromotion(PromotionEntity promotion, decimal orderTotal)
+    {
+        // Validate basic conditions first
+        var basicValidation = ValidatePromotionBasic(promotion);
+        if (!basicValidation.isValid)
+            return basicValidation;
+
+        // Validate minOrderAmount
         if (orderTotal < promotion.MinOrderAmount)
             return (false, $"Order amount must be at least {promotion.MinOrderAmount:C}");
-
-        if (promotion.UsedCount >= promotion.UsageLimit)
-            return (false, "Promotion usage limit exceeded");
 
         return (true, "Valid");
     }
@@ -528,5 +552,67 @@ public class OrderService : IOrderService
         content += $"Final Amount: {orderDetails.Data.FinalAmount:C}\n";
 
         return System.Text.Encoding.UTF8.GetBytes(content);
+    }
+
+    public async Task<ApiResponse<decimal>> GetTotalRevenueAsync(OrderRevenueRequest? request = null)
+    {
+        try
+        {
+            var query = _unitOfWork.Orders.GetQueryable();
+
+            // Apply same filters as GetOrdersAsync if request provided
+            if (request != null)
+            {
+                // Apply search filter
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    query = query.Where(o => o.Customer!.Name.Contains(request.Search) ||
+                                            o.User.FullName!.Contains(request.Search));
+                }
+
+                // Apply status filter
+                if (!string.IsNullOrEmpty(request.Status))
+                {
+                    if (Enum.TryParse<OrderStatus>(request.Status, true, out var status))
+                    {
+                        query = query.Where(o => o.Status == status);
+                    }
+                }
+
+                // Apply customer filter
+                if (request.CustomerId.HasValue)
+                {
+                    query = query.Where(o => o.CustomerId == request.CustomerId.Value);
+                }
+
+                // Apply user filter
+                if (request.UserId.HasValue)
+                {
+                    query = query.Where(o => o.UserId == request.UserId.Value);
+                }
+
+                // Apply date filters
+                if (request.StartDate.HasValue)
+                {
+                    query = query.Where(o => o.OrderDate >= request.StartDate.Value);
+                }
+
+                if (request.EndDate.HasValue)
+                {
+                    query = query.Where(o => o.OrderDate <= request.EndDate.Value);
+                }
+            }
+
+            // Calculate total revenue: sum of (TotalAmount - DiscountAmount) = FinalAmount
+            var totalRevenue = await query
+                .Select(o => o.TotalAmount - o.DiscountAmount)
+                .SumAsync();
+
+            return ApiResponse<decimal>.Success(totalRevenue);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<decimal>.Error(ex.Message);
+        }
     }
 }

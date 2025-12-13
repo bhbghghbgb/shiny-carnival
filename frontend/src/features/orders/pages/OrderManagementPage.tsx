@@ -1,4 +1,8 @@
+import { EyeOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { OrderDetailModal } from '../components/OrderDetailModal'
 import { OrderHeader } from '../components/OrderHeader'
 import { OrderSearchFilter } from '../components/OrderSearchFilter'
 import { OrderStatistics } from '../components/OrderStatistics'
@@ -8,9 +12,13 @@ import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
 import type { OrderEntity } from '../types/entity'
 
 export function OrderManagementPage() {
+    const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
     const {
         orders,
         total,
+        totalRevenue,
 
         searchText,
         statusFilter,
@@ -44,8 +52,15 @@ export function OrderManagementPage() {
         clearFormError,
     } = useOrderManagementPage()
 
-    // Tính tổng doanh thu từ orders
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+    const handleViewDetail = (order: OrderEntity) => {
+        setSelectedOrderId(order.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedOrderId(null)
+    }
 
     return (
         <div style={{ padding: '24px' }}>
@@ -96,6 +111,20 @@ export function OrderManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <OrderDetailModal
+                orderId={selectedOrderId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )

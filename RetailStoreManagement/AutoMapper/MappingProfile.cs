@@ -233,7 +233,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Barcode, opt => opt.MapFrom(src => src.Product.Barcode))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src =>
                 src.Quantity == 0 ? "out_of_stock" :
-                src.Quantity <= 10 ? "low_stock" : "in_stock"));
+                src.Quantity < 10 ? "low_stock" : "in_stock"));
 
         CreateMap<InventoryHistoryEntity, InventoryHistoryDto>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName))

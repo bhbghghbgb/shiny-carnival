@@ -8,8 +8,9 @@ export interface OrderEntity {
   promoId?: number;
   orderDate: string;
   status: OrderStatus;
-  totalAmount: number;
-  discountAmount: number;
+  totalAmount: number; // Tổng tiền trước khi giảm giá
+  discountAmount: number; // Số tiền được giảm
+  finalAmount: number; // Tổng tiền cuối cùng sau khi giảm giá (totalAmount - discountAmount)
 }
 
 // Order Item Entity
@@ -18,15 +19,27 @@ export interface OrderItemEntity {
   orderId: number;
   productId: number;
   productName: string;
+  barcode?: string;
   quantity: number;
   price: number;
   subtotal: number;
 }
 
+// Payment Entity
+export interface PaymentEntity {
+  paymentId: number;
+  orderId: number;
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+}
+
 // Extended Order with Details
 export interface OrderDetailsDto extends OrderEntity {
   customerName: string;
-  userName: string;
+  customerPhone?: string;
+  staffName: string; // Backend trả về StaffName (PascalCase) -> map thành staffName (camelCase)
   promoCode?: string;
   orderItems: OrderItemEntity[];
+  paymentInfo?: PaymentEntity;
 }

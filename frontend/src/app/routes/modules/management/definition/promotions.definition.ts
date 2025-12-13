@@ -12,11 +12,12 @@ import { createPaginatedQueryOptions } from '../../../../../lib/query/queryOptio
 const promotionSearchSchema = baseSearchSchema.extend({
   sortField: z.string().catch('id'),
   sortOrder: z.enum(['ascend', 'descend']).catch('descend'),
+  status: z.enum(['active', 'inactive']).optional(),
 });
 
 export type PromotionSearch = z.infer<typeof promotionSearchSchema>;
 
-function buildPagedRequest(search: PromotionSearch): PagedRequest {
+function buildPagedRequest(search: PromotionSearch): PagedRequest & { status?: string } {
   return {
     page: search.page || 1,
     pageSize: search.pageSize || 10,
@@ -24,6 +25,7 @@ function buildPagedRequest(search: PromotionSearch): PagedRequest {
     sortBy: search.sortField === 'promoCode' ? 'PromoCode' :
       search.sortField === 'startDate' ? 'StartDate' : 'Id',
     sortDesc: search.sortOrder === 'descend',
+    status: search.status,
   };
 }
 

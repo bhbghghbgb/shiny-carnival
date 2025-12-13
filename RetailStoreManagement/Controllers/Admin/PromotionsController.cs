@@ -54,6 +54,13 @@ public class PromotionsController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+    [HttpGet("active-count")]
+    public async Task<IActionResult> GetActivePromotionCount()
+    {
+        var result = await _promotionService.GetActivePromotionCountAsync();
+        return StatusCode(result.StatusCode, result);
+    }
+
     [HttpPost("validate")]
     public async Task<IActionResult> ValidatePromotion([FromBody] ValidatePromoRequest request)
     {

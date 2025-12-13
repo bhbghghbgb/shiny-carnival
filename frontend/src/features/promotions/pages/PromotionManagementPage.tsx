@@ -1,10 +1,5 @@
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
-import { API_CONFIG } from '../../../config/api.config'
-import { PromotionHeader } from '../components/PromotionHeader'
-import { PromotionSearchFilter } from '../components/PromotionSearchFilter'
-import { PromotionStatistics } from '../components/PromotionStatistics'
 import { promotionPageConfig } from '../config/promotionPageConfig'
-import { usePromotionManagementPage } from '../hooks/usePromotionManagementPage'
 import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
 import type { PromotionEntity } from '../types/entity'
 
@@ -12,15 +7,18 @@ export function PromotionManagementPage() {
     const {
         promotions,
         total,
+        activePromotionCount,
 
         searchText,
         sortField,
         sortOrder,
+        status,
         page,
         pageSize,
 
         handleSearch,
         handleSort,
+        handleStatusChange,
         handlePageChange,
         clearFilters,
 
@@ -37,8 +35,7 @@ export function PromotionManagementPage() {
         clearFormError,
     } = usePromotionManagementPage()
 
-    // Tính số khuyến mãi đang hoạt động
-    const activePromotions = promotions.filter(p => p.status === API_CONFIG.PROMOTION_STATUS.ACTIVE).length
+    // activePromotionCount lấy từ API /api/admin/promotions/active-count trong hook
 
     return (
         <div style={{ padding: '24px' }}>
@@ -67,7 +64,7 @@ export function PromotionManagementPage() {
                 statisticsSlot={
                     <PromotionStatistics
                         totalPromotions={total}
-                        activePromotions={activePromotions}
+                        activePromotions={activePromotionCount}
                     />
                 }
                 filtersSlot={
@@ -75,8 +72,10 @@ export function PromotionManagementPage() {
                         searchText={searchText}
                         sortField={sortField}
                         sortOrder={sortOrder}
+                        status={status}
                         onSearchChange={handleSearch}
                         onSortChange={handleSort}
+                        onStatusChange={handleStatusChange}
                         onClearFilters={clearFilters}
                     />
                 }
