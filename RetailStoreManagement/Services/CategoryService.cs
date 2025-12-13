@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
@@ -181,23 +182,52 @@ public class CategoryService : ICategoryService
 
             if (category == null)
             {
-                return ApiResponse<bool>.Error("Category not found", 404);
+                return ApiResponse<bool>.Error("Không tìm thấy loại sản phẩm", 404);
             }
 
-            // Check if category has products
-            if (category.Products.Any())
+            // Kiểm tra xem Category có Products không
+            var productCount = category.Products.Count;
+            if (productCount > 0)
             {
-                return ApiResponse<bool>.Error("Cannot delete category that has products", 409);
+                return ApiResponse<bool>.Error(
+                    $"Không thể xóa loại sản phẩm này vì đang có {productCount} sản phẩm liên quan. " +
+                    "Vui lòng xóa hoặc chuyển các sản phẩm trước khi xóa loại sản phẩm.",
+                    400
+                );
             }
 
             await _unitOfWork.Categories.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<bool>.Success(true, "Category deleted successfully");
+            return ApiResponse<bool>.Success(true, "Xóa loại sản phẩm thành công");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Xử lý lỗi database constraint violation
+            if (dbEx.InnerException is PostgresException pgEx)
+            {
+                // Lỗi foreign key constraint violation (23503) hoặc not null constraint (23502)
+                if (pgEx.SqlState == "23503" || pgEx.SqlState == "23502")
+                {
+                    return ApiResponse<bool>.Error(
+                        "Không thể xóa loại sản phẩm này vì đang có sản phẩm liên quan. " +
+                        "Vui lòng xóa hoặc chuyển các sản phẩm trước khi xóa loại sản phẩm.",
+                        400
+                    );
+                }
+            }
+
+            return ApiResponse<bool>.Error(
+                "Lỗi khi xóa loại sản phẩm. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+                500
+            );
         }
         catch (Exception ex)
         {
-            return ApiResponse<bool>.Error(ex.Message);
+            return ApiResponse<bool>.Error(
+                $"Lỗi không xác định: {ex.Message}",
+                500
+            );
         }
     }
 }

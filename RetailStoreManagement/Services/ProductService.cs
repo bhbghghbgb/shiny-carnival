@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Models.Common;
@@ -207,20 +208,58 @@ public class ProductService : IProductService
     {
         try
         {
-            var product = await _unitOfWork.Products.GetByIdAsync(id);
+            var product = await _unitOfWork.Products.GetQueryable()
+                .Include(p => p.OrderItems)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (product == null)
             {
-                return ApiResponse<bool>.Error("Product not found", 404);
+                return ApiResponse<bool>.Error("Không tìm thấy sản phẩm", 404);
+            }
+
+            // Kiểm tra xem Product có OrderItems không
+            var orderItemCount = product.OrderItems.Count;
+            if (orderItemCount > 0)
+            {
+                return ApiResponse<bool>.Error(
+                    $"Không thể xóa sản phẩm này vì đang có {orderItemCount} chi tiết đơn hàng liên quan. " +
+                    "Vui lòng xóa các đơn hàng liên quan trước khi xóa sản phẩm.",
+                    400
+                );
             }
 
             await _unitOfWork.Products.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<bool>.Success(true, "Product deleted successfully");
+            return ApiResponse<bool>.Success(true, "Xóa sản phẩm thành công");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Xử lý lỗi database constraint violation
+            if (dbEx.InnerException is PostgresException pgEx)
+            {
+                // Lỗi foreign key constraint violation (23503) hoặc not null constraint (23502)
+                if (pgEx.SqlState == "23503" || pgEx.SqlState == "23502")
+                {
+                    return ApiResponse<bool>.Error(
+                        "Không thể xóa sản phẩm này vì đang có chi tiết đơn hàng liên quan. " +
+                        "Vui lòng xóa các đơn hàng liên quan trước khi xóa sản phẩm.",
+                        400
+                    );
+                }
+            }
+
+            return ApiResponse<bool>.Error(
+                "Lỗi khi xóa sản phẩm. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+                500
+            );
         }
         catch (Exception ex)
         {
-            return ApiResponse<bool>.Error(ex.Message);
+            return ApiResponse<bool>.Error(
+                $"Lỗi không xác định: {ex.Message}",
+                500
+            );
         }
     }
 }

@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
@@ -133,20 +134,58 @@ public class CustomerService : ICustomerService
     {
         try
         {
-            var customer = await _unitOfWork.Customers.GetByIdAsync(id);
+            var customer = await _unitOfWork.Customers.GetQueryable()
+                .Include(c => c.Orders)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (customer == null)
             {
-                return ApiResponse<bool>.Error("Customer not found", 404);
+                return ApiResponse<bool>.Error("Không tìm thấy khách hàng", 404);
+            }
+
+            // Kiểm tra xem Customer có Orders không
+            var orderCount = customer.Orders.Count;
+            if (orderCount > 0)
+            {
+                return ApiResponse<bool>.Error(
+                    $"Không thể xóa khách hàng này vì đang có {orderCount} đơn hàng liên quan. " +
+                    "Vui lòng xóa hoặc chuyển các đơn hàng trước khi xóa khách hàng.",
+                    400
+                );
             }
 
             await _unitOfWork.Customers.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<bool>.Success(true, "Customer deleted successfully");
+            return ApiResponse<bool>.Success(true, "Xóa khách hàng thành công");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Xử lý lỗi database constraint violation
+            if (dbEx.InnerException is PostgresException pgEx)
+            {
+                // Lỗi foreign key constraint violation (23503) hoặc not null constraint (23502)
+                if (pgEx.SqlState == "23503" || pgEx.SqlState == "23502")
+                {
+                    return ApiResponse<bool>.Error(
+                        "Không thể xóa khách hàng này vì đang có đơn hàng liên quan. " +
+                        "Vui lòng xóa hoặc chuyển các đơn hàng trước khi xóa khách hàng.",
+                        400
+                    );
+                }
+            }
+
+            return ApiResponse<bool>.Error(
+                "Lỗi khi xóa khách hàng. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+                500
+            );
         }
         catch (Exception ex)
         {
-            return ApiResponse<bool>.Error(ex.Message);
+            return ApiResponse<bool>.Error(
+                $"Lỗi không xác định: {ex.Message}",
+                500
+            );
         }
     }
 }

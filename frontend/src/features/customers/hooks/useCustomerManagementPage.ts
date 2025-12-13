@@ -51,7 +51,13 @@ export const useCustomerManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa khách hàng thất bại: ${parseApiError(error)}`)
+            const errorMessage = parseApiError(error)
+            // Nếu message từ backend đã rõ ràng (có chứa "không thể xóa" hoặc "đang có"), dùng trực tiếp
+            if (errorMessage.includes('không thể xóa') || errorMessage.includes('đang có')) {
+                setPageErrorMessage(errorMessage)
+            } else {
+                setPageErrorMessage(`Xóa khách hàng thất bại: ${errorMessage}`)
+            }
         },
     })
 

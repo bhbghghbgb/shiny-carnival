@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
@@ -137,23 +138,52 @@ public class SupplierService : ISupplierService
 
             if (supplier == null)
             {
-                return ApiResponse<bool>.Error("Supplier not found", 404);
+                return ApiResponse<bool>.Error("Không tìm thấy nhà cung cấp", 404);
             }
 
-            // Check if supplier has products
-            if (supplier.Products.Any())
+            // Kiểm tra xem Supplier có Products không
+            var productCount = supplier.Products.Count;
+            if (productCount > 0)
             {
-                return ApiResponse<bool>.Error("Cannot delete supplier that has products", 409);
+                return ApiResponse<bool>.Error(
+                    $"Không thể xóa nhà cung cấp này vì đang có {productCount} sản phẩm liên quan. " +
+                    "Vui lòng xóa hoặc chuyển các sản phẩm trước khi xóa nhà cung cấp.",
+                    400
+                );
             }
 
             await _unitOfWork.Suppliers.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<bool>.Success(true, "Supplier deleted successfully");
+            return ApiResponse<bool>.Success(true, "Xóa nhà cung cấp thành công");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Xử lý lỗi database constraint violation
+            if (dbEx.InnerException is PostgresException pgEx)
+            {
+                // Lỗi foreign key constraint violation (23503) hoặc not null constraint (23502)
+                if (pgEx.SqlState == "23503" || pgEx.SqlState == "23502")
+                {
+                    return ApiResponse<bool>.Error(
+                        "Không thể xóa nhà cung cấp này vì đang có sản phẩm liên quan. " +
+                        "Vui lòng xóa hoặc chuyển các sản phẩm trước khi xóa nhà cung cấp.",
+                        400
+                    );
+                }
+            }
+
+            return ApiResponse<bool>.Error(
+                "Lỗi khi xóa nhà cung cấp. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+                500
+            );
         }
         catch (Exception ex)
         {
-            return ApiResponse<bool>.Error(ex.Message);
+            return ApiResponse<bool>.Error(
+                $"Lỗi không xác định: {ex.Message}",
+                500
+            );
         }
     }
 }
