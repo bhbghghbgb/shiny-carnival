@@ -16,11 +16,13 @@ export function PromotionManagementPage() {
         searchText,
         sortField,
         sortOrder,
+        status,
         page,
         pageSize,
 
         handleSearch,
         handleSort,
+        handleStatusChange,
         handlePageChange,
         clearFilters,
 
@@ -74,8 +76,10 @@ export function PromotionManagementPage() {
                         searchText={searchText}
                         sortField={sortField}
                         sortOrder={sortOrder}
+                        status={status}
                         onSearchChange={handleSearch}
                         onSortChange={handleSort}
+                        onStatusChange={handleStatusChange}
                         onClearFilters={clearFilters}
                     />
                 }

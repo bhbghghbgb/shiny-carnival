@@ -70,6 +70,13 @@ public class OrdersController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+    [HttpGet("total-revenue")]
+    public async Task<IActionResult> GetTotalRevenue([FromQuery] OrderRevenueRequest? request)
+    {
+        var result = await _orderService.GetTotalRevenueAsync(request);
+        return StatusCode(result.StatusCode, result);
+    }
+
     [HttpGet("{id}/invoice")]
     public async Task<IActionResult> GetInvoice(int id)
     {

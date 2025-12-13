@@ -72,6 +72,7 @@ export const usePromotionManagementPage = () => {
     const searchText = search?.search || ''
     const sortField = search?.sortField || 'id'
     const sortOrder = search?.sortOrder || 'descend'
+    const status = search?.status
     const page = search?.page || 1
     const pageSize = search?.pageSize || 10
 
@@ -80,6 +81,16 @@ export const usePromotionManagementPage = () => {
             search: (prev: PromotionSearch) => ({
                 ...prev,
                 search: value || undefined,
+                page: 1,
+            }),
+        })
+    }
+
+    const handleStatusChange = (value: 'active' | 'inactive' | undefined) => {
+        navigate({
+            search: (prev: PromotionSearch) => ({
+                ...prev,
+                status: value,
                 page: 1,
             }),
         })
@@ -113,6 +124,7 @@ export const usePromotionManagementPage = () => {
                 search: undefined,
                 sortField: 'id',
                 sortOrder: 'descend',
+                status: undefined,
             },
         })
     }
@@ -135,11 +147,13 @@ export const usePromotionManagementPage = () => {
         searchText,
         sortField,
         sortOrder,
+        status,
         page,
         pageSize,
 
         handleSearch,
         handleSort,
+        handleStatusChange,
         handlePageChange,
         clearFilters,
 

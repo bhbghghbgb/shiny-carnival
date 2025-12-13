@@ -34,6 +34,15 @@ public class PromotionService : IPromotionService
                                         (p.Description != null && p.Description.Contains(request.Search)));
             }
 
+            // Apply status filter
+            if (!string.IsNullOrEmpty(request.Status))
+            {
+                if (Enum.TryParse<PromotionStatus>(request.Status, true, out var status))
+                {
+                    query = query.Where(p => p.Status == status);
+                }
+            }
+
             // Apply sorting
             query = request.SortDesc
                 ? query.OrderByDescending(p => EF.Property<object>(p, request.SortBy))

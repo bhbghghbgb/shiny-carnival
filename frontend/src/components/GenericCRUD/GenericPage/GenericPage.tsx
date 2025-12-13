@@ -33,6 +33,7 @@ export interface GenericPageProps<TData, TCreate, TUpdate> {
     onClearPageError?: () => void
     formErrorMessage?: string | null
     onClearFormError?: () => void
+    renderCustomActions?: (record: TData) => React.ReactNode
 }
 
 export function GenericPage<TData extends { id?: string | number }, TCreate, TUpdate>({
@@ -61,6 +62,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     onClearPageError,
     formErrorMessage,
     onClearFormError,
+    renderCustomActions,
 }: GenericPageProps<TData, TCreate, TUpdate>) {
     const [form] = Form.useForm()
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -95,13 +97,15 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             actions.push('delete')
         }
 
-        if (!actions.length) return null
+        const hasCustomActions = renderCustomActions !== undefined
+        if (!actions.length && !hasCustomActions) return null
 
         return {
             title: 'Actions',
             key: 'actions',
             render: (_, record) => (
                 <Space>
+                    {renderCustomActions && renderCustomActions(record)}
                     {actions.includes('edit') && (
                         <Button size="small" onClick={() => handleEdit(record)}>
                             Edit
@@ -122,7 +126,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 </Space>
             ),
         }
-    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate, handleDelete, handleEdit])
+    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate, handleDelete, handleEdit, renderCustomActions])
 
     const columns: ColumnsType<TData> = useMemo(() => {
         const base = config.table.columns

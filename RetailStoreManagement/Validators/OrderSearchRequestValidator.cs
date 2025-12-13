@@ -30,17 +30,11 @@ public class OrderSearchRequestValidator : BasePaginationValidator<OrderSearchRe
             .WithMessage("UserId must be greater than 0")
             .When(x => x.UserId.HasValue);
 
-        // Validation cho StartDate
-        RuleFor(x => x.StartDate)
-            .LessThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage("StartDate cannot be in the future")
-            .When(x => x.StartDate.HasValue);
-
-        // Validation cho EndDate
-        RuleFor(x => x.EndDate)
-            .LessThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage("EndDate cannot be in the future")
-            .When(x => x.EndDate.HasValue);
+        // Validation cho StartDate - cho phép date trong tương lai (có thể có pre-orders)
+        // Không validate "cannot be in the future" vì có thể có use case hợp lệ
+        
+        // Validation cho EndDate - cho phép date trong tương lai
+        // Không validate "cannot be in the future" vì có thể có use case hợp lệ
 
         // Validation cho date range
         RuleFor(x => x)

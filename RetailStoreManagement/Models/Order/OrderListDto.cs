@@ -8,5 +8,6 @@ public class OrderListDto
     public string StaffName { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
+    public decimal DiscountAmount { get; set; }
     public decimal FinalAmount { get; set; }
 }

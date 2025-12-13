@@ -44,6 +44,7 @@ export const API_CONFIG = {
       ORDER_BY_ID: (id: number) => `/api/admin/orders/${id}`,
       ORDER_STATUS: (id: number) => `/api/admin/orders/${id}/status`,
       ORDER_INVOICE: (id: number) => `/api/admin/orders/${id}/invoice`,
+      ORDER_TOTAL_REVENUE: '/api/admin/orders/total-revenue',
       
       // Order Items
       ORDER_ITEMS: (orderId: number) => `/api/admin/orders/${orderId}/items`,

@@ -3,7 +3,8 @@ import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericP
 import type { OrderEntity } from '../types/entity'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
-import { Tag } from 'antd'
+import { Tag, Button, Space } from 'antd'
+import { EyeOutlined } from '@ant-design/icons'
 import { API_CONFIG } from '../../../config/api.config'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import type { CustomerEntity } from '../../customers/types/entity'
@@ -48,7 +49,17 @@ const columns: ColumnsType<OrderEntity> = [
     {
         title: 'Giảm giá',
         dataIndex: 'discountAmount',
-        render: (value: number) => `${value?.toLocaleString()} đ`,
+        render: (value: number) => value > 0 ? `-${value?.toLocaleString()} đ` : '0 đ',
+    },
+    {
+        title: 'Thành tiền',
+        dataIndex: 'finalAmount',
+        sorter: true,
+        render: (value: number, record: OrderEntity) => {
+            // Nếu có finalAmount từ backend thì dùng, nếu không thì tính: totalAmount - discountAmount
+            const finalAmount = value ?? (record.totalAmount - record.discountAmount);
+            return <strong style={{ color: '#1890ff' }}>{finalAmount?.toLocaleString()} đ</strong>;
+        },
     },
 ]
 
