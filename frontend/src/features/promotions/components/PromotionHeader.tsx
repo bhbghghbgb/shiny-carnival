@@ -1,7 +1,10 @@
 import { FileExcelOutlined, FilePdfOutlined, GiftOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { exportTablePdf } from '../../../utils/exportPdf'
+import { importTableExcel } from '../../../utils/importExcel'
 import { promotionPageConfig } from '../config/promotionPageConfig'
+import { usePromotionManagementPage } from '../hooks'
+import type { CreatePromotionRequest } from '../types/api'
 import type { PromotionEntity } from '../types/entity'
 
 const { Title, Text } = Typography
@@ -11,12 +14,19 @@ interface PromotionHeaderProps {
 }
 
 export const PromotionHeader = ({ promotions }: PromotionHeaderProps) => {
+    const {createPromotion} = usePromotionManagementPage()
+
     const exportPDF = () => {
         exportTablePdf(promotionPageConfig,promotions,"promotions");
     };
-    const importExcel = () =>{
-
-    }
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createPromotion.mutateAsync({
+                ...(payload as CreatePromotionRequest),
+            })
+        );
+    };
+    
     return (
         <Card
             style={{
@@ -42,6 +52,16 @@ export const PromotionHeader = ({ promotions }: PromotionHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
                     <Button
                             type="primary"
                             size="large"

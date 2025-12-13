@@ -2,9 +2,9 @@ import { FileExcelOutlined, FilePdfOutlined, TeamOutlined } from '@ant-design/ic
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
 import { exportTablePdf } from '../../../utils/exportPdf';
 import { importTableExcel } from '../../../utils/importExcel';
+import type { CreateUserRequest } from '../api';
 import { userPageConfig } from '../config/userPageConfig';
 import { useUserManagementPage } from '../hooks/useUserManagementPage';
-import type { CreateUserRequest } from '../types/api';
 import type { UserNoPass } from '../types/entity';
 
 const { Title, Text } = Typography
@@ -15,17 +15,18 @@ interface UserHeaderProps {
 
 export const UserHeader = ({ users }: UserHeaderProps) => {
     const {createUser} = useUserManagementPage()
-    const createFields: (keyof CreateUserRequest)[] = ["username", "password", "fullName", "role"];
 
     const exportPDF = () => {
         exportTablePdf(userPageConfig,users,"users");
     };
     const importExcel = async (file: File) => {
-        await importTableExcel(createFields, file, payload =>
-            createUser.mutateAsync(payload)
+        await importTableExcel(file, payload => 
+            createUser.mutateAsync({
+                ...(payload as CreateUserRequest),
+                password: String(payload.password),
+            })
         );
     };
-    
     
     return (
         <Card

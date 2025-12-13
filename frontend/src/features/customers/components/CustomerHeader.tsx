@@ -1,7 +1,10 @@
 import { FileExcelOutlined, FilePdfOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { exportTablePdf } from '../../../utils/exportPdf'
+import { importTableExcel } from '../../../utils/importExcel'
 import { customerPageConfig } from '../config/customerPageConfig'
+import { useCustomerManagementPage } from '../hooks'
+import type { CreateCustomerRequest } from '../types/api'
 import type { CustomerEntity } from '../types/entity'
 
 const { Title, Text } = Typography
@@ -11,13 +14,19 @@ interface CustomerHeaderProps {
 }
 
 export const CustomerHeader = ({ customers }: CustomerHeaderProps) => {
+    const {createCustomer} = useCustomerManagementPage()
+
 
     const exportPDF = () => {
         exportTablePdf(customerPageConfig,customers,"customers");
     };
-    const importExcel = () =>{
-
-    }
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createCustomer.mutateAsync({
+                ...(payload as CreateCustomerRequest),
+            })
+        );
+    };
     return (
         <Card
             style={{
@@ -43,6 +52,16 @@ export const CustomerHeader = ({ customers }: CustomerHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
                     <Button
                             type="primary"
                             size="large"

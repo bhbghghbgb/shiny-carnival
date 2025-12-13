@@ -1,7 +1,10 @@
 import { FileExcelOutlined, FilePdfOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { exportTablePdf } from '../../../utils/exportPdf'
+import { importTableExcel } from '../../../utils/importExcel'
 import { orderPageConfig } from '../config/orderPageConfig'
+import { useOrderManagementPage } from '../hooks'
+import type { CreateOrderRequest } from '../types/api'
 import type { OrderEntity } from '../types/entity'
 
 const { Title, Text } = Typography
@@ -11,12 +14,18 @@ interface OrderHeaderProps {
 }
 
 export const OrderHeader = ({ orders }: OrderHeaderProps) => {
+    const {createOrder} = useOrderManagementPage()
+
     const exportPDF = () => {
         exportTablePdf(orderPageConfig,orders,"orders");
     };
-    const importExcel = () =>{
-
-    }
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createOrder.mutateAsync({
+                ...(payload as CreateOrderRequest),
+            })
+        );
+    };
     return (
         <Card
             style={{
@@ -42,6 +51,16 @@ export const OrderHeader = ({ orders }: OrderHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
                     <Button
                             type="primary"
                             size="large"

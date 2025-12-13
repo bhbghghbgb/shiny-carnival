@@ -1,7 +1,10 @@
 import { FileExcelOutlined, FilePdfOutlined, ShopOutlined } from "@ant-design/icons";
 import { Button, Card, Col, Row, Space, Typography } from "antd";
 import { exportTablePdf } from "../../../utils/exportPdf";
+import { importTableExcel } from "../../../utils/importExcel";
 import { supplierPageConfig } from "../config/supplierPageConfig";
+import { useSupplierManagementPage } from "../hooks";
+import type { CreateSupplierRequest } from "../types/api";
 import type { SupplierEntity } from "../types/entity";
 
 const { Title, Text } = Typography;
@@ -11,12 +14,18 @@ interface SupplierHeaderProps {
 }
 
 export const SupplierHeader = ({ suppliers }: SupplierHeaderProps) => {
+  const {createSupplier} = useSupplierManagementPage()
     const exportPDF = () => {
       exportTablePdf(supplierPageConfig,suppliers,"suppliers");
     };
-    const importExcel = () =>{
+    const importExcel = async (file: File) => {
+      await importTableExcel(file, payload => 
+        createSupplier.mutateAsync({
+          ...(payload as CreateSupplierRequest),
 
-    }
+          })
+      );
+  };
   return (
     <Card
       style={{
@@ -39,6 +48,16 @@ export const SupplierHeader = ({ suppliers }: SupplierHeaderProps) => {
         </Col>
         <Col>
           <Space>
+          <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
             <Button
                             type="primary"
                             size="large"

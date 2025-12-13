@@ -1,7 +1,10 @@
 import { FileExcelOutlined, FilePdfOutlined, FolderOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { exportTablePdf } from '../../../utils/exportPdf'
+import { importTableExcel } from '../../../utils/importExcel'
 import { categoryPageConfig } from '../config/categoryPageConfig'
+import { useCategoryManagementPage } from '../hooks'
+import type { CreateCategoryRequest } from '../types/api'
 import type { CategoryEntity } from '../types/entity'
 
 const { Title, Text } = Typography
@@ -11,12 +14,17 @@ interface CategoryHeaderProps {
 }
 
 export const CategoryHeader = ({ categories }: CategoryHeaderProps) => {
+    const {createCategory} =useCategoryManagementPage()
     const exportPDF = () => {
         exportTablePdf(categoryPageConfig,categories,"category");
     };
-    const importExcel = () =>{
-
-    }
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createCategory.mutateAsync({
+                ...(payload as CreateCategoryRequest),
+            })
+        );
+    };
     return (
         <Card
             style={{
@@ -42,6 +50,16 @@ export const CategoryHeader = ({ categories }: CategoryHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
                     <Button
                             type="primary"
                             size="large"

@@ -1,8 +1,10 @@
 import { FileExcelOutlined, FilePdfOutlined, ShoppingOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
 import { exportTablePdf } from '../../../utils/exportPdf';
-import type { ProductEntity } from '../api';
+import { importTableExcel } from '../../../utils/importExcel';
+import type { CreateProductRequest, ProductEntity } from '../api';
 import { productPageConfig } from '../config/productPageConfig';
+import { useProductManagementPage } from '../hooks';
 
 const { Title, Text } = Typography
 
@@ -12,12 +14,18 @@ interface ProductHeaderProps {
 }
 
 export const ProductHeader = ({ products }: ProductHeaderProps) => {
+    const {createProduct} = useProductManagementPage()
+
     const exportPDF = () => {
         exportTablePdf(productPageConfig,products,"products");
     };
-    const importExcel = () =>{
-
-    }
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createProduct.mutateAsync({
+                ...(payload as CreateProductRequest),
+            })
+        );
+    };
 
     return (
         <Card
@@ -45,6 +53,16 @@ export const ProductHeader = ({ products }: ProductHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
                     <Button
                             type="primary"
                             size="large"
