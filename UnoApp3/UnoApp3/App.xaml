@@ -26,9 +26,10 @@
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <!-- Boolean to Visibility Converter -->
-            <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
 
+            <converters:QuantityIsGreaterThanOneToBoolConverter x:Key="QuantityIsGreaterThanOneToBoolConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

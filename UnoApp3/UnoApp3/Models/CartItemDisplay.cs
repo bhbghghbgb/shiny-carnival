@@ -8,5 +8,6 @@ public class CartItemDisplay
     public string ProductName { get; set; } = "";
     public decimal Price { get; set; }
     public decimal Subtotal => Price * Quantity;
+    public string PriceFormatted => $"Giá: {Price:N0} đ";
     public string SubtotalFormatted => $"{Subtotal:N0} đ";
 }

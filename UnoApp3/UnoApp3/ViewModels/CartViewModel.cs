@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using Microsoft.UI.Dispatching;
 using Uno.Extensions.Navigation;
 using UnoApp3.Data.Entities;
 using UnoApp3.Models.Product;
@@ -16,7 +17,9 @@ public partial class CartViewModel : BaseViewModel
 
     [ObservableProperty] private ObservableCollection<CartItemDisplay> _cartItems;
 
-    [ObservableProperty] private bool _hasItems;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCheckoutEnabled))]
+    private bool _hasItems;
 
     [ObservableProperty] private Dictionary<int, ProductListDto> _productCache;
 
@@ -24,6 +27,7 @@ public partial class CartViewModel : BaseViewModel
     [NotifyPropertyChangedFor(nameof(TotalAmountFormatted))]
     private decimal _totalAmount;
 
+    public bool IsCheckoutEnabled => HasItems;
     public string TotalAmountFormatted => $"{TotalAmount:N0} đ";
 
     public CartViewModel(
@@ -53,8 +57,10 @@ public partial class CartViewModel : BaseViewModel
             CartItems.Clear();
             ProductCache.Clear();
             TotalAmount = 0;
+            HasItems = false;
 
             var items = await _cartRepository.GetCartItemsAsync();
+            HasItems = items.Count > 0;
 
             foreach (var item in items)
             {
@@ -83,8 +89,6 @@ public partial class CartViewModel : BaseViewModel
                     TotalAmount += product.Price * item.Quantity;
                 }
             }
-
-            HasItems = CartItems.Any();
         }
         finally
         {
@@ -94,18 +98,24 @@ public partial class CartViewModel : BaseViewModel
 
     // Option 1: Separate increase/decrease commands (recommended for UI)
     [RelayCommand]
-    private async Task IncreaseQuantity(CartItem item)
+    private async Task IncreaseQuantity(CartItemDisplay itemDisplay)
     {
-        if (item == null) return;
+        if (itemDisplay == null) return;
+
+        // Create the CartItem entity required by the repository
+        var item = new CartItem { ProductId = itemDisplay.ProductId, Quantity = itemDisplay.Quantity };
 
         await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity + 1);
         await LoadCart();
     }
 
     [RelayCommand]
-    private async Task DecreaseQuantity(CartItem item)
+    private async Task DecreaseQuantity(CartItemDisplay itemDisplay)
     {
-        if (item == null || item.Quantity <= 1) return;
+        if (itemDisplay == null || itemDisplay.Quantity <= 1) return;
+
+        // Create the CartItem entity required by the repository
+        var item = new CartItem { ProductId = itemDisplay.ProductId, Quantity = itemDisplay.Quantity };
 
         await _cartRepository.UpdateCartItemAsync(item.ProductId, item.Quantity - 1);
         await LoadCart();
@@ -122,11 +132,11 @@ public partial class CartViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async Task RemoveItem(CartItem item)
+    private async Task RemoveItem(CartItemDisplay itemDisplay)
     {
-        if (item == null) return;
+        if (itemDisplay == null) return;
 
-        await _cartRepository.RemoveFromCartAsync(item.ProductId);
+        await _cartRepository.RemoveFromCartAsync(itemDisplay.ProductId);
         await LoadCart();
     }
 

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Uno.Extensions.Navigation;
 
 namespace UnoApp3.ViewModels;
@@ -13,10 +14,13 @@ public partial class BaseViewModel : ObservableObject
     private string _title;
 
     protected INavigator Navigator { get; }
+    
+    // protected DispatcherQueue Dispatcher { get; }
 
     public BaseViewModel(INavigator navigator)
     {
         Navigator = navigator;
+        // Dispatcher = DispatcherQueue.GetForCurrentThread();
     }
 
     [RelayCommand]

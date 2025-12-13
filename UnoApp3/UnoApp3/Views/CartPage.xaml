@@ -5,9 +5,103 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:utu="using:Uno.Toolkit.UI"
       xmlns:vm="using:UnoApp3.ViewModels"
+      xmlns:models="using:UnoApp3.Models"
+      xmlns:entities="using:UnoApp3.Data.Entities"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance Type=vm:CartViewModel}"
+      x:Name="PageRoot"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <DataTemplate x:DataType="models:CartItemDisplay" x:Key="CartItemTemplate">
+            <Grid Padding="0,10"
+                  BorderThickness="0,0,0,1"
+                  BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0"
+                            Grid.Column="0"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding ProductName}"
+                               Style="{StaticResource SubtitleTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding PriceFormatted}"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+
+                <Button Grid.Row="0"
+                        Grid.Column="2"
+                        Style="{StaticResource OutlinedButtonStyle}"
+                        Command="{Binding DataContext.RemoveItemCommand, ElementName=CartItemsList}"
+                        CommandParameter="{Binding}"
+                        HorizontalAlignment="Right">
+                    <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                    <ToolTipService.ToolTip>
+                        <ToolTip Content="Xóa khỏi giỏ" />
+                    </ToolTipService.ToolTip>
+                </Button>
+
+
+                <StackPanel Grid.Row="1"
+                            Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            Margin="0,8,0,0">
+
+                    <Button Style="{StaticResource AccentButtonStyle}"
+                            Width="30"
+                            Height="30"
+                            Padding="0"
+                            CornerRadius="15"
+                            Command="{Binding DataContext.DecreaseQuantityCommand, ElementName=CartItemsList}"
+                            CommandParameter="{Binding}"
+                            IsEnabled="{Binding Quantity, Converter={StaticResource QuantityIsGreaterThanOneToBoolConverter}, ConverterParameter=1}">
+                        <TextBlock Text="-" FontWeight="SemiBold" />
+                    </Button>
+
+                    <Border BorderThickness="1"
+                            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                            CornerRadius="{StaticResource ControlCornerRadius}"
+                            Padding="8,4">
+                        <TextBlock Text="{Binding Quantity}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   Width="30" />
+                    </Border>
+
+                    <Button Style="{StaticResource AccentButtonStyle}"
+                            Width="30"
+                            Height="30"
+                            Padding="0"
+                            CornerRadius="15"
+                            Command="{Binding DataContext.IncreaseQuantityCommand, ElementName=CartItemsList}"
+                            CommandParameter="{Binding}">
+                        <TextBlock Text="+" FontWeight="SemiBold" />
+                    </Button>
+                </StackPanel>
+
+                <TextBlock Grid.Row="1"
+                           Grid.Column="2"
+                           Text="{Binding SubtotalFormatted}"
+                           Style="{StaticResource SubtitleTextBlockStyle}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           Margin="16,8,0,0" />
+
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -16,21 +110,20 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Navigation Bar -->
         <utu:NavigationBar Content="Giỏ hàng" />
 
-        <!-- Cart Items List -->
         <ListView Grid.Row="1"
+                  x:Name="CartItemsList"
                   ItemsSource="{Binding CartItems}"
                   SelectionMode="None"
-                  ItemTemplate="{StaticResource CartItemTemplate}" />
+                  ItemTemplate="{StaticResource CartItemTemplate}"
+                  Padding="20,0"
+                  Margin="0,10,0,0" />
 
-        <!-- Empty State -->
         <StackPanel Grid.Row="1"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-            <!-- OR use FontIcon with Segoe MDL2 Assets -->
+                    Visibility="{Binding HasItems, Converter={StaticResource InverseBoolToVisibilityConverter}, Mode=OneWay}">
             <FontIcon Glyph="&#xE7BF;" FontSize="48" FontFamily="Segoe MDL2 Assets" />
             <TextBlock Text="Giỏ hàng trống"
                        Style="{StaticResource TitleTextBlockStyle}"
@@ -40,7 +133,6 @@
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
         </StackPanel>
 
-        <!-- Total and Checkout Button -->
         <Border Grid.Row="2"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 Padding="20">
@@ -55,12 +147,13 @@
                     <TextBlock Grid.Column="1"
                                Text="{Binding TotalAmountFormatted}"
                                Style="{StaticResource TitleTextBlockStyle}"
+                               FontWeight="SemiBold"
                                Foreground="{ThemeResource SystemAccentColor}" />
                 </Grid>
 
                 <Button Content="Đặt hàng"
                         Command="{Binding CheckoutCommand}"
-                        IsEnabled="{Binding HasItems}"
+                        IsEnabled="{Binding IsCheckoutEnabled}"
                         HorizontalAlignment="Stretch" />
             </StackPanel>
         </Border>
