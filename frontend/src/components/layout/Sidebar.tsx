@@ -52,8 +52,4 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
   );
 };
 
-<<<<<<< HEAD
 export default Sidebar;
-=======
-export default Sidebar;
->>>>>>> dev/hung-nt-init-ui
