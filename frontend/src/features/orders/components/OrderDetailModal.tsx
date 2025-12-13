@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { orderApiService } from '../api/OrderApiService'
 import type { OrderDetailsDto, OrderItemEntity } from '../types/entity'
 import { API_CONFIG } from '../../../config/api.config'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 
 const { Title, Text } = Typography
 
@@ -13,8 +14,11 @@ interface OrderDetailModalProps {
 }
 
 export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalProps) {
+    // Sử dụng query key pattern giống với createQueryKeys để đảm bảo invalidate đúng
+    const queryKeys = createQueryKeys('orders')
+    
     const { data: orderDetails, isLoading } = useQuery<OrderDetailsDto>({
-        queryKey: ['order', 'details', orderId],
+        queryKey: queryKeys.detail(orderId!),
         queryFn: () => orderApiService.getOrderDetails(orderId!),
         enabled: open && orderId !== null,
     })

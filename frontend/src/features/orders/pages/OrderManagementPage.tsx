@@ -5,6 +5,7 @@ import { OrderHeader } from '../components/OrderHeader'
 import { OrderStatistics } from '../components/OrderStatistics'
 import { OrderSearchFilter } from '../components/OrderSearchFilter'
 import { OrderDetailModal } from '../components/OrderDetailModal'
+import { CreateOrderForm } from '../components/CreateOrderForm'
 import { useOrderManagementPage } from '../hooks/useOrderManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
 import { orderPageConfig } from '../config/orderPageConfig'
@@ -120,6 +121,22 @@ export function OrderManagementPage() {
                         Chi tiết
                     </Button>
                 )}
+                renderCustomForm={({ mode, onSubmit, onCancel, loading, errorMessage, onClearError }) => {
+                    // Chỉ render custom form cho create mode
+                    if (mode === 'create') {
+                        return (
+                            <CreateOrderForm
+                                onSubmit={onSubmit as (values: CreateOrderRequest) => Promise<void>}
+                                onCancel={onCancel}
+                                loading={loading}
+                                errorMessage={errorMessage}
+                                onClearError={onClearError}
+                            />
+                        )
+                    }
+                    // Update mode vẫn dùng generic form
+                    return null
+                }}
             />
             <OrderDetailModal
                 orderId={selectedOrderId}
