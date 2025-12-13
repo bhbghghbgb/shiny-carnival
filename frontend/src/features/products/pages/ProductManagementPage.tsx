@@ -1,6 +1,10 @@
+import { useState } from 'react'
+import { Button } from 'antd'
+import { EyeOutlined } from '@ant-design/icons'
 import { ProductHeader } from '../components/ProductHeader'
 import { ProductStatistics } from '../components/ProductStatistics'
 import { ProductSearchFilter } from '../components/ProductSearchFilter'
+import { ProductDetailModal } from '../components/ProductDetailModal'
 import { useProductManagementPage } from '../hooks/useProductManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
 import { productPageConfig } from '../config/productPageConfig'
@@ -8,6 +12,9 @@ import type { ProductEntity } from '../types/entity'
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
 
 export function ProductManagementPage() {
+    const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
     const {
         products,
         total,
@@ -43,6 +50,16 @@ export function ProductManagementPage() {
         clearPageError,
         clearFormError,
     } = useProductManagementPage()
+
+    const handleViewDetail = (product: ProductEntity) => {
+        setSelectedProductId(product.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedProductId(null)
+    }
 
     return (
         <div style={{ padding: '24px' }}>
@@ -91,6 +108,20 @@ export function ProductManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <ProductDetailModal
+                productId={selectedProductId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )
