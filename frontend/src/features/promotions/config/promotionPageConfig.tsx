@@ -48,6 +48,18 @@ const columns: ColumnsType<PromotionEntity> = [
         render: (value: string) => value ? new Date(value).toLocaleDateString('vi-VN') : '--',
     },
     {
+        title: 'Số lần đã dùng',
+        dataIndex: 'usedCount',
+        align: 'center',
+        render: (value: number) => value ?? 0,
+    },
+    {
+        title: 'Số lần sử dụng giới hạn',
+        dataIndex: 'usageLimit',
+        align: 'center',
+        render: (value: number) => value ?? '--',
+    },
+    {
         title: 'Trạng thái',
         dataIndex: 'status',
         render: (status: string) => {

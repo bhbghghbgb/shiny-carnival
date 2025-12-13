@@ -59,6 +59,7 @@ public class PromotionService : IPromotionService
                 StartDate = p.StartDate.ToDateTime(TimeOnly.MinValue),
                 EndDate = p.EndDate.ToDateTime(TimeOnly.MaxValue),
                 Status = p.Status.ToString().ToLower(),
+                UsageLimit = p.UsageLimit,
                 UsedCount = p.UsedCount,
                 RemainingUsage = p.UsageLimit - p.UsedCount
             });
