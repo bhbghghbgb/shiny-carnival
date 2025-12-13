@@ -89,7 +89,7 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
                     })
                     const items = paged.items ?? []
                     return items.map((c: CustomerEntity) => ({ 
-                        label: c.name ?? `#${c.id}`, 
+                        label: `${c.name ?? 'N/A'} - ${c.phone ?? 'N/A'}`, 
                         value: c.id 
                     }))
                 },
