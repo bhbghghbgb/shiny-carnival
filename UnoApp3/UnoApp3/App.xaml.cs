@@ -102,19 +102,25 @@ public partial class App : Application
         (initialNavigate: async (services, navigator) =>
         {
             // Initialize database before any navigation
+            this.Log().LogInformation("Database initialzing");
             await InitializeDatabaseAsync(services);
+            this.Log().LogInformation("Database initialized");
 
-            var auth = services.GetRequiredService<IAuthenticationService>();
-            var authenticated = await auth.RefreshAsync();
-            if (authenticated)
-            {
-                await navigator.NavigateViewModelAsync<MainScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
-            }
-            else
-            {
-                await navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
-            }
+            // var auth = services.GetRequiredService<IAuthenticationService>();
+            // var authenticated = await auth.RefreshAsync();
+            // if (authenticated)
+            // {
+            //     await navigator.NavigateViewModelAsync<MainScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
+            // }
+            // else
+            // {
+            //     await navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
+            // }
+            
+            await navigator.NavigateViewModelAsync<LoginViewModel>(this, qualifier: Qualifiers.Nested);
+            this.Log().LogInformation("Navigated to login page");
         });
+        this.Log().LogInformation("Navigated Async");
     }
 
     /// <summary>
@@ -153,7 +159,7 @@ public partial class App : Application
             new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
                 Nested:
                 [
-                    new("Login", View: views.FindByViewModel<LoginViewModel>()),
+                    new("Login", View: views.FindByViewModel<LoginViewModel>(), IsDefault: true),
                     new("Main", View: views.FindByViewModel<MainViewModel>(),
                         Nested:
                         [
