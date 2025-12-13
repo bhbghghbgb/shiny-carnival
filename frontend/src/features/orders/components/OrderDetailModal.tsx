@@ -1,8 +1,10 @@
-import { Modal, Descriptions, Table, Tag, Divider, Space, Typography } from 'antd'
 import { useQuery } from '@tanstack/react-query'
+import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Typography } from 'antd'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+import { API_CONFIG } from '../../../config/api.config'
 import { orderApiService } from '../api/OrderApiService'
 import type { OrderDetailsDto, OrderItemEntity } from '../types/entity'
-import { API_CONFIG } from '../../../config/api.config'
 
 const { Title, Text } = Typography
 
@@ -81,6 +83,39 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
         return methodMap[method] || method
     }
 
+    const printPDF = async () => {
+        const input = document.getElementById('order-detail-pdf')
+        if (!input) return
+
+        const pdf = new jsPDF('p', 'mm', 'a4')
+        const pageWidth = pdf.internal.pageSize.getWidth()
+        const pageHeight = pdf.internal.pageSize.getHeight()
+
+        // Chụp canvas
+        const canvas = await html2canvas(input, { scale: 2 })
+        const imgData = canvas.toDataURL('image/png')
+        const imgWidth = pageWidth
+        const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+        if (imgHeight <= pageHeight) {
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+        } else {
+            // Nếu cao hơn 1 trang, chia thành nhiều trang
+            let position = 0
+            let remainingHeight = imgHeight
+            const pageCanvasHeight = (canvas.height * pageWidth) / canvas.width * (pageHeight / imgHeight)
+
+            while (remainingHeight > 0) {
+                pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight)
+                remainingHeight -= pageHeight
+                position += pageHeight
+                if (remainingHeight > 0) pdf.addPage()
+            }
+        }
+
+        pdf.save(`don-hang-${orderId}.pdf`)
+    }
+
     return (
         <Modal
             title={<Title level={4} style={{ margin: 0 }}>Chi tiết đơn hàng #{orderId}</Title>}
@@ -93,6 +128,8 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
             {isLoading ? (
                 <div style={{ textAlign: 'center', padding: '40px' }}>Đang tải...</div>
             ) : orderDetails ? (
+                <>
+                <div id="order-detail-pdf">
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     {/* Thông tin đơn hàng */}
                     <Descriptions title="Thông tin đơn hàng" bordered column={2}>
@@ -188,6 +225,10 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
                         </>
                     )}
                 </Space>
+                </div>
+
+                    <Button type="primary" style={{ marginTop: 16 }} onClick={printPDF}>Xuất PDF</Button>
+                </>
             ) : (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
                     Không tìm thấy thông tin đơn hàng
