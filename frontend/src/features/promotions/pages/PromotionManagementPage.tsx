@@ -1,4 +1,7 @@
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { PromotionHeader } from '../components/PromotionHeader'
+import { PromotionSearchFilter } from '../components/PromotionSearchFilter'
+import { PromotionStatistics } from '../components/PromotionStatistics'
 import { promotionPageConfig } from '../config/promotionPageConfig'
 import { usePromotionManagementPage } from '../hooks'
 import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'

@@ -1,3 +1,4 @@
+import { FilePdfOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
 import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Typography } from 'antd'
 import html2canvas from 'html2canvas'
@@ -90,35 +91,41 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
     const printPDF = async () => {
         const input = document.getElementById('order-detail-pdf')
         if (!input) return
-
+    
         const pdf = new jsPDF('p', 'mm', 'a4')
+    
         const pageWidth = pdf.internal.pageSize.getWidth()
         const pageHeight = pdf.internal.pageSize.getHeight()
+        const contentWidth = pageWidth - 15 * 2
+        const contentHeight = pageHeight
 
-        // Chụp canvas
-        const canvas = await html2canvas(input, { scale: 2 })
-        const imgData = canvas.toDataURL('image/png')
-        const imgWidth = pageWidth
-        const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-        if (imgHeight <= pageHeight) {
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
-        } else {
-            // Nếu cao hơn 1 trang, chia thành nhiều trang
-            let position = 0
-            let remainingHeight = imgHeight
-            const pageCanvasHeight = (canvas.height * pageWidth) / canvas.width * (pageHeight / imgHeight)
-
-            while (remainingHeight > 0) {
-                pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight)
-                remainingHeight -= pageHeight
-                position += pageHeight
-                if (remainingHeight > 0) pdf.addPage()
-            }
+        const drawHeader = () => {
+            pdf.setFontSize(14)
+            pdf.setFont('helvetica', 'bold')
+            pdf.text('CHI TIET DON HANG #'+ orderId, pageWidth / 2, 20, { align: 'center' })
+            pdf.setLineWidth(0.3)
+            pdf.line(15, 35, pageWidth - 15, 35)
         }
+    
+        const canvas = await html2canvas(input, {scale: 2,useCORS: true,backgroundColor: '#ffffff',})
+        const imgData = canvas.toDataURL('image/jpeg', 1.0)
+        const imgHeight = (canvas.height * contentWidth) / canvas.width
+        let heightLeft = imgHeight
+        let position = 20
 
+        drawHeader()
+        pdf.addImage(imgData,'JPEG',15,position,contentWidth,imgHeight)
+    
+        heightLeft -= contentHeight
+        while (heightLeft > 0) {
+            pdf.addPage()
+            position = 20 - (imgHeight - heightLeft)
+            pdf.addImage(imgData,'JPEG',15,position,contentWidth,imgHeight)
+            heightLeft -= contentHeight
+        }
         pdf.save(`don-hang-${orderId}.pdf`)
     }
+    
 
     return (
         <Modal
@@ -230,8 +237,23 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
                     )}
                 </Space>
                 </div>
-
-                    <Button type="primary" style={{ marginTop: 16 }} onClick={printPDF}>Xuất PDF</Button>
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<FilePdfOutlined />}
+                    onClick={printPDF}
+                    style={{
+                        borderRadius: '8px',
+                        height: '40px',
+                        paddingLeft: '20px',
+                        paddingRight: '20px',
+                        marginTop:  '20px',
+                        background: '#d9534f',
+                        boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                    }}
+                >
+                    Export PDF
+                </Button>
                 </>
             ) : (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
