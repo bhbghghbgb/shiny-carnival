@@ -6,6 +6,6 @@ namespace UnoApp3.Services.Api;
 
 public interface IAuthApi
 {
-    [Post("/auth/login")]
+    [Post("/Auth/login")]
     Task<Models.Common.ApiResponse<LoginResponse>> Login([Body] LoginRequest request);
 }

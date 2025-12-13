@@ -6,9 +6,9 @@ namespace UnoApp3.Services.Api;
 
 public interface IProductApi
 {
-    [Get("/admin/products")]
+    [Get("/public/products")]
     Task<Models.Common.ApiResponse<PagedList<ProductListDto>>> GetProducts([Query] ProductSearchRequest request);
 
-    [Get("/admin/products/{id}")]
+    [Get("/public/products/{id}")]
     Task<Models.Common.ApiResponse<ProductResponseDto>> GetProduct(int id);
 }

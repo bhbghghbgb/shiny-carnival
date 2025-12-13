@@ -6,6 +6,6 @@ namespace UnoApp3.Services.Api;
 
 public interface IOrderApi
 {
-    [Post("/admin/orders")]
+    [Post("/public/orders")]
     Task<Models.Common.ApiResponse<OrderDetailsDto>> CreateOrder([Body] CreateOrderRequest request);
 }
