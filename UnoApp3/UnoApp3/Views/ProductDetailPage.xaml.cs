@@ -1,56 +1,99 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using UnoApp3.ViewModels;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+﻿using UnoApp3.ViewModels;
 
 namespace UnoApp3.Views;
 
-/// <summary>
-/// An empty page that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class ProductDetailPage : Page
 {
-    private ProductDetailViewModel ViewModel =>
-        DataContext as ProductDetailViewModel ?? throw new NullReferenceException();
+    private int? _pendingProductId;
 
-    private int? _productId = null;
+    public ProductDetailViewModel? ViewModel => DataContext as ProductDetailViewModel;
 
     public ProductDetailPage()
     {
         this.InitializeComponent();
-        this.Loaded += ProductDetailPage_Loaded;
+        this.DataContextChanged += OnDataContextChanged;
     }
 
-    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        ;
-        // If we received a productId parameter directly
+
+        this.Log().LogDebug($"OnNavigatedTo - Parameter type: {e.Parameter?.GetType().Name}");
+        this.Log().LogDebug($"OnNavigatedTo - DataContext is null: {DataContext == null}");
+
+        // Extract productId from different parameter types
         if (e.Parameter is int productId)
         {
-            this._productId = productId;
+            _pendingProductId = productId;
+            this.Log().LogDebug($"Received productId: {productId}");
+        }
+        else if (e.Parameter is IDictionary<string, object> dict &&
+                 dict.TryGetValue("productId", out var idObj))
+        {
+            if (idObj is int id)
+            {
+                _pendingProductId = id;
+                this.Log().LogDebug($"Received productId from dict: {id}");
+            }
+        }
+
+        // Try to load immediately if DataContext is available
+        if (ViewModel != null && _pendingProductId.HasValue)
+        {
+            this.Log().LogDebug("DataContext available immediately, loading product");
+            _ = LoadProductWhenReady(_pendingProductId.Value);
+        }
+        else
+        {
+            this.Log().LogDebug("DataContext not ready, will wait");
         }
     }
 
-    private async void ProductDetailPage_Loaded(object sender, RoutedEventArgs e)
+    private async void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
     {
-        var data = new Dictionary<string, object>
+        this.Log().LogDebug(
+            $"DataContextChanged - New DataContext type: {args.NewValue?.GetType().Name}");
+
+        if (ViewModel != null && _pendingProductId.HasValue)
         {
-            ["productId"] = _productId
-        };
-        await ViewModel.OnNavigatedTo(data);
+            this.Log().LogDebug($"DataContext now available, loading product {_pendingProductId.Value}");
+            await LoadProductWhenReady(_pendingProductId.Value);
+            _pendingProductId = null; // Clear so we don't load again
+        }
+    }
+
+    private async Task LoadProductWhenReady(int productId)
+    {
+        // Wait up to 5 seconds for ViewModel to be available
+        var maxAttempts = 50; // 50 * 100ms = 5 seconds
+        var attempts = 0;
+
+        while (ViewModel == null && attempts < maxAttempts)
+        {
+            this.Log().LogDebug($"Waiting for ViewModel... Attempt {attempts + 1}");
+            await Task.Delay(100);
+            attempts++;
+        }
+
+        if (ViewModel != null)
+        {
+            this.Log().LogDebug(
+                $"ViewModel ready after {attempts * 100}ms, loading product {productId}");
+            var data = new Dictionary<string, object>
+            {
+                ["productId"] = productId
+            };
+            await ViewModel.OnNavigatedTo(data);
+        }
+        else
+        {
+            this.Log().LogDebug($"ERROR: ViewModel still null after {maxAttempts * 100}ms!");
+        }
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        this.DataContextChanged -= OnDataContextChanged;
     }
 }
