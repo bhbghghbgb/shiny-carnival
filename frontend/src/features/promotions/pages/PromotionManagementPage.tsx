@@ -1,5 +1,6 @@
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
 import { promotionPageConfig } from '../config/promotionPageConfig'
+import { usePromotionManagementPage } from '../hooks'
 import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
 import type { PromotionEntity } from '../types/entity'
 
