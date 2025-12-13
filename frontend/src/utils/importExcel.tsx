@@ -13,7 +13,6 @@ export async function importTableExcel(createFields, file, onCreate) {
                 const rows: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
                 for (const row of rows) {
-                    const payload = {};
 
                     for (const field of createFields) {
                         payload[field] = row[field] ?? "";
