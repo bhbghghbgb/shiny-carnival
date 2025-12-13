@@ -77,10 +77,6 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
             [API_CONFIG.PAYMENT_METHODS.BANK_TRANSFER]: 'Chuyển khoản',
             [API_CONFIG.PAYMENT_METHODS.E_WALLET]: 'Ví điện tử',
             // Fallback cho các format khác
-            'bank_transfer': 'Chuyển khoản',
-            'bank-transfer': 'Chuyển khoản',
-            'e-wallet': 'Ví điện tử',
-            'e_wallet': 'Ví điện tử',
         }
         return methodMap[method] || method
     }
