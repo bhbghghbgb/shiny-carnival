@@ -137,11 +137,51 @@ axiosClient.interceptors.response.use(
 
     // Xử lý các lỗi khác
     if (error.response?.data) {
+      // Backend có thể trả về ApiResponse hoặc ProblemDetails (application/problem+json) hoặc validation errors
+      const responseData = error.response.data as any;
+
+      // Lấy message từ nhiều nguồn có thể
+      let errorMessage = 'Có lỗi xảy ra';
+
+      // Ưu tiên 1: ApiResponse format từ backend (isError === true)
+      if (responseData.isError === true && responseData.message) {
+        errorMessage = responseData.message;
+      }
+      // Ưu tiên 2: ApiResponse format nhưng không có isError flag (fallback)
+      else if (responseData.message && typeof responseData.message === 'string') {
+        errorMessage = responseData.message;
+      }
+      // Ưu tiên 3: ProblemDetails format (application/problem+json)
+      else if (responseData.title) {
+        errorMessage = responseData.title;
+        if (responseData.detail) {
+          errorMessage += `: ${responseData.detail}`;
+        }
+      }
+      // Ưu tiên 4: Detail không có title
+      else if (responseData.detail) {
+        errorMessage = responseData.detail;
+      }
+      // Ưu tiên 5: Validation errors (FluentValidation format)
+      else if (responseData.errors) {
+        const validationMessages = Object.values(responseData.errors as Record<string, string[]>)
+          .flat()
+          .join('; ');
+        if (validationMessages) {
+          errorMessage = validationMessages;
+        }
+      }
+      // Ưu tiên 6: String response
+      else if (typeof responseData === 'string') {
+        errorMessage = responseData;
+      }
+
       // Trả về error message từ API response
       return Promise.reject({
         ...error,
-        message: error.response.data.message || 'Có lỗi xảy ra',
-        data: error.response.data
+        message: errorMessage,
+        data: responseData,
+        originalError: error, // Giữ lại error gốc để debug
       });
     }
 

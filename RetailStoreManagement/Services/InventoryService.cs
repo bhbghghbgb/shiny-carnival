@@ -156,7 +156,7 @@ public class InventoryService : IInventoryService
         {
             var lowStockItems = await _unitOfWork.Inventory.GetQueryable()
                 .Include(i => i.Product)
-                .Where(i => i.Quantity <= LOW_STOCK_THRESHOLD)
+                .Where(i => i.Quantity < LOW_STOCK_THRESHOLD)
                 .ToListAsync();
 
             var alertDtos = lowStockItems.Select(i => new LowStockAlertDto

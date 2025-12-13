@@ -1,9 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Alert, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
+import type React from 'react'
+import { Alert, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, message, DatePicker } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { ColumnsType, TablePaginationConfig, TableProps, ColumnType, ColumnGroupType } from 'antd/es/table'
 import type { GenericPageConfig } from './GenericPageConfig'
 import { DropDownWithFilter } from '../../common/DropDownWithFilter'
+import type { Dayjs } from 'dayjs'
+
+const { RangePicker } = DatePicker
 
 type Order = 'ascend' | 'descend' | undefined
 
@@ -33,6 +37,17 @@ export interface GenericPageProps<TData, TCreate, TUpdate> {
     onClearPageError?: () => void
     formErrorMessage?: string | null
     onClearFormError?: () => void
+    renderCustomActions?: (record: TData) => React.ReactNode
+    renderCustomForm?: (props: {
+        mode: 'create' | 'update'
+        onSubmit: (values: TCreate | TUpdate) => Promise<void>
+        onCancel: () => void
+        loading: boolean
+        errorMessage: string | null
+        onClearError: () => void
+        initialValues?: Partial<TCreate | TUpdate>
+        record?: TData
+    }) => React.ReactNode
 }
 
 export function GenericPage<TData extends { id?: string | number }, TCreate, TUpdate>({
@@ -61,6 +76,8 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     onClearPageError,
     formErrorMessage,
     onClearFormError,
+    renderCustomActions,
+    renderCustomForm,
 }: GenericPageProps<TData, TCreate, TUpdate>) {
     const [form] = Form.useForm()
     const [isModalVisible, setIsModalVisible] = useState(false)
@@ -95,13 +112,15 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             actions.push('delete')
         }
 
-        if (!actions.length) return null
+        const hasCustomActions = renderCustomActions !== undefined
+        if (!actions.length && !hasCustomActions) return null
 
         return {
             title: 'Actions',
             key: 'actions',
             render: (_, record) => (
                 <Space>
+                    {renderCustomActions && renderCustomActions(record)}
                     {actions.includes('edit') && (
                         <Button size="small" onClick={() => handleEdit(record)}>
                             Edit
@@ -122,7 +141,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 </Space>
             ),
         }
-    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate, handleDelete, handleEdit])
+    }, [config.features?.enableDelete, config.features?.enableEdit, deleteLoading, onDelete, onUpdate, handleDelete, handleEdit, renderCustomActions])
 
     const columns: ColumnsType<TData> = useMemo(() => {
         const base = config.table.columns
@@ -182,8 +201,12 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields()
+            
             if (editingRecord) {
-                if (!onUpdate) return
+                if (!onUpdate) {
+                    console.warn('onUpdate is not provided')
+                    return
+                }
                 const payload = config.form.mapUpdatePayload
                     ? config.form.mapUpdatePayload(values, editingRecord)
                     : values
@@ -191,7 +214,10 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 message.success(`${config.entity.displayName} đã được cập nhật`)
             } else {
                 if (!onCreate) return
-                await onCreate(values)
+                const payload = config.form.mapCreatePayload
+                    ? config.form.mapCreatePayload(values)
+                    : values
+                await onCreate(payload)
                 message.success(`${config.entity.displayName} đã được tạo`)
             }
             form.resetFields()
@@ -199,6 +225,15 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             setEditingRecord(null)
         } catch (error: unknown) {
             if (error && typeof error === 'object' && 'errorFields' in error) {
+                // Validation errors - Ant Design will display them automatically
+                // But we should still show a message to user
+                const errorFields = (error as { errorFields?: Array<{ name: string[]; errors: string[] }> }).errorFields
+                if (errorFields && errorFields.length > 0) {
+                    const firstError = errorFields[0]?.errors?.[0]
+                    if (firstError) {
+                        message.error(firstError)
+                    }
+                }
                 return
             }
             const msg = error instanceof Error ? error.message : 'Thao tác không thành công'
@@ -281,6 +316,43 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 )
             }
 
+            if (field.type === 'dateRange') {
+                // Merge default validation with custom rules
+                const dateRangeRules = [
+                    {
+                        required: true,
+                        message: 'Vui lòng chọn khoảng thời gian',
+                        validator: (_: any, value: [Dayjs, Dayjs] | null | undefined) => {
+                            if (!value || !Array.isArray(value) || value.length !== 2 || !value[0] || !value[1]) {
+                                return Promise.reject(new Error('Vui lòng chọn khoảng thời gian'))
+                            }
+                            return Promise.resolve()
+                        },
+                    },
+                    ...(field.rules || []),
+                ]
+                
+                return (
+                    <Form.Item
+                        key={field.name}
+                        label={field.label}
+                        name={fieldName}
+                        rules={dateRangeRules}
+                    >
+                        <RangePicker
+                            style={{ width: '100%' }}
+                            showTime
+                            format="DD/MM/YYYY HH:mm"
+                            placeholder={
+                                field.placeholder
+                                    ? (field.placeholder.split(',') as [string, string])
+                                    : (['Ngày bắt đầu', 'Ngày kết thúc'] as [string, string])
+                            }
+                        />
+                    </Form.Item>
+                )
+            }
+
             return (
                 <Form.Item
                     key={field.name}
@@ -333,33 +405,90 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                 onChange={handleTableChange}
             />
 
-            <Modal
-                title={
-                    editingRecord
-                        ? `Cập nhật ${config.entity.displayName}`
-                        : `Thêm ${config.entity.displayName}`
+            {(() => {
+                // Kiểm tra xem custom form có được render hay không
+                let hasCustomForm = false
+                let customFormContent: React.ReactNode = null
+
+                if (renderCustomForm) {
+                    customFormContent = renderCustomForm({
+                        mode: editingRecord ? 'update' : 'create',
+                        onSubmit: async (values: TCreate | TUpdate) => {
+                            try {
+                                if (editingRecord) {
+                                    if (!onUpdate) return
+                                    await onUpdate(editingRecord, values as TUpdate)
+                                    message.success(`${config.entity.displayName} đã được cập nhật`)
+                                } else {
+                                    if (!onCreate) return
+                                    await onCreate(values as TCreate)
+                                    message.success(`${config.entity.displayName} đã được tạo`)
+                                }
+                                form.resetFields()
+                                setIsModalVisible(false)
+                                setEditingRecord(null)
+                            } catch (error) {
+                                const msg = error instanceof Error ? error.message : 'Thao tác không thành công'
+                                message.error(msg)
+                            }
+                        },
+                        onCancel: closeModal,
+                        loading: editingRecord ? (updateLoading || false) : (createLoading || false),
+                        errorMessage: formErrorMessage || null,
+                        onClearError: onClearFormError || (() => {}),
+                        initialValues: editingRecord
+                            ? (config.form.getUpdateInitialValues?.(editingRecord) ?? (editingRecord as unknown as Partial<TUpdate>))
+                            : (config.form.getCreateInitialValues?.() ?? {}),
+                        record: editingRecord || undefined,
+                    })
+                    hasCustomForm = customFormContent !== null
                 }
-                open={isModalVisible}
-                onOk={handleSubmit}
-                onCancel={closeModal}
-                confirmLoading={editingRecord ? updateLoading : createLoading}
-                destroyOnClose
-                forceRender
-            >
-                {formErrorMessage && (
-                    <Alert
-                        style={{ marginBottom: 16 }}
-                        type="error"
-                        showIcon
-                        closable
-                        message={formErrorMessage}
-                        onClose={onClearFormError}
-                    />
-                )}
-                <Form form={form} layout="vertical">
-                    {renderFormFields}
-                </Form>
-            </Modal>
+
+                return (
+                    <Modal
+                        title={
+                            editingRecord
+                                ? `Cập nhật ${config.entity.displayName}`
+                                : `Thêm ${config.entity.displayName}`
+                        }
+                        open={isModalVisible}
+                        onOk={hasCustomForm ? undefined : handleSubmit}
+                        onCancel={closeModal}
+                        confirmLoading={editingRecord ? updateLoading : createLoading}
+                        destroyOnClose
+                        forceRender
+                        width={hasCustomForm ? 1200 : undefined}
+                        footer={hasCustomForm ? null : undefined}
+                    >
+                        {hasCustomForm ? (
+                            customFormContent
+                        ) : (
+                            <>
+                                {formErrorMessage && (
+                                    <Alert
+                                        style={{ marginBottom: 16 }}
+                                        type="error"
+                                        showIcon
+                                        closable
+                                        message={formErrorMessage}
+                                        onClose={onClearFormError}
+                                    />
+                                )}
+                                <Form 
+                                    form={form} 
+                                    layout="vertical" 
+                                    onFinish={(values) => {
+                                        console.log('Form onFinish called', values)
+                                        handleSubmit()
+                                    }}
+                                >
+                                    {renderFormFields}
+                                </Form>
+                            </>
+                        )}
+                    </Modal>
+                )
+            })()}
         </Space>
     )
 }

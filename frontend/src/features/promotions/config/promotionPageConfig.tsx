@@ -4,6 +4,7 @@ import type { PromotionEntity } from '../types/entity'
 import type { CreatePromotionRequest, UpdatePromotionRequest } from '../types/api'
 import { Tag } from 'antd'
 import { API_CONFIG } from '../../../config/api.config'
+import dayjs from 'dayjs'
 
 const columns: ColumnsType<PromotionEntity> = [
     {
@@ -106,18 +107,11 @@ export const promotionPageConfig: GenericPageConfig<PromotionEntity, CreatePromo
                 placeholder: 'Nhập giá trị giảm',
             },
             {
-                name: 'startDate',
-                label: 'Ngày bắt đầu',
-                type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập ngày bắt đầu (ISO format)' }],
-                placeholder: 'YYYY-MM-DDTHH:mm:ss',
-            },
-            {
-                name: 'endDate',
-                label: 'Ngày kết thúc',
-                type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập ngày kết thúc (ISO format)' }],
-                placeholder: 'YYYY-MM-DDTHH:mm:ss',
+                name: 'dateRange' as any,
+                label: 'Khoảng thời gian',
+                type: 'dateRange',
+                rules: [{ required: true, message: 'Vui lòng chọn khoảng thời gian' }],
+                placeholder: 'Ngày bắt đầu, Ngày kết thúc',
             },
             {
                 name: 'minOrderAmount',
@@ -175,18 +169,11 @@ export const promotionPageConfig: GenericPageConfig<PromotionEntity, CreatePromo
                 placeholder: 'Nhập giá trị giảm',
             },
             {
-                name: 'startDate',
-                label: 'Ngày bắt đầu',
-                type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập ngày bắt đầu (ISO format)' }],
-                placeholder: 'YYYY-MM-DDTHH:mm:ss',
-            },
-            {
-                name: 'endDate',
-                label: 'Ngày kết thúc',
-                type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập ngày kết thúc (ISO format)' }],
-                placeholder: 'YYYY-MM-DDTHH:mm:ss',
+                name: 'dateRange' as any,
+                label: 'Khoảng thời gian',
+                type: 'dateRange',
+                rules: [{ required: true, message: 'Vui lòng chọn khoảng thời gian' }],
+                placeholder: 'Ngày bắt đầu, Ngày kết thúc',
             },
             {
                 name: 'minOrderAmount',
@@ -222,17 +209,71 @@ export const promotionPageConfig: GenericPageConfig<PromotionEntity, CreatePromo
             description: record.description,
             discountType: record.discountType,
             discountValue: record.discountValue,
-            startDate: record.startDate,
-            endDate: record.endDate,
+            dateRange: record.startDate && record.endDate 
+                ? [dayjs(record.startDate), dayjs(record.endDate)]
+                : null,
             minOrderAmount: record.minOrderAmount,
             usageLimit: record.usageLimit,
             status: record.status,
-        }),
-        mapUpdatePayload: (values, record) => ({
-            ...values,
-            id: record.id,
-            usedCount: record.usedCount,
-        }),
+        } as any),
+        mapCreatePayload: (values: any) => {
+            // Extract startDate and endDate from dateRange
+            // According to swagger.json: startDate and endDate are required (format: date-time)
+            const dateRange = values.dateRange as [any, any] | null | undefined
+            if (!dateRange || !dateRange[0] || !dateRange[1]) {
+                throw new Error('Vui lòng chọn khoảng thời gian')
+            }
+            const startDate = dateRange[0].toISOString()
+            const endDate = dateRange[1].toISOString()
+            
+            // According to swagger.json:
+            // - Required: discountType, discountValue, endDate, promoCode, startDate, status
+            // - minOrderAmount: optional (minimum: 0)
+            // - usageLimit: optional but has minimum: 1, maximum: 2147483647
+            // - description: nullable, optional
+            return {
+                promoCode: values.promoCode,
+                description: values.description || null,
+                discountType: values.discountType,
+                discountValue: Number(values.discountValue), // Ensure it's a number
+                startDate,
+                endDate,
+                minOrderAmount: values.minOrderAmount ? Number(values.minOrderAmount) : 0,
+                usageLimit: values.usageLimit ? Math.floor(Number(values.usageLimit)) : 1, // Ensure it's an integer (int32 per swagger)
+                status: values.status,
+            } as CreatePromotionRequest
+        },
+        mapUpdatePayload: (values: any) => {
+            // Map to UpdatePromotionRequest format (camelCase)
+            // Based on swagger.json: UpdatePromotionRequest does NOT include usedCount
+            // Backend will automatically map camelCase to PascalCase properties via JSON serialization
+            // Ensure dates are in ISO string format for .NET DateTime parsing
+            // Extract startDate and endDate from dateRange
+            // According to swagger.json: startDate and endDate are required (format: date-time)
+            const dateRange = values.dateRange as [any, any] | null | undefined
+            if (!dateRange || !dateRange[0] || !dateRange[1]) {
+                throw new Error('Vui lòng chọn khoảng thời gian')
+            }
+            const startDate = dateRange[0].toISOString()
+            const endDate = dateRange[1].toISOString()
+            
+            // According to swagger.json:
+            // - Required: id, discountType, discountValue, endDate, promoCode, startDate, status
+            // - minOrderAmount: optional (minimum: 0)
+            // - usageLimit: optional but has minimum: 1, maximum: 2147483647
+            // - description: nullable, optional
+            return {
+                promoCode: values.promoCode,
+                description: values.description || null, // nullable according to swagger
+                discountType: values.discountType,
+                discountValue: values.discountValue,
+                startDate,
+                endDate,
+                minOrderAmount: values.minOrderAmount || 0,
+                usageLimit: values.usageLimit || 1, // Default to 1 if not provided (minimum per swagger)
+                status: values.status,
+            } as UpdatePromotionRequest
+        },
     },
     features: {
         enableCreate: true,

@@ -24,7 +24,10 @@ async function fetchCustomerOptions(keyword: string): Promise<DropDownWithFilter
         pageSize: 20,
     })
     const items = paged.items ?? []
-    return items.map((c: CustomerEntity) => ({ label: c.name ?? `#${c.id}`, value: c.id }))
+    return items.map((c: CustomerEntity) => ({ 
+        label: `${c.name ?? 'N/A'} - ${c.phone ?? 'N/A'}`, 
+        value: c.id 
+    }))
 }
 
 async function fetchUserOptions(keyword: string): Promise<DropDownWithFilterOption[]> {

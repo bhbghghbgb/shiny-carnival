@@ -5,9 +5,6 @@ namespace RetailStoreManagement.Models.User;
 public class UpdateUserRequest
 {
     [Required]
-    public int Id { get; set; }
-
-    [Required]
     [MaxLength(50)]
     public string Username { get; set; } = string.Empty;
 

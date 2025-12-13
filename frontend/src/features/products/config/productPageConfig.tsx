@@ -186,10 +186,7 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
             categoryId: record.categoryId,
             supplierId: record.supplierId,
         }),
-        mapUpdatePayload: (values, record) => ({
-            ...values,
-            id: record.id as number,
-        }),
+        mapUpdatePayload: (values) => values,
     },
     features: {
         enableCreate: true,

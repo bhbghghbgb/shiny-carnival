@@ -16,7 +16,10 @@ import type { ApiResponse } from '../types/api.types';
  */
 export function unwrapResponse<T>(response: ApiResponse<T>): T {
   if (response.isError || response.data == null) {
-    throw new Error(response.message || 'API request failed');
+    const error = new Error(response.message || 'API request failed') as Error & { responseData?: ApiResponse<T> };
+    // Attach response data to error for debugging
+    error.responseData = response;
+    throw error;
   }
   return response.data;
 }

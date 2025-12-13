@@ -12,4 +12,5 @@ public interface IPromotionService
     Task<ApiResponse<PromotionResponseDto>> UpdatePromotionAsync(int id, UpdatePromotionRequest request);
     Task<ApiResponse<bool>> DeletePromotionAsync(int id);
     Task<ApiResponse<ValidatePromoResponse>> ValidatePromotionAsync(ValidatePromoRequest request);
+    Task<ApiResponse<int>> GetActivePromotionCountAsync();
 }

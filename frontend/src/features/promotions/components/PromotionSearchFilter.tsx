@@ -2,7 +2,9 @@ import { Card, Row, Col, Space, Typography, Input, Select, Button } from 'antd'
 import {
     SearchOutlined,
     SortAscendingOutlined,
+    FilterOutlined,
 } from '@ant-design/icons'
+import type { PromotionStatus } from '../../../config/api.config'
 
 const { Text } = Typography
 
@@ -10,8 +12,10 @@ interface PromotionSearchFilterProps {
     searchText: string
     sortField: string
     sortOrder: 'ascend' | 'descend'
+    status?: PromotionStatus
     onSearchChange: (value: string) => void
     onSortChange: (field: string, order: 'ascend' | 'descend') => void
+    onStatusChange: (status: PromotionStatus | undefined) => void
     onClearFilters: () => void
 }
 
@@ -19,8 +23,10 @@ export const PromotionSearchFilter = ({
     searchText,
     sortField,
     sortOrder,
+    status,
     onSearchChange,
     onSortChange,
+    onStatusChange,
     onClearFilters,
 }: PromotionSearchFilterProps) => {
     const handleSortChange = (value: string) => {
@@ -37,7 +43,7 @@ export const PromotionSearchFilter = ({
             }}
         >
             <Row gutter={16} align="middle">
-                <Col span={12}>
+                <Col span={8}>
                     <Space>
                         <SearchOutlined style={{ color: '#1890ff' }} />
                         <Text strong>Tìm kiếm:</Text>
@@ -50,7 +56,23 @@ export const PromotionSearchFilter = ({
                         allowClear
                     />
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
+                    <Space>
+                        <FilterOutlined style={{ color: '#1890ff' }} />
+                        <Text strong>Trạng thái:</Text>
+                    </Space>
+                    <Select
+                        value={status}
+                        onChange={onStatusChange}
+                        placeholder="Tất cả"
+                        allowClear
+                        style={{ width: '100%', marginTop: '8px' }}
+                    >
+                        <Select.Option value="active">Đang hoạt động</Select.Option>
+                        <Select.Option value="inactive">Không hoạt động</Select.Option>
+                    </Select>
+                </Col>
+                <Col span={6}>
                     <Space>
                         <SortAscendingOutlined style={{ color: '#1890ff' }} />
                         <Text strong>Sắp xếp:</Text>
