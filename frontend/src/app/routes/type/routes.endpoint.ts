@@ -23,6 +23,7 @@ export const ENDPOINTS = {
         PROMOTIONS: '/admin/promotions',
         REPORTS: '/admin/reports',
         SUPPLIERS: '/admin/suppliers',
+        QR_SCANNER: '/admin/qr-scanner',
 
         CUSTOMERS: {
             LIST: '/admin/customers',

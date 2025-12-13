@@ -7,6 +7,7 @@ import { mainLayoutRoute } from './layout/main.layout';
 import { createAdminLayoutRoute } from './layout/admin.layout';
 import { homeRoutes } from './modules/home.routes';
 import { authRoutes } from './modules/auth.routes';
+import { qrScannerRoutes } from './modules/qr-scanner.routes';
 // ... import các module routes khác như trong file gốc
 import { productsRoutes } from './modules/management/products.routes';
 import { usersRoutes } from './modules/management/users.routes';
@@ -79,6 +80,7 @@ const homeModuleRoutes: ModuleRoutes<any>[] = [
 
 // Admin routes (có sidebar)
 const adminModuleRoutes: ModuleRoutes<any>[] = [
+  qrScannerRoutes,
   productsRoutes,
   usersRoutes,
   categoriesRoutes,
