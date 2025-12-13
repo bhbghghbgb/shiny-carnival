@@ -1,10 +1,16 @@
-import type {CustomerEntity} from "./entity.ts";
+import type { CustomerEntity } from "./entity.ts";
 
 export interface CreateCustomerRequest {
     name: string;
     phone: string;
-    email: string;
-    address: string;
+    email?: string | null;
+    address?: string | null;
 }
 
-export type UpdateCustomerRequest = CustomerEntity
+export interface UpdateCustomerRequest {
+    id: number;
+    name: string;
+    phone: string;
+    email?: string | null;
+    address?: string | null;
+}

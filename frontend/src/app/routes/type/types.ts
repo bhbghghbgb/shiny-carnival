@@ -59,6 +59,12 @@ export interface ModuleRouteConfig<
   };
 }
 
+// Type for hierarchical route configs
+export type HierarchicalModuleRouteConfig = ModuleRouteConfig & {
+  children?: HierarchicalModuleRouteConfig[];
+};
+
+
 // Helper type để extract loader data type
 export type ExtractLoaderData<T> = T extends ModuleRouteConfig<infer U, any, any, any> ? U : never;
 

@@ -1,10 +1,12 @@
 import { z } from 'zod';
-import { baseSearchSchema, type CrudModuleDefinition } from '../../../type/types';
+import { queryOptions, type QueryClient } from '@tanstack/react-query';
+import { baseSearchSchema, type CrudModuleDefinition, type LoaderContext } from '../../../type/types';
 import { InventoryListPage } from '../../../../../features/inventory/pages/InventoryListPage';
 import { InventoryDetailPage } from '../../../../../features/inventory/pages/InventoryDetailPage';
 import { InventoryCreatePage } from '../../../../../features/inventory/pages/InventoryCreatePage';
 import { InventoryEditPage } from '../../../../../features/inventory/pages/InventoryEditPage';
 import { inventory as mockInventory } from '../../../../../_mocks/inventory';
+import { createQueryKeys } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
 // --------------------------
@@ -28,25 +30,41 @@ const inventorySearchSchema = baseSearchSchema.extend({
 export type InventoryListSearch = z.infer<typeof inventorySearchSchema>;
 export type InventoryDetailParams = { id: string };
 
-async function fetchInventoryList(search: InventoryListSearch): Promise<InventoryListData> {
-  console.log('Fetching inventory with params:', search);
-  await new Promise(resolve => setTimeout(resolve, 200));
-  return {
-    items: mockInventory,
-    total: mockInventory.length,
-    page: search.page,
-    pageSize: search.pageSize,
-  };
+async function fetchInventoryList(ctx: LoaderContext<Record<string, never>, InventoryListSearch, { queryClient: QueryClient }>): Promise<InventoryListData> {
+  const { search, context } = ctx;
+  const queryKeys = createQueryKeys('inventory');
+  const queryOpts = queryOptions<InventoryListData>({
+    queryKey: [...queryKeys.lists(), 'mock', search],
+    queryFn: async () => {
+      await new Promise(resolve => setTimeout(resolve, 200));
+      return {
+        items: mockInventory,
+        total: mockInventory.length,
+        page: search.page,
+        pageSize: search.pageSize,
+      };
+    },
+  });
+
+  return context.queryClient.ensureQueryData(queryOpts);
 }
 
-async function fetchInventoryById(id: string): Promise<Inventory> {
-  console.log('Fetching inventory item with id:', id);
-  const inventoryId = parseInt(id);
-  const item = mockInventory.find(i => i.inventoryId === inventoryId);
-  if (!item) {
-    throw new Error(`Inventory item with id ${id} not found`);
-  }
-  return item;
+async function fetchInventoryById(ctx: LoaderContext<InventoryDetailParams, InventoryListSearch, { queryClient: QueryClient }>): Promise<Inventory> {
+  const { params, context } = ctx;
+  const queryKeys = createQueryKeys('inventory');
+  const queryOpts = queryOptions<Inventory>({
+    queryKey: [...queryKeys.details(), params.id],
+    queryFn: async () => {
+      const inventoryId = parseInt(params.id);
+      const item = mockInventory.find(i => i.inventoryId === inventoryId);
+      if (!item) {
+        throw new Error(`Inventory item with id ${params.id} not found`);
+      }
+      return item;
+    },
+  });
+
+  return context.queryClient.ensureQueryData(queryOpts);
 }
 
 // 2. Tạo "Bản thiết kế" cho module CRUD
@@ -57,10 +75,10 @@ export const inventoryModuleDefinition: CrudModuleDefinition<
   Inventory,              // Kiểu loader cho Detail
   InventoryListSearch,    // Kiểu search cho List
   InventoryDetailParams,  // Kiểu params cho Detail
-  { apiClient: any }      // Kiểu router context
+  { queryClient: QueryClient }      // Kiểu router context
 > = {
   entityName: 'kho hàng',
-  basePath: '/admin/inventory',
+  basePath: 'inventory',
   components: {
     list: InventoryListPage,
     detail: InventoryDetailPage,
@@ -68,8 +86,8 @@ export const inventoryModuleDefinition: CrudModuleDefinition<
     edit: InventoryEditPage,
   },
   loaders: {
-    list: ({ search }) => fetchInventoryList(search),
-    detail: ({ params }) => fetchInventoryById(params.id),
+    list: (ctx) => fetchInventoryList(ctx),
+    detail: (ctx) => fetchInventoryById(ctx),
   },
   searchSchemas: {
     list: inventorySearchSchema,

@@ -1,4 +1,3 @@
-
 import { Menu } from 'antd';
 import {
   AppstoreOutlined,
@@ -7,7 +6,8 @@ import {
   PieChartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import {Link} from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { ENDPOINTS } from '../../app/routes/type/routes.endpoint';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -20,9 +20,15 @@ const items: MenuItem[] = [
     label: 'Management',
     icon: <AppstoreOutlined />,
     children: [
-      { key: '5', label: <Link to={"/users"}>Users</Link> },
-      { key: '6', label: 'Suppliers' },
-      { key: '7', label: 'Categories' },
+      { key: '5', label: <Link to={ENDPOINTS.ADMIN.USERS}>Users</Link> },
+      { key: '5a', label: <Link to={ENDPOINTS.ADMIN.PRODUCTS}>Products</Link> },
+      { key: '6', label: <Link to={ENDPOINTS.ADMIN.SUPPLIERS}>Suppliers</Link> },
+      { key: '7', label: <Link to={ENDPOINTS.ADMIN.CATEGORIES}>Categories</Link> },
+      { key: '8', label: <Link to={ENDPOINTS.ADMIN.CUSTOMERS.LIST}>Customers</Link> },
+      { key: '9', label: <Link to={ENDPOINTS.ADMIN.ORDERS.LIST}>Orders</Link> },
+      { key: '10', label: <Link to={ENDPOINTS.ADMIN.INVENTORY.LIST}>Inventory</Link> },
+      { key: '11', label: <Link to={ENDPOINTS.ADMIN.PROMOTIONS}>Promotions</Link> },
+      { key: '12', label: <Link to={ENDPOINTS.ADMIN.REPORTS}>Reports</Link> },
     ],
   },
 ];
@@ -46,4 +52,8 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
   );
 };
 
+<<<<<<< HEAD
 export default Sidebar;
+=======
+export default Sidebar;
+>>>>>>> dev/hung-nt-init-ui

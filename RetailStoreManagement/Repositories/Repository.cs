@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using RetailStoreManagement.Common;
+using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Data;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
@@ -20,7 +21,7 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
         _dbSet = context.Set<TEntity>();
     }
 
-    public virtual async Task<TEntity> GetByIdAsync(TKey id)
+    public virtual async Task<TEntity?> GetByIdAsync(TKey id)
     {
         return await _dbSet.FindAsync(id);
     }

@@ -1,10 +1,12 @@
 import { Form, Input, Select } from 'antd'
-import type { UserEntity } from '../types/entity'
+import type { UserNoPass } from '../types/entity'
+
+import type { FormInstance } from 'antd/es/form'
 
 interface UserFormProps {
-    form: any
+    form: FormInstance
     isEdit?: boolean
-    initialValues?: UserEntity
+    initialValues?: UserNoPass
 }
 
 const { Option } = Select
@@ -38,7 +40,19 @@ export const UserForm = ({
                 label="Password"
                 rules={[
                     { required: !isEdit, message: 'Vui lòng nhập password!' },
-                    { min: 6, message: 'Password phải có ít nhất 6 ký tự!' },
+                    // Chỉ validate min length nếu password có giá trị (không phải empty)
+                    {
+                        validator(_, value) {
+                            if (!value || value.length === 0) {
+                                // Empty password trong edit mode là OK (không đổi password)
+                                return Promise.resolve()
+                            }
+                            if (value.length < 6) {
+                                return Promise.reject(new Error('Password phải có ít nhất 6 ký tự!'))
+                            }
+                            return Promise.resolve()
+                        },
+                    },
                 ]}
             >
                 <Input.Password

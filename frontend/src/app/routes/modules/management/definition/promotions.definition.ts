@@ -1,32 +1,47 @@
 import { z } from 'zod';
-import { baseSearchSchema, type ManagementRouteDefinition } from '../../../type/types';
+import { queryOptions, type QueryClient } from '@tanstack/react-query';
+import { baseSearchSchema, type ManagementRouteDefinition, type LoaderContext } from '../../../type/types';
 import { PromotionManagementPage } from '../../../../../features/promotions/pages/PromotionManagementPage';
-import { promotions as mockPromotions } from '../../../../../_mocks/promotions';
+import { promotionApiService } from '../../../../../features/promotions/api/PromotionApiService';
+import type { PromotionEntity } from '../../../../../features/promotions/types/entity';
+import type { PagedRequest } from '../../../../../lib/api/types/api.types';
+import { createPaginatedQueryOptions } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
-// --------------------------
-
-interface PromotionLoaderData {
-  promotions: (typeof mockPromotions);
-  total: number;
-}
 
 const promotionSearchSchema = baseSearchSchema.extend({
-  // type: z.enum(['discount', 'coupon', 'special_offer']).optional(),
-  // status: z.enum(['active', 'expired', 'scheduled']).optional(),
-  // startDate: z.string().optional(),
-  // endDate: z.string().optional(),
+  sortField: z.string().catch('id'),
+  sortOrder: z.enum(['ascend', 'descend']).catch('descend'),
 });
 
 export type PromotionSearch = z.infer<typeof promotionSearchSchema>;
 
-async function fetchPromotions(search: PromotionSearch): Promise<PromotionLoaderData> {
-  console.log('Fetching promotions with filters:', search);
-  // Giả lập gọi API
-  await new Promise(resolve => setTimeout(resolve, 200));
+function buildPagedRequest(search: PromotionSearch): PagedRequest {
   return {
-    promotions: mockPromotions,
-    total: mockPromotions.length,
+    page: search.page || 1,
+    pageSize: search.pageSize || 10,
+    search: search.search,
+    sortBy: search.sortField === 'promoCode' ? 'PromoCode' :
+      search.sortField === 'startDate' ? 'StartDate' : 'Id',
+    sortDesc: search.sortOrder === 'descend',
+  };
+}
+
+async function fetchPromotions(ctx: LoaderContext<Record<string, never>, PromotionSearch, { queryClient: QueryClient }>): Promise<{ promotions: PromotionEntity[]; total: number }> {
+  const { search, context } = ctx;
+  const params = buildPagedRequest(search);
+
+  const promotionsQueryOptions = createPaginatedQueryOptions<PromotionEntity>(
+    'promotions',
+    promotionApiService,
+    params,
+  );
+
+  const data = await context.queryClient.ensureQueryData(promotionsQueryOptions);
+
+  return {
+    promotions: data.items || [],
+    total: data.totalCount || (data.items ? data.items.length : 0),
   };
 }
 
@@ -34,13 +49,18 @@ async function fetchPromotions(search: PromotionSearch): Promise<PromotionLoader
 // ----------------------------------------
 
 export const promotionAdminDefinition: ManagementRouteDefinition<
-  PromotionLoaderData,     // Kiểu loader data
-  PromotionSearch,         // Kiểu search params
-  { apiClient: never }       // Kiểu router context (ví dụ)
+  { promotions: PromotionEntity[]; total: number },
+  PromotionSearch,
+  { queryClient: QueryClient }
 > = {
   entityName: 'Khuyến mãi',
-  path: '/admin/promotions',
+  path: 'promotions',
   component: PromotionManagementPage,
   searchSchema: promotionSearchSchema,
-  loader: ({ search }) => fetchPromotions(search),
+  loader: (ctx) => fetchPromotions(ctx),
 };
+
+export function createPromotionsQueryOptions(search: PromotionSearch) {
+  const params = buildPagedRequest(search);
+  return createPaginatedQueryOptions<PromotionEntity>('promotions', promotionApiService, params);
+}

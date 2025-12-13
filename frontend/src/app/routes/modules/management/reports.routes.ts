@@ -1,14 +1,17 @@
-import { createModuleRoutes, generateManagementRoute } from '../../utils/routeHelpers';
+import { generateManagementRouteConfigs } from '../../utils/routeHelpers';
 import { reportAdminDefinition } from './definition/reports.definition';
+import type { ModuleRoutes } from '../../type/types';
 
 // Export một object tạm thời để phá vỡ sự phụ thuộc vòng tròn
 export const reportsRoutes: object = {};
 
-const generatedRoutes = createModuleRoutes(
-  'reportsAdmin',
-  '/admin/reports',
-  generateManagementRoute(reportAdminDefinition)
-);
+// Tạo trực tiếp module config.
+// basePath giờ đây là tương đối so với layout cha (/admin).
+const generatedModule: ModuleRoutes<any> = {
+  moduleName: 'reports',
+  basePath: '/reports',
+  routes: generateManagementRouteConfigs(reportAdminDefinition),
+};
 
-// Gán các thuộc tính từ route đã tạo vào object tạm thời
-Object.assign(reportsRoutes, generatedRoutes);
+// Gán các thuộc tính từ config đã tạo vào object tạm thời
+Object.assign(reportsRoutes, generatedModule);

@@ -1,3 +1,11 @@
-// Export tất cả API functions và types cho Products feature
-export * from './productApi';
-export { default as productApi } from './productApi';
+/**
+ * Products API
+ * 
+ * Export ProductApiService và instance
+ */
+
+export { ProductApiService, productApiService } from './ProductApiService';
+
+// Re-export types
+export type { ProductEntity } from '../types/entity';
+export type { CreateProductRequest, UpdateProductRequest } from '../types/api';

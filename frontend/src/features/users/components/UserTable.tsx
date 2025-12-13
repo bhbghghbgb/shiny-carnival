@@ -14,14 +14,14 @@ import {
     UserOutlined,
     CrownOutlined,
 } from '@ant-design/icons'
-import type { UserEntity } from '../types/entity'
+import type { UserNoPass } from '../types/entity'
 
 const { Text } = Typography
 
 interface UserTableProps {
-    users: UserEntity[]
-    onEditUser: (user: UserEntity) => void
-    onDeleteUser: (user: UserEntity) => void
+    users: UserNoPass[]
+    onEditUser: (user: UserNoPass) => void
+    onDeleteUser: (user: UserNoPass) => void
 }
 
 export const UserTable = ({
@@ -33,7 +33,7 @@ export const UserTable = ({
         {
             title: 'Người dùng',
             key: 'user',
-            render: (record: UserEntity) => (
+            render: (record: UserNoPass) => (
                 <Space>
                     <Avatar
                         size="large"
@@ -89,7 +89,7 @@ export const UserTable = ({
         {
             title: 'Thao tác',
             key: 'action',
-            render: (record: UserEntity) => (
+            render: (record: UserNoPass) => (
                 <Space>
                     <Tooltip title="Chỉnh sửa">
                         <Button

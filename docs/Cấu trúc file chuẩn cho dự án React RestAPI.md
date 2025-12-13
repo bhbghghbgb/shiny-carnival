@@ -40,7 +40,7 @@ src/
 Chứa các file cấu hình và khởi tạo cấp ứng dụng. Đây là nơi tập trung các cài đặt toàn cục.
 
 *   `main.tsx`: Điểm khởi chạy của ứng dụng (entry point), nơi React DOM được render và **TanStack Router** được khởi tạo.
-*   `routes/`: Thư mục chứa các file định nghĩa route cho cơ chế **file-based routing** của TanStack Router. Mỗi file trong đây là một định nghĩa "mỏng", liên kết một URL với một component trang cụ thể.
+*   `routes/`: Thư mục chứa các file định nghĩa route cho cơ chế **Code-based routing** của TanStack Router. Mỗi file trong đây là một định nghĩa "mỏng", liên kết một URL với một component trang cụ thể.
 *   `routeTree.gen.ts`: File được **TanStack Router** tự động tạo ra, chứa toàn bộ cây định tuyến của ứng dụng. **Không được chỉnh sửa file này bằng tay.**
 *   `store.ts`: Cấu hình Zustand store toàn cục (nếu có).
 

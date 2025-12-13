@@ -1,4 +1,4 @@
-import type { OrderStatus } from '../../../config/api';
+import type { OrderStatus } from '../../../config/api.config';
 
 // Core Order Entity
 export interface OrderEntity {

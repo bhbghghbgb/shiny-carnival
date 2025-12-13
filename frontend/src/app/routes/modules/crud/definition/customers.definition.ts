@@ -1,11 +1,13 @@
 import { z } from 'zod';
-import { baseSearchSchema, type CrudModuleDefinition } from '../../../type/types';
+import { queryOptions, type QueryClient } from '@tanstack/react-query';
+import { baseSearchSchema, type CrudModuleDefinition, type LoaderContext } from '../../../type/types';
 import { CustomerListPage } from '../../../../../features/customers/pages/CustomerListPage';
 import { CustomerDetailPage } from '../../../../../features/customers/pages/CustomerDetailPage';
 import { CustomerCreatePage } from '../../../../../features/customers/pages/CustomerCreatePage';
 import { CustomerEditPage } from '../../../../../features/customers/pages/CustomerEditPage';
 import { customers as mockCustomers } from '../../../../../_mocks/customers';
 import type { CustomerEntity as Customer } from '../../../../../features/customers/types/entity';
+import { createQueryKeys } from '../../../../../lib/query/queryOptionsFactory';
 
 // 1. Định nghĩa Types và API
 // --------------------------
@@ -24,22 +26,32 @@ const customerSearchSchema = baseSearchSchema.extend({
 export type CustomerListSearch = z.infer<typeof customerSearchSchema>;
 export type CustomerDetailParams = { id: string };
 
-async function fetchCustomers(search: CustomerListSearch): Promise<CustomerListData> {
-  console.log('Fetching customers with:', search);
-  return {
-    customers: mockCustomers,
-    total: mockCustomers.length
-  };
+async function fetchCustomers(ctx: LoaderContext<Record<string, never>, CustomerListSearch, { queryClient: QueryClient }>): Promise<CustomerListData> {
+  const { search, context } = ctx;
+  const queryKeys = createQueryKeys('customers');
+  const queryOpts = queryOptions<CustomerListData>({
+    queryKey: [...queryKeys.lists(), 'mock', search],
+    queryFn: async () => ({
+      customers: mockCustomers,
+      total: mockCustomers.length,
+    }),
+  });
+  return context.queryClient.ensureQueryData(queryOpts);
 }
 
-async function fetchCustomerById(id: string): Promise<Customer> {
-  console.log('Fetching customer with id:', id);
-  const customerId = parseInt(id);
-  const customer = mockCustomers.find(c => c.id === customerId);
-  if (!customer) {
-    throw new Error(`Customer with id ${id} not found`);
-  }
-  return customer;
+async function fetchCustomerById(ctx: LoaderContext<CustomerDetailParams, CustomerListSearch, { queryClient: QueryClient }>): Promise<Customer> {
+  const { params, context } = ctx;
+  const queryKeys = createQueryKeys('customers');
+  const queryOpts = queryOptions<Customer>({
+    queryKey: [...queryKeys.details(), params.id],
+    queryFn: async () => {
+      const customerId = parseInt(params.id);
+      const customer = mockCustomers.find(c => c.id === customerId);
+      if (!customer) throw new Error(`Customer with id ${params.id} not found`);
+      return customer;
+    },
+  });
+  return context.queryClient.ensureQueryData(queryOpts);
 }
 
 // 2. Tạo "Bản thiết kế" cho module CRUD
@@ -50,10 +62,10 @@ export const customerModuleDefinition: CrudModuleDefinition<
   Customer,              // Kiểu loader cho Detail
   CustomerListSearch,    // Kiểu search cho List
   CustomerDetailParams,  // Kiểu params cho Detail
-  { apiClient: any }      // Kiểu router context
+  { queryClient: QueryClient }      // Kiểu router context
 > = {
   entityName: 'Khách hàng',
-  basePath: '/customers',
+  basePath: 'customers',
   components: {
     list: CustomerListPage,
     detail: CustomerDetailPage,
@@ -61,8 +73,8 @@ export const customerModuleDefinition: CrudModuleDefinition<
     edit: CustomerEditPage,
   },
   loaders: {
-    list: ({ search }) => fetchCustomers(search),
-    detail: ({ params }) => fetchCustomerById(params.id),
+    list: (ctx) => fetchCustomers(ctx),
+    detail: (ctx) => fetchCustomerById(ctx),
   },
   searchSchemas: {
     list: customerSearchSchema,

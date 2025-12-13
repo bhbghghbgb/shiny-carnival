@@ -40,13 +40,13 @@ Agent phải luôn ghi nhớ và áp dụng các thông tin sau về dự án:
 
 - **Quản lý Trạng thái:** Zustand (toàn cục và cục bộ theo feature).
 
-- **Data Grids:** TanStack Table (headless UI).
+- **Data Grids:** Ant  Table (headless UI).
 
-- **Quản lý Form:** React Hook Form.
+- **Quản lý Form:** Ant desgin
 
 - **Gọi API:** Axios (với instance cấu hình sẵn, interceptors).
 
-- **Định tuyến (Routing):** `react-router-dom` với File-Based Routing.
+- **Định tuyến (Routing):** `TanStack-router` với Code-Based Routing.
 
 ### 2.3. Cấu trúc Backend và API
 
