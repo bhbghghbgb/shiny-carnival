@@ -116,7 +116,7 @@ public partial class App : Application
             // {
             //     await navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
             // }
-            
+
             await navigator.NavigateViewModelAsync<LoginViewModel>(this, qualifier: Qualifiers.Nested);
             this.Log().LogInformation("Navigated to login page");
         });
@@ -165,6 +165,7 @@ public partial class App : Application
                         Nested:
                         [
                             new("ProductList", View: views.FindByViewModel<ProductListViewModel>(), IsDefault: true),
+                            new("ProductDetail", View: views.FindByViewModel<ProductDetailViewModel>()),
                             new("Cart", View: views.FindByViewModel<CartViewModel>()),
                             new("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationViewModel>()),
                         ]),

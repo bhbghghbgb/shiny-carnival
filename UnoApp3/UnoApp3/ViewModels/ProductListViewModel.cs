@@ -15,23 +15,21 @@ public partial class ProductListViewModel : BaseViewModel
     private readonly ProductService _productService;
     private readonly ICartRepository _cartRepository;
 
-    [ObservableProperty]
-    private string _searchText;
+    [ObservableProperty] private string _searchText;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasProducts))]
     private ObservableCollection<ProductListDto> _products;
-    
+
     // Computed property
     public bool HasProducts => Products?.Any() ?? false;
 
-    [ObservableProperty]
-    private bool _isRefreshing;
+    [ObservableProperty] private bool _isRefreshing;
 
     public ProductListViewModel(
         INavigator navigator,
         ProductService productService,
-        ICartRepository cartRepository) 
+        ICartRepository cartRepository)
         : base(navigator)
     {
         _productService = productService;
@@ -42,11 +40,11 @@ public partial class ProductListViewModel : BaseViewModel
 
         // LoadProductsCommand.Execute(null);
     }
-    
+
     public override async Task OnNavigatedTo(IReadOnlyDictionary<string, object>? data = null)
     {
         await base.OnNavigatedTo(data);
-    
+
         // Load products when navigated to the page
         await LoadProductsCommand.ExecuteAsync(null);
     }
@@ -55,10 +53,10 @@ public partial class ProductListViewModel : BaseViewModel
     private async Task LoadProducts()
     {
         if (IsBusy) return;
-        
+
         IsBusy = true;
         IsRefreshing = true;
-        
+
         try
         {
             Products.Clear();
@@ -101,22 +99,19 @@ public partial class ProductListViewModel : BaseViewModel
     private async Task ViewProductDetail(ProductListDto product)
     {
         if (product == null) return;
-        
+
         // Fixed: Added 'this' as first parameter
-        await Navigator.NavigateRouteAsync(this, "ProductDetail", 
-            data: new Dictionary<string, object>
-            {
-                ["productId"] = product.Id
-            });
+        await Navigator.NavigateRouteAsync(this, "ProductDetail",
+            data: product.Id);
     }
 
     [RelayCommand]
     private async Task AddToCart(ProductListDto product)
     {
         if (product == null) return;
-        
+
         await _cartRepository.AddToCartAsync(product.Id, 1);
-        
+
         // TODO: Show confirmation message
     }
 

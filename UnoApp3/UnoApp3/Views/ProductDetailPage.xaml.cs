@@ -23,30 +23,34 @@ namespace UnoApp3.Views;
 /// </summary>
 public sealed partial class ProductDetailPage : Page
 {
-    private ProductDetailViewModel ViewModel => DataContext as ProductDetailViewModel ?? throw new NullReferenceException();
+    private ProductDetailViewModel ViewModel =>
+        DataContext as ProductDetailViewModel ?? throw new NullReferenceException();
+
+    private int? _productId = null;
 
     public ProductDetailPage()
     {
         this.InitializeComponent();
+        this.Loaded += ProductDetailPage_Loaded;
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-
+        ;
         // If we received a productId parameter directly
         if (e.Parameter is int productId)
         {
-            var data = new Dictionary<string, object>
-            {
-                ["productId"] = productId
-            };
-            await ViewModel.OnNavigatedTo(data);
+            this._productId = productId;
         }
-        // If we received a dictionary of parameters
-        else if (e.Parameter is IReadOnlyDictionary<string, object> dict)
+    }
+
+    private async void ProductDetailPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        var data = new Dictionary<string, object>
         {
-            await ViewModel.OnNavigatedTo(dict);
-        }
+            ["productId"] = _productId
+        };
+        await ViewModel.OnNavigatedTo(data);
     }
 }
