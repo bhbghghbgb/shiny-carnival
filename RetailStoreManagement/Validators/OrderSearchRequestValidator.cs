@@ -46,7 +46,7 @@ public class OrderSearchRequestValidator : BasePaginationValidator<OrderSearchRe
         // Validation cho Status
         RuleFor(x => x.Status)
             .Must(status => string.IsNullOrEmpty(status) || IsValidStatus(status))
-            .WithMessage("Status must be one of: Pending, Paid, Cancelled")
+            .WithMessage("Status must be one of: Pending, Paid, Canceled")
             .When(x => !string.IsNullOrEmpty(x.Status));
     }
 
@@ -64,7 +64,7 @@ public class OrderSearchRequestValidator : BasePaginationValidator<OrderSearchRe
     /// </summary>
     private static bool IsValidStatus(string status)
     {
-        var validStatuses = new[] { "Pending", "Paid", "Cancelled" };
+        var validStatuses = new[] { "Pending", "Paid", "Canceled" };
         return validStatuses.Contains(status, StringComparer.OrdinalIgnoreCase);
     }
 }
