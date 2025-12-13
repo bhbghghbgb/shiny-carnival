@@ -19,13 +19,12 @@ import {
     ShoppingCartOutlined,
 } from '@ant-design/icons'
 import { useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
-import { ENDPOINTS } from '../../../app/routes/type/endpoint'
+import { useState, useEffect } from 'react'
+import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
 // import { getRouteApi } from '@tanstack/react-router'
-import { products as mockProducts } from '../../../_mocks/products'
-import { customers as mockCustomers } from '../../../_mocks/customers'
-import { orders as mockOrders, addMockOrder } from '../../../_mocks/orders'
+import { orderApiService } from '../api/OrderApiService'
 import { emitOrdersChanged } from '../utils/orderEvents'
+import { useDraftOrderItems, useOrderStore } from '../store'
 
 const { Title } = Typography
 // const routeApi = getRouteApi('/admin/orders/create')
@@ -45,13 +44,32 @@ export const OrderCreatePage = () => {
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
     const [selectedProduct, setSelectedProduct] = useState<number | null>(null)
     const [quantity, setQuantity] = useState(1)
+    const draftItems = useDraftOrderItems()
+    const clearDraftItems = useOrderStore((state) => state.clearDraftItems)
 
     // Use mock data (for development)
-    const products = mockProducts
-    const customers = mockCustomers
+    // TODO: Replace with real API fetch for products/customers if needed
+    const products: any[] = []
+    const customers: any[] = []
 
     // TODO: Uncomment below to use API data from route loader
     // const { products, customers } = routeApi.useLoaderData()
+
+    // Prefill from draft cart captured by QR scanner
+    useEffect(() => {
+        if (draftItems && draftItems.length > 0 && orderItems.length === 0) {
+            const mapped: OrderItem[] = draftItems.map((d) => ({
+                key: `${d.productId}`,
+                productId: d.productId,
+                productName: d.productName,
+                price: d.price,
+                quantity: d.quantity,
+                subtotal: d.subtotal,
+            }))
+            setOrderItems(mapped)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleAddItem = () => {
         if (!selectedProduct) {
@@ -72,10 +90,10 @@ export const OrderCreatePage = () => {
                 orderItems.map((item) =>
                     item.productId === selectedProduct
                         ? {
-                              ...item,
-                              quantity: item.quantity + quantity,
-                              subtotal: (item.quantity + quantity) * item.price,
-                          }
+                            ...item,
+                            quantity: item.quantity + quantity,
+                            subtotal: (item.quantity + quantity) * item.price,
+                        }
                         : item
                 )
             )
@@ -107,10 +125,10 @@ export const OrderCreatePage = () => {
             orderItems.map((item) =>
                 item.key === key
                     ? {
-                          ...item,
-                          quantity: newQuantity,
-                          subtotal: newQuantity * item.price,
-                      }
+                        ...item,
+                        quantity: newQuantity,
+                        subtotal: newQuantity * item.price,
+                    }
                     : item
             )
         )
@@ -127,41 +145,25 @@ export const OrderCreatePage = () => {
         }
 
         try {
-            // Development: mutate mock orders in-memory
-            const items = orderItems.map((item, idx) => ({
-                orderItemId:
-                    idx +
-                    1 +
-                    mockOrders.reduce(
-                        (m, o) =>
-                            Math.max(
-                                m,
-                                ...(o.orderItems?.map(
-                                    (i: any) => i.orderItemId
-                                ) || [0])
-                            ),
-                        0
-                    ),
+            // Chuẩn hóa payload cho real API
+            const items = orderItems.map((item) => ({
                 productId: item.productId,
-                productName: item.productName,
                 quantity: item.quantity,
-                price: item.price,
-                subtotal: item.subtotal,
             }))
 
-            const totalAmount = items.reduce((s, i) => s + i.subtotal, 0)
-
-            addMockOrder({
+            const payload = {
                 customerId: values.customerId,
-                userId: 1,
-                promoId: values.promoCode ? 1 : null,
-                totalAmount,
+                promoCode: values.promoCode,
                 orderItems: items,
-            })
+            }
+
+            await orderApiService.create(payload)
 
             emitOrdersChanged()
+            // Clear draft after successful create
+            clearDraftItems()
             message.success('Tạo đơn hàng thành công!')
-            navigate({ to: ENDPOINTS.ADMIN.ORDERS.LIST })
+            navigate({ to: ENDPOINTS.ADMIN.ORDERS.LIST as any })
         } catch (error) {
             message.error('Không thể tạo đơn hàng!')
             console.error('Create order error:', error)
@@ -169,7 +171,7 @@ export const OrderCreatePage = () => {
     }
 
     const handleBack = () => {
-        navigate({ to: ENDPOINTS.ADMIN.ORDERS.LIST })
+        navigate({ to: ENDPOINTS.ADMIN.ORDERS.LIST as any })
     }
 
     const columns = [
