@@ -7,6 +7,7 @@ import { createCustomersQueryOptions } from '../../../app/routes/modules/managem
 import { useCreateCustomer, useUpdateCustomer, useDeleteCustomer } from './useCustomers'
 import type { CustomerEntity } from '../types/entity'
 import type { CreateCustomerRequest, UpdateCustomerRequest } from '../types/api'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useCustomerManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.CUSTOMERS.LIST)
@@ -24,19 +25,13 @@ export const useCustomerManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const createCustomer = useCreateCustomer({
         onSuccess: () => {
             router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Tạo khách hàng thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo khách hàng thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -46,7 +41,7 @@ export const useCustomerManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật khách hàng thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật khách hàng thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -56,7 +51,7 @@ export const useCustomerManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa khách hàng thất bại: ${parseErrorMessage(error)}`)
+            setPageErrorMessage(`Xóa khách hàng thất bại: ${parseApiError(error)}`)
         },
     })
 

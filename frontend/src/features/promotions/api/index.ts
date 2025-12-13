@@ -1,4 +1,2 @@
-// Export tất cả API functions và types cho Promotions feature
-export * from './promotionApi';
+// Export API service (kiến trúc mới)
 export * from './PromotionApiService';
-export { default as promotionApi } from './promotionApi';

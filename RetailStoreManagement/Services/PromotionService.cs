@@ -34,6 +34,15 @@ public class PromotionService : IPromotionService
                                         (p.Description != null && p.Description.Contains(request.Search)));
             }
 
+            // Apply status filter
+            if (!string.IsNullOrEmpty(request.Status))
+            {
+                if (Enum.TryParse<PromotionStatus>(request.Status, true, out var status))
+                {
+                    query = query.Where(p => p.Status == status);
+                }
+            }
+
             // Apply sorting
             query = request.SortDesc
                 ? query.OrderByDescending(p => EF.Property<object>(p, request.SortBy))
@@ -219,6 +228,27 @@ public class PromotionService : IPromotionService
         catch (Exception ex)
         {
             return ApiResponse<ValidatePromoResponse>.Error(ex.Message);
+        }
+    }
+
+    public async Task<ApiResponse<int>> GetActivePromotionCountAsync()
+    {
+        try
+        {
+            // Convert DateTime.UtcNow to DateOnly to avoid timezone issues with PostgreSQL
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var count = await _unitOfWork.Promotions.GetQueryable()
+                .Where(p => p.Status == PromotionStatus.Active
+                            && today >= p.StartDate
+                            && today <= p.EndDate
+                            && (p.UsageLimit == 0 || p.UsedCount < p.UsageLimit))
+                .CountAsync();
+
+            return ApiResponse<int>.Success(count);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<int>.Error(ex.Message);
         }
     }
 

@@ -1,6 +1,11 @@
+import { useState } from 'react'
+import { Button } from 'antd'
+import { EyeOutlined } from '@ant-design/icons'
 import { OrderHeader } from '../components/OrderHeader'
 import { OrderStatistics } from '../components/OrderStatistics'
 import { OrderSearchFilter } from '../components/OrderSearchFilter'
+import { OrderDetailModal } from '../components/OrderDetailModal'
+import { CreateOrderForm } from '../components/CreateOrderForm'
 import { useOrderManagementPage } from '../hooks/useOrderManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
 import { orderPageConfig } from '../config/orderPageConfig'
@@ -8,9 +13,13 @@ import type { OrderEntity } from '../types/entity'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
 
 export function OrderManagementPage() {
+    const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
     const {
         orders,
         total,
+        totalRevenue,
 
         searchText,
         statusFilter,
@@ -44,8 +53,15 @@ export function OrderManagementPage() {
         clearFormError,
     } = useOrderManagementPage()
 
-    // Tính tổng doanh thu từ orders
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+    const handleViewDetail = (order: OrderEntity) => {
+        setSelectedOrderId(order.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedOrderId(null)
+    }
 
     return (
         <div style={{ padding: '24px' }}>
@@ -96,6 +112,36 @@ export function OrderManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+                renderCustomForm={({ mode, onSubmit, onCancel, loading, errorMessage, onClearError }) => {
+                    // Chỉ render custom form cho create mode
+                    if (mode === 'create') {
+                        return (
+                            <CreateOrderForm
+                                onSubmit={onSubmit as (values: CreateOrderRequest) => Promise<void>}
+                                onCancel={onCancel}
+                                loading={loading}
+                                errorMessage={errorMessage}
+                                onClearError={onClearError}
+                            />
+                        )
+                    }
+                    // Update mode vẫn dùng generic form
+                    return null
+                }}
+            />
+            <OrderDetailModal
+                orderId={selectedOrderId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )
