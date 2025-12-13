@@ -4,6 +4,7 @@ import { Button, message, Space, Alert } from 'antd';
 import { CameraOutlined, CloseOutlined } from '@ant-design/icons';
 import { productApiService } from '../../products/api/ProductApiService';
 import type { ProductEntity } from '../../products/types/entity';
+import { useOrderStore } from '../../orders/store';
 
 interface QRScannerProps {
     onScanSuccess?: (product: ProductEntity) => void;
@@ -13,6 +14,7 @@ interface QRScannerProps {
 export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
     const [isScanning, setIsScanning] = useState(false);
     const [messageApi, contextHolder] = message.useMessage();
+    const addDraftItem = useOrderStore((state) => state.addDraftItem);
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const isProcessingRef = useRef(false);
     const lastScannedRef = useRef<string>('');
@@ -74,6 +76,9 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
             messageApi.destroy();
             messageApi.success(`Đã quét: ${product.productName}`);
 
+            // Lưu vào draft order (global state + localStorage via persist)
+            addDraftItem(product);
+
             // Delay 1 giây trước khi dừng để hiển thị thông báo
             await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -93,6 +98,9 @@ export const QRScanner = ({ onScanSuccess }: QRScannerProps) => {
             scannedProducts.unshift(mockProduct);
             localStorage.setItem('scanned_products', JSON.stringify(scannedProducts));
             messageApi.success('Đã lưu sản phẩm mẫu!');
+
+            // Lưu vào draft order (global state + localStorage via persist)
+            addDraftItem(mockProduct as any);
 
             // Delay 1 giây trước khi dừng để hiển thị thông báo
             await new Promise(resolve => setTimeout(resolve, 1000));
