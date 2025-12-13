@@ -1,13 +1,15 @@
-import { Menu } from 'antd';
+import { Avatar, Menu, Space, Typography } from 'antd';
 import {
   AppstoreOutlined,
   ContainerOutlined,
   DesktopOutlined,
   PieChartOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Link } from "@tanstack/react-router";
 import { ENDPOINTS } from '../../app/routes/type/routes.endpoint';
+import { useAuthStore } from '../../features/auth/store';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -38,9 +40,24 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ collapsed }: SidebarProps) => {
+
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <div>
       <div className="p-4 text-2xl font-bold text-white text-center">Logo</div>
+      {isAuthenticated && !collapsed && (
+        <div className="px-4 py-3 mb-4 bg-gray-700 rounded-md mx-2 text-white flex items-center space-x-3">
+          <Avatar 
+            size="large" 
+            icon={<UserOutlined />} 
+          />
+          <Typography.Text ellipsis style={{ color: 'white', fontWeight: '500', marginLeft: "10px" }}>
+            {user?.username || "No Name"}
+          </Typography.Text>
+        </div>
+      )}
       <Menu
         defaultSelectedKeys={['1']}
         mode="inline"
