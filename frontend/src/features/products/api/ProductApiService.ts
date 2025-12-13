@@ -3,8 +3,7 @@ import axiosClient from '../../../lib/api/axios';
 import { API_CONFIG } from '../../../config/api.config';
 import type { ProductEntity, ProductDetailsDto } from '../types/entity';
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api';
-import type { PagedList, PagedRequest, ApiResponse } from '../../../lib/api/types/api.types';
-import { unwrapResponse } from '../../../lib/api/base/apiResponseAdapter';
+import type { PagedList, PagedRequest } from '../../../lib/api/types/api.types';
 
 /**
  * ProductApiService - Extends BaseApiService với custom methods cho Products
@@ -70,12 +69,14 @@ export class ProductApiService extends BaseApiService<
   /**
    * GET product details: GET /api/admin/products/{id}
    * Lấy chi tiết sản phẩm bao gồm category name, supplier name, inventory quantity
+   * 
+   * Sử dụng getById() từ BaseApiService với type assertion để trả về ProductDetailsDto
+   * thay vì ProductEntity (vì backend trả về ProductResponseDto với đầy đủ thông tin)
    */
   async getProductDetails(id: number): Promise<ProductDetailsDto> {
-    const response = await this.axios.get<ApiResponse<ProductDetailsDto>>(
-      `${this.endpoint}/${id}`
-    ) as unknown as ApiResponse<ProductDetailsDto>;
-    return unwrapResponse(response);
+    // Sử dụng getById() từ BaseApiService và cast type sang ProductDetailsDto
+    // vì backend trả về ProductResponseDto (có categoryName, supplierName, inventoryQuantity, createdAt)
+    return this.getById(id) as Promise<ProductDetailsDto>;
   }
 }
 
