@@ -18,7 +18,23 @@ export function parseApiError(error: unknown): string {
 
   // Nếu error là Error instance với message đã được set từ interceptor
   if (error instanceof Error && error.message && error.message !== 'Có lỗi xảy ra') {
-    return error.message;
+    // Check for common database errors and provide user-friendly messages
+    const message = error.message;
+    
+    // Database constraint violations
+    if (message.includes('duplicate key') || message.includes('unique constraint')) {
+      if (message.includes('PK_')) {
+        return 'Lỗi database: Không thể tạo mới. Vui lòng thử lại hoặc liên hệ quản trị viên.';
+      }
+      return 'Dữ liệu đã tồn tại trong hệ thống. Vui lòng kiểm tra lại.';
+    }
+    
+    // Generic database errors
+    if (message.includes('saving the entity changes') || message.includes('database')) {
+      return 'Lỗi khi lưu dữ liệu. Vui lòng thử lại hoặc liên hệ quản trị viên.';
+    }
+    
+    return message;
   }
 
   // Kiểm tra nếu error là object
