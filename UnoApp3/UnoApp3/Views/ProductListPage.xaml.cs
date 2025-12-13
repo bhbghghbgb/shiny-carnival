@@ -12,6 +12,8 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using UnoApp3.Models.Product;
+using UnoApp3.ViewModels;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -26,5 +28,13 @@ public sealed partial class ProductListPage : Page
     {
         this.InitializeComponent();
     }
-}
 
+
+    private async void ListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is ProductListDto product && DataContext is ProductListViewModel vm)
+        {
+            await vm.ViewProductDetailCommand.ExecuteAsync(product);
+        }
+    }
+}

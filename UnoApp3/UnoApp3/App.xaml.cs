@@ -151,6 +151,7 @@ public partial class App : Application
             new ViewMap<LoginPage, LoginViewModel>(),
             new ViewMap<MainPage, MainViewModel>(),
             new ViewMap<ProductListPage, ProductListViewModel>(),
+            new ViewMap<ProductDetailPage, ProductDetailViewModel>(),
             new ViewMap<CartPage, CartViewModel>(),
             new ViewMap<OrderConfirmationPage, OrderConfirmationViewModel>()
         );

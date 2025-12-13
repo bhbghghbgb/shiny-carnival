@@ -7,47 +7,51 @@
       xmlns:vm="using:UnoApp3.ViewModels"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance Type=vm:ProductListViewModel}"
+      x:Name="PageRoot"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- Header with search and cart button -->
-        <utu:NavigationBar Content="Danh sách sản phẩm" Grid.Row="0"/>
+        <utu:NavigationBar Content="Danh sách sản phẩm" Grid.Row="0" />
 
         <Grid Grid.Row="1" Padding="16,8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <TextBox Grid.Column="0"
                      PlaceholderText="Tìm kiếm sản phẩm..."
                      Text="{Binding SearchText, Mode=TwoWay}"
-                     Margin="0,0,12,0"/>
+                     Margin="0,0,12,0" />
 
             <Button Grid.Column="1"
                     Command="{Binding LoadProductsCommand}"
                     Margin="0,0,8,0">
-                <SymbolIcon Symbol="Refresh"/>
+                <SymbolIcon Symbol="Refresh" />
             </Button>
 
             <Button Grid.Column="2"
                     Command="{Binding GoToCartCommand}">
-                <SymbolIcon Symbol="Shop"/>
+                <SymbolIcon Symbol="Shop" />
             </Button>
         </Grid>
 
         <!-- Tab filter (Category/Supplier - displayed as Pivot) -->
-        <Pivot Grid.Row="1" Margin="0,10,0,0">
+        <Pivot Grid.Row="2" Margin="0,10,0,0">
             <PivotItem Header="Tất cả">
                 <Grid>
                     <!-- Product List with Refresh (if RefreshContainer works) -->
                     <ListView ItemsSource="{Binding Products}"
+                              IsItemClickEnabled="True"
+                              ItemClick="ListView_ItemClick"
                               SelectionMode="None"
                               HorizontalContentAlignment="Stretch">
                         <ListView.ItemTemplate>
@@ -55,49 +59,57 @@
                                 <Grid Padding="12"
                                       Background="Transparent">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="50" />  <!-- ID -->
+                                        <ColumnDefinition Width="80" />  <!-- Image -->
+                                        <ColumnDefinition Width="*" />   <!-- Info -->
+                                        <ColumnDefinition Width="Auto" /> <!-- Button -->
                                     </Grid.ColumnDefinitions>
 
+                                    <!-- Product ID -->
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Id}"
+                                               Style="{StaticResource BodyTextBlockStyle}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
                                     <!-- Product Image -->
-                                    <Border Grid.Column="0"
+                                    <Border Grid.Column="1"
                                             Width="80"
                                             Height="80"
                                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                             CornerRadius="8">
                                         <Image Source="{Binding ImageUrl}"
-                                               Stretch="UniformToFill"/>
+                                               Stretch="UniformToFill" />
                                     </Border>
 
                                     <!-- Product Details -->
-                                    <StackPanel Grid.Column="1"
+                                    <StackPanel Grid.Column="2"
                                                 Margin="12,0"
                                                 VerticalAlignment="Center">
                                         <TextBlock Text="{Binding ProductName}"
                                                    Style="{StaticResource BodyTextBlockStyle}"
                                                    FontWeight="SemiBold"
-                                                   TextTrimming="CharacterEllipsis"/>
+                                                   TextTrimming="CharacterEllipsis" />
                                         <TextBlock Text="{Binding CategoryName}"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                   Margin="0,2,0,0"/>
+                                                   Margin="0,2,0,0" />
                                         <TextBlock Text="{Binding PriceFormatted}"
                                                    Style="{StaticResource BodyTextBlockStyle}"
                                                    Foreground="{ThemeResource SystemAccentColor}"
-                                                   Margin="0,4,0,0"/>
+                                                   Margin="0,4,0,0" />
                                         <TextBlock Text="{Binding InventoryFormatted}"
                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                   Margin="0,2,0,0"/>
+                                                   Margin="0,2,0,0" />
                                     </StackPanel>
 
                                     <!-- Add to Cart Button -->
-                                    <Button Grid.Column="2"
+                                    <Button Grid.Column="3"
                                             Command="{Binding DataContext.AddToCartCommand, ElementName=PageRoot}"
                                             CommandParameter="{Binding}"
-                                            VerticalAlignment="Center"
-                                            Background="Transparent">
-                                        <SymbolIcon Symbol="Add"/>
+                                            VerticalAlignment="Center">
+                                        <SymbolIcon Symbol="Add" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
@@ -112,7 +124,7 @@
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            Style="{StaticResource BodyTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             </PivotItem>
         </Pivot>
 
@@ -122,6 +134,6 @@
                       Width="50"
                       Height="50"
                       HorizontalAlignment="Center"
-                      VerticalAlignment="Center"/>
+                      VerticalAlignment="Center" />
     </Grid>
 </Page>

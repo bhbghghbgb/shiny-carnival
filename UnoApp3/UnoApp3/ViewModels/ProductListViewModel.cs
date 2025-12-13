@@ -2,6 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using Uno.Extensions.Navigation;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 using UnoApp3.Models.Product;
 using UnoApp3.Services;
 using UnoApp3.Services.Interfaces;
@@ -36,8 +38,17 @@ public partial class ProductListViewModel : BaseViewModel
         _cartRepository = cartRepository;
         Title = "Danh sách sản phẩm";
         Products = new ObservableCollection<ProductListDto>();
-        
-        LoadProductsCommand.Execute(null);
+        this.Log().LogInformation("ProductListViewModel: initialized");
+
+        // LoadProductsCommand.Execute(null);
+    }
+    
+    public override async Task OnNavigatedTo(IReadOnlyDictionary<string, object>? data = null)
+    {
+        await base.OnNavigatedTo(data);
+    
+        // Load products when navigated to the page
+        await LoadProductsCommand.ExecuteAsync(null);
     }
 
     [RelayCommand]
@@ -51,7 +62,9 @@ public partial class ProductListViewModel : BaseViewModel
         try
         {
             Products.Clear();
-            
+
+            this.Log().LogInformation("LoadProducts: starting product search");
+
             var request = new ProductSearchRequest
             {
                 PageIndex = 1,
@@ -59,9 +72,11 @@ public partial class ProductListViewModel : BaseViewModel
                 SortColumn = "productName",
                 SortDirection = "asc"
             };
-            
+
             var result = await _productService.SearchProductsAsync(request);
-            
+
+            this.Log().LogInformation("LoadProducts: products fetched: {count}", result?.Items?.Count ?? 0);
+
             if (result?.Items != null)
             {
                 foreach (var product in result.Items)
@@ -69,6 +84,11 @@ public partial class ProductListViewModel : BaseViewModel
                     Products.Add(product);
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            this.Log().LogError(ex, "LoadProducts failed");
+            throw;
         }
         finally
         {

@@ -15,14 +15,33 @@ public class ProductService
 
     public async Task<PagedList<ProductListDto>> SearchProductsAsync(ProductSearchRequest request)
     {
-        var response = await _productApi.GetProducts(request);
-        return response?.Data;
+        try
+        {
+            this.Log().LogInformation("SearchProductsAsync: calling API page {page} size {size}", request.PageIndex, request.PageSize);
+            var response = await _productApi.GetProducts(request);
+            this.Log().LogInformation("SearchProductsAsync: received {count} items", response?.Data?.Items?.Count ?? 0);
+            return response?.Data;
+        }
+        catch (Exception ex)
+        {
+            this.Log().LogError(ex, "SearchProductsAsync: API call failed");
+            throw;
+        }
     }
 
     public async Task<ProductResponseDto> GetProductAsync(int id)
     {
-        var response = await _productApi.GetProduct(id);
-        return response?.Data;
+        try
+        {
+            this.Log().LogInformation("GetProductAsync: getting product {id}", id);
+            var response = await _productApi.GetProduct(id);
+            return response?.Data;
+        }
+        catch (Exception ex)
+        {
+            this.Log().LogError(ex, "GetProductAsync: failed to get product {id}", id);
+            throw;
+        }
     }
 
     public string GetProductImageUrl(int productId, string baseUrl)
