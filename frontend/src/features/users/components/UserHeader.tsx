@@ -4,6 +4,7 @@ import { exportTablePdf } from '../../../utils/exportPdf';
 import { importTableExcel } from '../../../utils/importExcel';
 import { userPageConfig } from '../config/userPageConfig';
 import { useUserManagementPage } from '../hooks/useUserManagementPage';
+import type { CreateUserRequest } from '../types/api';
 import type { UserNoPass } from '../types/entity';
 
 const { Title, Text } = Typography
@@ -14,11 +15,13 @@ interface UserHeaderProps {
 
 export const UserHeader = ({ users }: UserHeaderProps) => {
     const {createUser} = useUserManagementPage()
+    const createFields: (keyof CreateUserRequest)[] = ["username", "password", "fullName", "role"];
+
     const exportPDF = () => {
-        exportTablePdf(userPageConfig,users,"products");
+        exportTablePdf(userPageConfig,users,"users");
     };
     const importExcel = async (file: File) => {
-        await importTableExcel(userPageConfig, file, payload =>
+        await importTableExcel(createFields, file, payload =>
             createUser.mutateAsync(payload)
         );
     };

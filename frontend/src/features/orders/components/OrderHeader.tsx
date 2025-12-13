@@ -12,7 +12,7 @@ interface OrderHeaderProps {
 
 export const OrderHeader = ({ orders }: OrderHeaderProps) => {
     const exportPDF = () => {
-        exportTablePdf(orderPageConfig,orders,"products");
+        exportTablePdf(orderPageConfig,orders,"orders");
     };
     const importExcel = () =>{
 
@@ -46,7 +46,7 @@ export const OrderHeader = ({ orders }: OrderHeaderProps) => {
                             type="primary"
                             size="large"
                             icon={<FileExcelOutlined />}
-                            onClick={importExcel}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',

@@ -12,7 +12,7 @@ interface PromotionHeaderProps {
 
 export const PromotionHeader = ({ promotions }: PromotionHeaderProps) => {
     const exportPDF = () => {
-        exportTablePdf(promotionPageConfig,promotions,"products");
+        exportTablePdf(promotionPageConfig,promotions,"promotions");
     };
     const importExcel = () =>{
 
@@ -46,7 +46,7 @@ export const PromotionHeader = ({ promotions }: PromotionHeaderProps) => {
                             type="primary"
                             size="large"
                             icon={<FileExcelOutlined />}
-                            onClick={importExcel}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',

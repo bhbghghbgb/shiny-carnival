@@ -12,7 +12,7 @@ interface SupplierHeaderProps {
 
 export const SupplierHeader = ({ suppliers }: SupplierHeaderProps) => {
     const exportPDF = () => {
-      exportTablePdf(supplierPageConfig,suppliers,"products");
+      exportTablePdf(supplierPageConfig,suppliers,"suppliers");
     };
     const importExcel = () =>{
 
@@ -43,7 +43,7 @@ export const SupplierHeader = ({ suppliers }: SupplierHeaderProps) => {
                             type="primary"
                             size="large"
                             icon={<FileExcelOutlined />}
-                            onClick={importExcel}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',

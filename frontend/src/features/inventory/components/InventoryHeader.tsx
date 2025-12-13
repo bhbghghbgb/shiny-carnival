@@ -46,7 +46,7 @@ export const InventoryHeader = ({inventories} : InventoryHeaderProps) => {
                             type="primary"
                             size="large"
                             icon={<FileExcelOutlined />}
-                            onClick={importExcel}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
