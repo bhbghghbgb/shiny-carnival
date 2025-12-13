@@ -6,7 +6,9 @@ namespace RetailStoreManagement.Models.Common;
 /// </summary>
 public class PromotionSearchRequest : PagedRequest
 {
-    // Có thể thêm các filters riêng cho Promotion sau này
-    // Ví dụ: Status, DiscountType, MinDiscountValue, etc.
+    /// <summary>
+    /// Lọc theo trạng thái khuyến mãi: "active" hoặc "inactive"
+    /// </summary>
+    public string? Status { get; set; }
 }
 

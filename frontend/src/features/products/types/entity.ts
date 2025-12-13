@@ -8,3 +8,11 @@ export interface ProductEntity {
     price: number;
     unit: string;
 }
+
+// Extended Product with Details (from ProductResponseDto)
+export interface ProductDetailsDto extends ProductEntity {
+    categoryName?: string;
+    supplierName?: string;
+    inventoryQuantity: number;
+    createdAt?: string;
+}

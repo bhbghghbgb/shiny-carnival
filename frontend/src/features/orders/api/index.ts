@@ -1,4 +1,2 @@
-// Export tất cả API functions và types cho Orders feature
-export * from './orderApi';
+// Export API service (kiến trúc mới)
 export * from './OrderApiService';
-export { default as orderApi } from './orderApi';

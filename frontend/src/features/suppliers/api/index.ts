@@ -1,4 +1,2 @@
-// Export tất cả API functions và types cho Suppliers feature
-export * from './supplierApi';
-export { default as supplierApi } from './supplierApi';
+// Export API service (kiến trúc mới)
 export * from './SupplierApiService';

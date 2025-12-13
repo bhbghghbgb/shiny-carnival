@@ -84,6 +84,7 @@ public class OrderService : IOrderService
                     StaffName = o.User.FullName ?? string.Empty,
                     Status = o.Status.ToString().ToLower(),
                     TotalAmount = o.TotalAmount,
+                    DiscountAmount = o.DiscountAmount,
                     FinalAmount = o.TotalAmount - o.DiscountAmount
                 });
 
@@ -168,11 +169,16 @@ public class OrderService : IOrderService
 
                 if (promotion != null)
                 {
-                    var validationResult = ValidatePromotion(promotion, 0); // We'll calculate total later
-                    if (!validationResult.isValid)
+                    // Validate basic promotion conditions (status, date, usage limit) - không cần totalAmount
+                    var basicValidationResult = ValidatePromotionBasic(promotion);
+                    if (!basicValidationResult.isValid)
                     {
-                        return ApiResponse<OrderDetailsDto>.Error(validationResult.message, 400);
+                        return ApiResponse<OrderDetailsDto>.Error(basicValidationResult.message, 400);
                     }
+                }
+                else
+                {
+                    return ApiResponse<OrderDetailsDto>.Error("Promotion code not found", 404);
                 }
             }
 
@@ -196,14 +202,15 @@ public class OrderService : IOrderService
                 orderItems.Add(orderItem);
             }
 
-            // Apply discount if promotion is valid
+            // Apply discount if promotion is valid - validate với totalAmount đã tính
             if (promotion != null)
             {
                 var validationResult = ValidatePromotion(promotion, totalAmount);
-                if (validationResult.isValid)
+                if (!validationResult.isValid)
                 {
-                    discountAmount = CalculateDiscount(promotion, totalAmount);
+                    return ApiResponse<OrderDetailsDto>.Error(validationResult.message, 400);
                 }
+                discountAmount = CalculateDiscount(promotion, totalAmount);
             }
 
             // 5. Create order
@@ -247,7 +254,10 @@ public class OrderService : IOrderService
         }
     }
 
-    private (bool isValid, string message) ValidatePromotion(PromotionEntity promotion, decimal orderTotal)
+    /// <summary>
+    /// Validate basic promotion conditions (status, date, usage limit) - không cần totalAmount
+    /// </summary>
+    private (bool isValid, string message) ValidatePromotionBasic(PromotionEntity promotion)
     {
         if (promotion.Status != PromotionStatus.Active)
             return (false, "Promotion is not active");
@@ -259,11 +269,25 @@ public class OrderService : IOrderService
         if (now < startDate || now > endDate)
             return (false, "Promotion is not valid for current date");
 
+        if (promotion.UsageLimit > 0 && promotion.UsedCount >= promotion.UsageLimit)
+            return (false, "Promotion usage limit exceeded");
+
+        return (true, "Valid");
+    }
+
+    /// <summary>
+    /// Validate promotion với totalAmount (bao gồm cả minOrderAmount check)
+    /// </summary>
+    private (bool isValid, string message) ValidatePromotion(PromotionEntity promotion, decimal orderTotal)
+    {
+        // Validate basic conditions first
+        var basicValidation = ValidatePromotionBasic(promotion);
+        if (!basicValidation.isValid)
+            return basicValidation;
+
+        // Validate minOrderAmount
         if (orderTotal < promotion.MinOrderAmount)
             return (false, $"Order amount must be at least {promotion.MinOrderAmount:C}");
-
-        if (promotion.UsedCount >= promotion.UsageLimit)
-            return (false, "Promotion usage limit exceeded");
 
         return (true, "Valid");
     }
@@ -294,26 +318,34 @@ public class OrderService : IOrderService
                 return ApiResponse<OrderResponseDto>.Error("Order not found", 404);
             }
 
-            // Validate status transition (pending → paid/canceled only)
-            if (order.Status != OrderStatus.Pending)
-            {
-                return ApiResponse<OrderResponseDto>.Error("Can only update status of pending orders", 400);
-            }
-
             var newStatus = request.Status.ToLower() switch
             {
+                "pending" => OrderStatus.Pending,
                 "paid" => OrderStatus.Paid,
                 "canceled" => OrderStatus.Canceled,
                 _ => throw new ArgumentException("Invalid status")
             };
 
-            if (newStatus == OrderStatus.Paid)
+            // Nếu status không thay đổi, không cần làm gì
+            if (order.Status == newStatus)
             {
-                // Update inventory (decrease quantities)
+                var unchangedOrderDto = _mapper.Map<OrderResponseDto>(order);
+                return ApiResponse<OrderResponseDto>.Success(unchangedOrderDto, "Order status unchanged");
+            }
+
+            // Handle status transitions
+            if (order.Status == OrderStatus.Pending && newStatus == OrderStatus.Paid)
+            {
+                // Pending → Paid: Decrease inventory and create payment
                 foreach (var orderItem in order.OrderItems)
                 {
                     if (orderItem.Product.Inventory != null)
                     {
+                        // Check if sufficient stock before decreasing
+                        if (orderItem.Product.Inventory.Quantity < orderItem.Quantity)
+                        {
+                            return ApiResponse<OrderResponseDto>.Error($"Insufficient stock for product {orderItem.Product.ProductName}", 400);
+                        }
                         orderItem.Product.Inventory.Quantity -= orderItem.Quantity;
                         await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
                     }
@@ -329,12 +361,121 @@ public class OrderService : IOrderService
                 };
                 await _unitOfWork.Payments.AddAsync(payment);
             }
-            else if (newStatus == OrderStatus.Canceled)
+            else if (order.Status == OrderStatus.Paid && newStatus == OrderStatus.Pending)
             {
+                // Paid → Pending: Rollback inventory, delete payment, and decrement promotion
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.Product.Inventory != null)
+                    {
+                        // Reload inventory from database to ensure we have the latest quantity
+                        var inventory = await _unitOfWork.Inventory.GetByIdAsync(orderItem.Product.Inventory.Id);
+                        if (inventory != null)
+                        {
+                            // Restore inventory: current quantity + order item quantity
+                            inventory.Quantity = inventory.Quantity + orderItem.Quantity;
+                            await _unitOfWork.Inventory.UpdateAsync(inventory);
+                        }
+                    }
+                }
+
+                // Delete payment record
+                var payment = await _unitOfWork.Payments.GetQueryable()
+                    .FirstOrDefaultAsync(p => p.OrderId == order.Id);
+                if (payment != null)
+                {
+                    await _unitOfWork.Payments.DeleteAsync(payment.Id);
+                }
+
                 // Decrement promotion usedCount if was applied
                 if (order.Promotion != null && order.DiscountAmount > 0)
                 {
                     order.Promotion.UsedCount--;
+                    await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+                }
+            }
+            else if (order.Status == OrderStatus.Pending && newStatus == OrderStatus.Canceled)
+            {
+                // Pending → Canceled: Decrement promotion usedCount if was applied
+                if (order.Promotion != null && order.DiscountAmount > 0)
+                {
+                    order.Promotion.UsedCount--;
+                    await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+                }
+            }
+            else if (order.Status == OrderStatus.Paid && newStatus == OrderStatus.Canceled)
+            {
+                // Paid → Canceled: Rollback inventory, delete payment, and decrement promotion
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.Product.Inventory != null)
+                    {
+                        // Reload inventory from database to ensure we have the latest quantity
+                        var inventory = await _unitOfWork.Inventory.GetByIdAsync(orderItem.Product.Inventory.Id);
+                        if (inventory != null)
+                        {
+                            // Restore inventory: current quantity + order item quantity
+                            inventory.Quantity = inventory.Quantity + orderItem.Quantity;
+                            await _unitOfWork.Inventory.UpdateAsync(inventory);
+                        }
+                    }
+                }
+
+                // Delete payment record
+                var payment = await _unitOfWork.Payments.GetQueryable()
+                    .FirstOrDefaultAsync(p => p.OrderId == order.Id);
+                if (payment != null)
+                {
+                    await _unitOfWork.Payments.DeleteAsync(payment.Id);
+                }
+
+                // Decrement promotion usedCount if was applied
+                if (order.Promotion != null && order.DiscountAmount > 0)
+                {
+                    order.Promotion.UsedCount--;
+                    await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+                }
+            }
+            else if (order.Status == OrderStatus.Canceled && newStatus == OrderStatus.Paid)
+            {
+                // Canceled → Paid: Decrease inventory and create payment
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.Product.Inventory != null)
+                    {
+                        // Check if sufficient stock before decreasing
+                        if (orderItem.Product.Inventory.Quantity < orderItem.Quantity)
+                        {
+                            return ApiResponse<OrderResponseDto>.Error($"Insufficient stock for product {orderItem.Product.ProductName}", 400);
+                        }
+                        orderItem.Product.Inventory.Quantity -= orderItem.Quantity;
+                        await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
+                    }
+                }
+
+                // Create payment record
+                var payment = new PaymentEntity
+                {
+                    OrderId = order.Id,
+                    Amount = order.TotalAmount - order.DiscountAmount,
+                    PaymentMethod = PaymentMethod.Cash,
+                    PaymentDate = DateTime.UtcNow
+                };
+                await _unitOfWork.Payments.AddAsync(payment);
+
+                // Increment promotion usedCount if was applied
+                if (order.Promotion != null && order.DiscountAmount > 0)
+                {
+                    order.Promotion.UsedCount++;
+                    await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+                }
+            }
+            else if (order.Status == OrderStatus.Canceled && newStatus == OrderStatus.Pending)
+            {
+                // Canceled → Pending: Increment promotion usedCount if was applied (no inventory change needed)
+                if (order.Promotion != null && order.DiscountAmount > 0)
+                {
+                    order.Promotion.UsedCount++;
                     await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
                 }
             }
@@ -528,5 +669,78 @@ public class OrderService : IOrderService
         content += $"Final Amount: {orderDetails.Data.FinalAmount:C}\n";
 
         return System.Text.Encoding.UTF8.GetBytes(content);
+    }
+
+    public async Task<ApiResponse<decimal>> GetTotalRevenueAsync(OrderRevenueRequest? request = null)
+    {
+        try
+        {
+            var query = _unitOfWork.Orders.GetQueryable();
+
+            // Apply same filters as GetOrdersAsync if request provided
+            if (request != null)
+            {
+                // Apply search filter
+                if (!string.IsNullOrEmpty(request.Search))
+                {
+                    query = query.Where(o => o.Customer!.Name.Contains(request.Search) ||
+                                            o.User.FullName!.Contains(request.Search));
+                }
+
+                // Apply status filter
+                if (!string.IsNullOrEmpty(request.Status))
+                {
+                    if (Enum.TryParse<OrderStatus>(request.Status, true, out var status))
+                    {
+                        query = query.Where(o => o.Status == status);
+                    }
+                }
+                // Todo: nên bỏ tổng doanh thu vào trong database
+                else
+                {
+                    // Default: Only calculate revenue from Paid orders (if no status filter specified)
+                    query = query.Where(o => o.Status == OrderStatus.Paid);
+                }
+
+                // Apply customer filter
+                if (request.CustomerId.HasValue)
+                {
+                    query = query.Where(o => o.CustomerId == request.CustomerId.Value);
+                }
+
+                // Apply user filter
+                if (request.UserId.HasValue)
+                {
+                    query = query.Where(o => o.UserId == request.UserId.Value);
+                }
+
+                // Apply date filters
+                if (request.StartDate.HasValue)
+                {
+                    query = query.Where(o => o.OrderDate >= request.StartDate.Value);
+                }
+
+                if (request.EndDate.HasValue)
+                {
+                    query = query.Where(o => o.OrderDate <= request.EndDate.Value);
+                }
+            }
+            else
+            {
+                // If no request provided, default to only Paid orders
+                query = query.Where(o => o.Status == OrderStatus.Paid);
+            }
+
+            // Calculate total revenue: sum of (TotalAmount - DiscountAmount) = FinalAmount
+            var totalRevenue = await query
+                .Select(o => o.TotalAmount - o.DiscountAmount)
+                .SumAsync();
+
+            return ApiResponse<decimal>.Success(totalRevenue);
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<decimal>.Error(ex.Message);
+        }
     }
 }

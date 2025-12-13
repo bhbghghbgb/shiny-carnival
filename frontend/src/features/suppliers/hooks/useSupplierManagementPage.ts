@@ -7,6 +7,7 @@ import { createSuppliersQueryOptions } from '../../../app/routes/modules/managem
 import { useCreateSupplier, useUpdateSupplier, useDeleteSupplier } from './useSuppliers'
 import type { SupplierEntity } from '../types/entity'
 import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useSupplierManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.SUPPLIERS)
@@ -24,19 +25,13 @@ export const useSupplierManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const createSupplier = useCreateSupplier({
         onSuccess: () => {
             router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Tạo nhà cung cấp thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo nhà cung cấp thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -46,7 +41,7 @@ export const useSupplierManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật nhà cung cấp thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật nhà cung cấp thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -56,7 +51,7 @@ export const useSupplierManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa nhà cung cấp thất bại: ${parseErrorMessage(error)}`)
+            setPageErrorMessage(`Xóa nhà cung cấp thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -113,7 +108,7 @@ export const useSupplierManagementPage = () => {
     }
 
     const handleUpdate = async (record: SupplierEntity, values: UpdateSupplierRequest) => {
-        await updateSupplier.mutateAsync({ ...values, id: record.id })
+        await updateSupplier.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: SupplierEntity) => deleteSupplier.mutateAsync(record.id)

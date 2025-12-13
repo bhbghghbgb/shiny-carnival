@@ -7,6 +7,7 @@ import { createCategoriesQueryOptions } from '../../../app/routes/modules/manage
 import { useCreateCategory, useUpdateCategory, useDeleteCategory } from './useCategories'
 import type { CategoryEntity } from '../types/entity'
 import type { CreateCategoryRequest, UpdateCategoryRequest } from '../types/api'
+import { parseApiError } from '../../../lib/api/utils/parseApiError'
 
 export const useCategoryManagementPage = () => {
     const routeApi = getRouteApi(ENDPOINTS.ADMIN.CATEGORIES)
@@ -24,19 +25,13 @@ export const useCategoryManagementPage = () => {
     const [pageErrorMessage, setPageErrorMessage] = useState<string | null>(null)
     const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
 
-    const parseErrorMessage = (error: unknown) => {
-        if (error instanceof Error) return error.message
-        if (typeof error === 'string') return error
-        return 'Đã có lỗi xảy ra, vui lòng thử lại.'
-    }
-
     const createCategory = useCreateCategory({
         onSuccess: () => {
             router.invalidate()
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Tạo danh mục thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Tạo danh mục thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -46,7 +41,7 @@ export const useCategoryManagementPage = () => {
             setFormErrorMessage(null)
         },
         onError: (error: Error) => {
-            setFormErrorMessage(`Cập nhật danh mục thất bại: ${parseErrorMessage(error)}`)
+            setFormErrorMessage(`Cập nhật danh mục thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -56,7 +51,7 @@ export const useCategoryManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa danh mục thất bại: ${parseErrorMessage(error)}`)
+            setPageErrorMessage(`Xóa danh mục thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -113,7 +108,7 @@ export const useCategoryManagementPage = () => {
     }
 
     const handleUpdate = async (record: CategoryEntity, values: UpdateCategoryRequest) => {
-        await updateCategory.mutateAsync({ ...values, id: record.id })
+        await updateCategory.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: CategoryEntity) => deleteCategory.mutateAsync(record.id)
