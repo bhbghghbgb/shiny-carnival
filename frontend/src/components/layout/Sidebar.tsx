@@ -1,10 +1,8 @@
 import { Menu } from 'antd';
 import {
   AppstoreOutlined,
-  ContainerOutlined,
-  DesktopOutlined,
-  PieChartOutlined,
   UserOutlined,
+  ShoppingCartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Link } from "@tanstack/react-router";
@@ -14,8 +12,8 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
   { key: '1', icon: <UserOutlined />, label: <Link to={ENDPOINTS.AUTH.PROFILE as any}>Hồ sơ</Link> },
-  // { key: '2', icon: <PieChartOutlined />, label: 'Dashboard' },
-  // { key: '3', icon: <ContainerOutlined />, label: 'Orders' },
+  { key: '2', icon: <ShoppingCartOutlined />, label: <Link to={ENDPOINTS.STAFF.ORDER as any}>Order</Link> },
+  // { key: '3', icon: <PieChartOutlined />, label: 'Dashboard' },
   {
     key: 'sub1',
     label: 'Management',

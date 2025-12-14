@@ -45,4 +45,9 @@ export const ENDPOINTS = {
       EDIT: '/admin/inventory/$id/edit',
     },
   },
+
+  STAFF: {
+    ROOT: '/staff',
+    ORDER: '/staff/order',
+  },
 } as const;
