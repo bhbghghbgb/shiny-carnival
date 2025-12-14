@@ -2,21 +2,14 @@
 
 namespace UnoApp4.Services;
 
-public class ProductService
+public class ProductService(IProductApi productApi)
 {
-    private readonly IProductApi _productApi;
-
-    public ProductService(IProductApi productApi)
-    {
-        _productApi = productApi;
-    }
-
     public async Task<PagedList<ProductListDto>> SearchProductsAsync(ProductSearchRequest request)
     {
         try
         {
             this.Log().LogInformation("SearchProductsAsync: calling API page {page} size {size}", request.PageIndex, request.PageSize);
-            var response = await _productApi.GetProducts(request);
+            var response = await productApi.GetProducts(request);
             this.Log().LogInformation("SearchProductsAsync: received {count} items", response?.Data?.Items?.Count ?? 0);
             return response?.Data ?? throw new InvalidOperationException();
         }
@@ -32,8 +25,8 @@ public class ProductService
         try
         {
             this.Log().LogInformation("GetProductAsync: getting product {id}", id);
-            var response = await _productApi.GetProduct(id);
-            return response?.Data;
+            var response = await productApi.GetProduct(id);
+            return response?.Data ?? throw new InvalidOperationException();
         }
         catch (Exception ex)
         {
@@ -42,7 +35,7 @@ public class ProductService
         }
     }
 
-    public string GetProductImageUrl(int productId, string baseUrl)
+    public static string GetProductImageUrl(int productId, string baseUrl)
     {
         return $"{baseUrl}/images/{productId}";
     }

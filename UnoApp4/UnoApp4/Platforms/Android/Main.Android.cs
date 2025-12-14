@@ -19,10 +19,5 @@ namespace UnoApp4.Droid;
     HardwareAccelerated = true,
     Theme = "@style/Theme.App.Starting"
 )]
-public class Application : Microsoft.UI.Xaml.NativeApplication
-{
-    public Application(IntPtr javaReference, JniHandleOwnership transfer)
-        : base(() => new App(), javaReference, transfer)
-    {
-    }
-}
+public class Application(IntPtr javaReference, JniHandleOwnership transfer)
+    : Microsoft.UI.Xaml.NativeApplication(() => new App(), javaReference, transfer);

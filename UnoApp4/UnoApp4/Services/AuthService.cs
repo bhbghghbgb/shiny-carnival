@@ -59,7 +59,9 @@ public class AuthService(IAuthApi authApi)
                 RefreshToken = refreshToken
             };
 
-            var response = await authApi.RefreshToken(request);
+            // Manually add bearer token for refresh endpoint
+            var authorization = !string.IsNullOrEmpty(_token) ? $"Bearer {_token}" : "";
+            var response = await authApi.RefreshToken(request, authorization);
 
             if (response?.Data != null)
             {
@@ -97,7 +99,9 @@ public class AuthService(IAuthApi authApi)
                 RefreshToken = _refreshToken
             };
 
-            var response = await authApi.Logout(request);
+            // Manually add bearer token for logout endpoint
+            var authorization = !string.IsNullOrEmpty(_token) ? $"Bearer {_token}" : "";
+            var response = await authApi.Logout(request, authorization);
 
             if (response?.Success == true)
             {
@@ -122,6 +126,7 @@ public class AuthService(IAuthApi authApi)
             return false;
         }
     }
+
 
     public string? GetToken() => _token;
 

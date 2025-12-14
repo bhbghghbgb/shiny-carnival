@@ -1,14 +1,9 @@
 namespace UnoApp4.Services.Endpoints;
 
-internal class DebugHttpHandler : DelegatingHandler
+internal class DebugHttpHandler(ILogger<DebugHttpHandler> logger, HttpMessageHandler? innerHandler = null)
+    : DelegatingHandler(innerHandler ?? new HttpClientHandler())
 {
-    private readonly ILogger _logger;
-
-    public DebugHttpHandler(ILogger<DebugHttpHandler> logger, HttpMessageHandler? innerHandler = null)
-        : base(innerHandler ?? new HttpClientHandler())
-    {
-        _logger = logger;
-    }
+    private readonly ILogger _logger = logger;
 
     protected async override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,

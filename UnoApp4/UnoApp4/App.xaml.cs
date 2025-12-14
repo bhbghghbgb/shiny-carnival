@@ -78,13 +78,7 @@ public partial class App : Application
 
                     // API Clients with Refit using Uno.Extensions
                     // These read from appsettings.json endpoints
-                    services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint",
-                        configure: (builder, options) =>
-                            builder.ConfigureHttpClient(client =>
-                            {
-                                // Configure the HttpClient here
-                            }).AddHttpMessageHandler<AuthHeaderHandler>()
-                    );
+                    services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint");
                     services.AddRefitClient<IProductApi>(context, name: "ProductEndpoint",
                         configure: (builder, options) =>
                             builder.ConfigureHttpClient(client =>
@@ -207,7 +201,8 @@ public partial class App : Application
             else
             {
                 this.Log().LogInformation("User not authenticated, navigating to Login page");
-                await navigator.NavigateViewModelAsync<LoginModel>(this, qualifier: Qualifiers.Nested);
+                // await navigator.NavigateViewModelAsync<LoginModel>(this, qualifier: Qualifiers.Nested);
+                await navigator.NavigateViewModelAsync<LoginModel2>(this, qualifier: Qualifiers.Nested);
             }
         });
         this.Log().LogInformation("Navigation completed");
@@ -232,16 +227,16 @@ public partial class App : Application
             new RouteMap("", View: views.FindByViewModel<ShellModel>(),
                 Nested:
                 [
-                    new RouteMap("Login", View: views.FindByViewModel<LoginModel>()),
+                    new RouteMap("Login", View: views.FindByViewModel<LoginModel2>()),
                     new RouteMap("Main", View: views.FindByViewModel<MainModel>(), IsDefault: true)
-                        // Nested:
-                        // [
-                        //     // new RouteMap("ProductList", View: views.FindByViewModel<ProductListModel>(),
-                        //     //     IsDefault: true),
-                        //     // new RouteMap("ProductDetail", View: views.FindByViewModel<ProductDetailModel>()),
-                        //     // new RouteMap("Cart", View: views.FindByViewModel<CartModel>()),
-                        //     // new RouteMap("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationModel>()),
-                        // ]),
+                    // Nested:
+                    // [
+                    //     // new RouteMap("ProductList", View: views.FindByViewModel<ProductListModel>(),
+                    //     //     IsDefault: true),
+                    //     // new RouteMap("ProductDetail", View: views.FindByViewModel<ProductDetailModel>()),
+                    //     // new RouteMap("Cart", View: views.FindByViewModel<CartModel>()),
+                    //     // new RouteMap("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationModel>()),
+                    // ]),
                 ]
             )
         );

@@ -14,10 +14,24 @@
     <Grid Padding="20">
         <ScrollViewer>
             <StackPanel Spacing="16" MaxWidth="400" HorizontalAlignment="Center">
-                <TextBlock Text="Trang tượng trưng, bấm login trực tiếp để vào, không cần login"
-                           TextAlignment="Center"
-                           Style="{StaticResource TitleTextBlockStyle}"
-                           Margin="0,0,0,20" />
+                <TextBlock
+                    Text="Trang tượng trưng, bấm login trực tiếp để vào, không cần login (đã tích hợp login, h phải nhập đi mới login đc)"
+                    TextAlignment="Center"
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Margin="0,0,0,20" />
+
+                <!-- ERROR MESSAGE -->
+                <Border Background="{ThemeResource ErrorAcrylicBrush}"
+                        DataContext="{Binding ErrorMessage}"
+                        Visibility="{Binding IsSome}"
+                        CornerRadius="8"
+                        Padding="12">
+                    <TextBlock Foreground="{ThemeResource ErrorFillColorPrimaryBrush}"
+                               Text="{Binding Value}"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap" />
+                </Border>
 
                 <TextBox PlaceholderText="Tên đăng nhập"
                          Text="{Binding Username, Mode=TwoWay}"
@@ -40,7 +54,27 @@
                               Width="50"
                               Height="50"
                               HorizontalAlignment="Center" />
+
+                <TextBlock
+                    Text="{Binding IsBusyStr.Value}"
+                    TextAlignment="Center"
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Margin="0,0,0,20" />
             </StackPanel>
         </ScrollViewer>
+
+        <!-- SUCCESS DIALOG -->
+        <ContentDialog x:Name="SuccessDialog"
+                       Title="Đăng nhập thành công!"
+                       PrimaryButtonText="Tiếp tục"
+                       CloseButtonText="Đóng"
+                       DefaultButton="Primary"
+                       Visibility="{Binding ShowSuccessDialog, Converter={StaticResource BoolToVisibilityConverter}}"
+                       IsPrimaryButtonEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+            <TextBlock TextWrapping="Wrap">
+                Bạn đã đăng nhập thành công.
+                Nhấn Tiếp tục để vào ứng dụng chính.
+            </TextBlock>
+        </ContentDialog>
     </Grid>
 </Page>

@@ -9,10 +9,12 @@ public interface IAuthApi
     Task<Models.ApiResponse<LoginResponse>> Login([Body] LoginRequest request);
 
     [Post("/Auth/refresh")]
-    [Headers("Authorization: Bearer")]
-    Task<Models.ApiResponse<RefreshTokenResponse>> RefreshToken([Body] RefreshTokenRequest request);
+    Task<Models.ApiResponse<RefreshTokenResponse>> RefreshToken(
+        [Body] RefreshTokenRequest request,
+        [Header("Authorization")] string authorization);
 
     [Post("/Auth/logout")]
-    [Headers("Authorization: Bearer")]
-    Task<Models.ApiResponse<LogoutResponse>> Logout([Body] LogoutRequest request);
+    Task<Models.ApiResponse<object>> Logout(
+        [Body] LogoutRequest request,
+        [Header("Authorization")] string authorization);
 }
