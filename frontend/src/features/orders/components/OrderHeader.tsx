@@ -1,10 +1,9 @@
 import { FileExcelOutlined, FilePdfOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Space, Typography } from 'antd'
 import { exportTablePdf } from '../../../utils/exportPdf'
-import { importTableExcel } from '../../../utils/importExcel'
+import { importOrderExcel } from '../../../utils/importOrderExcel'
 import { orderPageConfig } from '../config/orderPageConfig'
 import { useOrderManagementPage } from '../hooks'
-import type { CreateOrderRequest } from '../types/api'
 import type { OrderEntity } from '../types/entity'
 
 const { Title, Text } = Typography
@@ -20,11 +19,7 @@ export const OrderHeader = ({ orders }: OrderHeaderProps) => {
         exportTablePdf(orderPageConfig,orders,"orders");
     };
     const importExcel = async (file: File) => {
-        await importTableExcel(file, payload => 
-            createOrder.mutateAsync({
-                ...(payload as CreateOrderRequest),
-            })
-        );
+        importOrderExcel(file, createOrder.mutateAsync)
     };
     return (
         <Card
