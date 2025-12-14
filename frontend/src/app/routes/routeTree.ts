@@ -72,10 +72,7 @@ const authModuleRoutes: ModuleRoutes<any>[] = [
   authRoutes,
 ];
 
-// Home routes (có sidebar)
-const homeModuleRoutes: ModuleRoutes<any>[] = [
-  homeRoutes,
-];
+
 
 // Admin routes (có sidebar)
 const adminModuleRoutes: ModuleRoutes<any>[] = [
@@ -102,12 +99,6 @@ const authRoutesBuilt = authRoutesConfig.flatMap(config => {
   return buildRoutesFromConfig([config], authLayoutRoute);
 });
 
-// Build home routes với mainLayoutRoute (có sidebar)
-const homeRoutesBuilt = buildRoutesFromConfig(
-  homeModuleRoutes.flatMap(m => m.routes as HierarchicalModuleRouteConfig[]),
-  mainLayoutRoute,
-);
-
 // Tạo adminLayoutRoute với mainLayoutRoute làm parent để đảm bảo sidebar hiển thị
 const adminLayoutRoute = createAdminLayoutRoute(mainLayoutRoute);
 
@@ -120,8 +111,6 @@ const adminRoutes = buildRoutesFromConfig(
 // 3. Gắn các route auth đã tạo vào authLayoutRoute
 authLayoutRoute.addChildren(authRoutesBuilt);
 
-// 4. Gắn các route home đã tạo vào mainLayoutRoute
-mainLayoutRoute.addChildren(homeRoutesBuilt);
 
 // 5. Gắn các route admin đã tạo vào adminLayoutRoute
 adminLayoutRoute.addChildren(adminRoutes);

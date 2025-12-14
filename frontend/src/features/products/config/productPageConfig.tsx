@@ -29,7 +29,7 @@ async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilter
     return items.map((s: SupplierEntity) => ({ label: s.name ?? `#${s.id}`, value: s.id }))
 }
 
-const columns: ColumnsType<ProductEntity> = [
+export const productColumns: ColumnsType<ProductEntity> = [
     {
         title: 'Tên sản phẩm',
         dataIndex: 'productName',
@@ -81,7 +81,7 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
         displayNamePlural: 'Sản phẩm',
     },
     table: {
-        columns,
+        columns: productColumns,
         rowKey: 'id',
     },
     form: {
