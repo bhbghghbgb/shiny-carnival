@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using static RetailStoreManagement.Common.ValidationConstants;
 
 namespace RetailStoreManagement.Models.Order;
 
@@ -7,10 +8,10 @@ public class CreateOrderRequest
     [Required]
     public int CustomerId { get; set; }
 
-    [MaxLength(50)]
+    [MaxLength(MAX_LENGTH_CODE)]
     public string? PromoCode { get; set; }
 
     [Required]
-    [MinLength(1, ErrorMessage = "Order must have at least one item.")]
+    [MinLength(MIN_QUANTITY, ErrorMessage = "Order must have at least one item.")]
     public List<OrderItemInput> OrderItems { get; set; } = new();
 }

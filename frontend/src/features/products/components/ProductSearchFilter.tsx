@@ -1,8 +1,9 @@
-import { Card, Row, Col, Space, Typography, Input, InputNumber, Select, Button } from 'antd'
+import { Card, Row, Col, Space, Typography, Input, InputNumber, Select, Button, Checkbox } from 'antd'
 import {
     SearchOutlined,
     FilterOutlined,
     SortAscendingOutlined,
+    WarningOutlined,
 } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
@@ -54,12 +55,14 @@ interface ProductSearchFilterProps {
     supplierId?: number
     minPrice?: number
     maxPrice?: number
+    onlyLowStock?: boolean
     sortField: string
     sortOrder: 'ascend' | 'descend'
     onSearchChange: (value: string) => void
     onCategoryChange: (value?: number) => void
     onSupplierChange: (value?: number) => void
     onPriceRangeChange: (min?: number, max?: number) => void
+    onLowStockChange: (checked: boolean) => void
     onSortChange: (field: string, order: 'ascend' | 'descend') => void
     onClearFilters: () => void
 }
@@ -70,12 +73,14 @@ export const ProductSearchFilter = ({
     supplierId,
     minPrice,
     maxPrice,
+    onlyLowStock,
     sortField,
     sortOrder,
     onSearchChange,
     onCategoryChange,
     onSupplierChange,
     onPriceRangeChange,
+    onLowStockChange,
     onSortChange,
     onClearFilters,
 }: ProductSearchFilterProps) => {
@@ -165,6 +170,19 @@ export const ProductSearchFilter = ({
                         onChange={(value) => onPriceRangeChange(minPrice, value ?? undefined)}
                         style={{ width: '100%', marginTop: '8px' }}
                     />
+                </Col>
+            </Row>
+            <Row gutter={16} align="middle" style={{ marginTop: '8px' }}>
+                <Col span={6}>
+                    <Checkbox
+                        checked={onlyLowStock || false}
+                        onChange={(e) => onLowStockChange(e.target.checked)}
+                    >
+                        <Space>
+                            <WarningOutlined style={{ color: '#faad14' }} />
+                            <Text strong>Chỉ hiển thị tồn kho thấp</Text>
+                        </Space>
+                    </Checkbox>
                 </Col>
             </Row>
             <Row gutter={16} align="middle" style={{ marginTop: '16px' }}>
