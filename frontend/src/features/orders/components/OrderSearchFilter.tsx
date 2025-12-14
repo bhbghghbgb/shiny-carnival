@@ -4,10 +4,12 @@ import {
     FilterOutlined,
     SortAscendingOutlined,
 } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import { userApiService } from '../../users/api/UserApiService'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CustomerEntity } from '../../customers/types/entity'
 import type { UserEntity } from '../../users/types/entity'
 import type { OrderStatus } from '../../../config/api.config'
@@ -17,27 +19,40 @@ import dayjs, { type Dayjs } from 'dayjs'
 const { Text } = Typography
 const { RangePicker } = DatePicker
 
-async function fetchCustomerOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await customerApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((c: CustomerEntity) => ({ 
-        label: `${c.name ?? 'N/A'} - ${c.phone ?? 'N/A'}`, 
-        value: c.id 
-    }))
+// Sử dụng TanStack Query để fetch options
+function createFetchCustomerOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const customerQueryKeys = createQueryKeys('customers')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...customerQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => customerApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((c: CustomerEntity) => ({ 
+            label: `${c.name ?? 'N/A'} - ${c.phone ?? 'N/A'}`, 
+            value: c.id 
+        }))
+    }
 }
 
-async function fetchUserOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await userApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((u: UserEntity) => ({ label: u.fullName ?? u.username ?? `#${u.id}`, value: u.id }))
+function createFetchUserOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const userQueryKeys = createQueryKeys('users')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...userQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => userApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((u: UserEntity) => ({ label: u.fullName ?? u.username ?? `#${u.id}`, value: u.id }))
+    }
 }
 
 interface OrderSearchFilterProps {
@@ -75,6 +90,9 @@ export const OrderSearchFilter = ({
     onSortChange,
     onClearFilters,
 }: OrderSearchFilterProps) => {
+    const queryClient = useQueryClient()
+    const fetchCustomerOptions = createFetchCustomerOptions(queryClient)
+    const fetchUserOptions = createFetchUserOptions(queryClient)
     const handleSortChange = (value: string) => {
         const [field, order] = value.split('-')
         onSortChange(field, order as 'ascend' | 'descend')

@@ -72,7 +72,10 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.GetQueryable()
+                .Include(u => u.Orders)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            
             if (user == null)
             {
                 return ApiResponse<UserResponseDto>.Error("User not found", 404);

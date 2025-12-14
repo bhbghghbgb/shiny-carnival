@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Form, Input, InputNumber, Button, Space, Card, Table, Typography, Divider, message, Alert } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import { productApiService } from '../../products/api/ProductApiService'
 import { useOrderStore, type DraftOrderItem } from '../store/orderStore'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CustomerEntity } from '../../customers/types/entity'
 import type { ProductEntity } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
@@ -30,6 +32,8 @@ export function CreateOrderForm({
     const [form] = Form.useForm()
     const [selectedProduct, setSelectedProduct] = useState<number | null>(null)
     const [quantity, setQuantity] = useState<number>(1)
+    const queryClient = useQueryClient()
+    const productQueryKeys = createQueryKeys('products')
 
     // ✅ Chỉ subscribe vào orderItems để re-render khi items thay đổi
     // Không subscribe vào customerId và promoCode vì chúng được quản lý bởi Form
@@ -51,10 +55,14 @@ export function CreateOrderForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []) // Chỉ chạy một lần khi mount để load draft từ localStorage
 
-    // Fetch products để lấy thông tin khi thêm vào order
+    // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
     const fetchProductDetails = async (productId: number): Promise<ProductEntity | null> => {
         try {
-            const product = await productApiService.getById(productId)
+            // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
+            const product = await queryClient.fetchQuery<ProductEntity>({
+                queryKey: productQueryKeys.detail(productId),
+                queryFn: () => productApiService.getById(productId),
+            })
             return product
         } catch (error) {
             console.error('Error fetching product:', error)
@@ -257,10 +265,15 @@ export function CreateOrderForm({
                         <DropDownWithFilter
                             placeholder="Chọn khách hàng"
                             fetchOptions={async (keyword: string): Promise<DropDownWithFilterOption[]> => {
-                                const paged = await customerApiService.getPaginated({
-                                    search: keyword || undefined,
-                                    page: 1,
-                                    pageSize: 20,
+                                // Sử dụng TanStack Query để fetch và cache data
+                                const customerQueryKeys = createQueryKeys('customers')
+                                const paged = await queryClient.fetchQuery({
+                                    queryKey: [...customerQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+                                    queryFn: () => customerApiService.getPaginated({
+                                        search: keyword || undefined,
+                                        page: 1,
+                                        pageSize: 20,
+                                    }),
                                 })
                                 const items = paged.items ?? []
                                 return items.map((c: CustomerEntity) => ({
@@ -285,10 +298,14 @@ export function CreateOrderForm({
                                     value={selectedProduct}
                                     onChange={(value) => setSelectedProduct(value as number | null)}
                                     fetchOptions={async (keyword: string): Promise<DropDownWithFilterOption[]> => {
-                                        const paged = await productApiService.getPaginated({
-                                            search: keyword || undefined,
-                                            page: 1,
-                                            pageSize: 20,
+                                        // Sử dụng TanStack Query để fetch và cache data
+                                        const paged = await queryClient.fetchQuery({
+                                            queryKey: [...productQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+                                            queryFn: () => productApiService.getPaginated({
+                                                search: keyword || undefined,
+                                                page: 1,
+                                                pageSize: 20,
+                                            }),
                                         })
                                         const items = paged.items ?? []
                                         return items.map((p: ProductEntity) => ({

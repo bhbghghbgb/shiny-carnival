@@ -23,6 +23,7 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => (int)src.Role));
 
         CreateMap<UserEntity, UserResponseDto>()
+            .ForMember(dest => dest.TotalOrders, opt => opt.MapFrom(src => src.Orders.Count))
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => (int)src.Role));
 
         CreateMap<CreateUserRequest, UserEntity>()
