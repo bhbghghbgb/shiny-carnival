@@ -5,9 +5,6 @@ namespace RetailStoreManagement.Models.Promotion;
 public class UpdatePromotionRequest
 {
     [Required]
-    public int Id { get; set; }
-
-    [Required]
     [MaxLength(50)]
     public string PromoCode { get; set; } = string.Empty;
 

@@ -9,6 +9,11 @@ export interface CreateProductRequest {
     unit: string;
 }
 
-export interface UpdateProductRequest extends CreateProductRequest {
-    id: number;
+export interface UpdateProductRequest {
+    categoryId?: number;
+    supplierId?: number;
+    productName?: string;
+    barcode?: string;
+    price?: number;
+    unit?: string;
 }

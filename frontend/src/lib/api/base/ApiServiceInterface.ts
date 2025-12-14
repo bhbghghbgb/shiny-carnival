@@ -1,4 +1,4 @@
-import type { PagedList, PagedRequest } from '../../types/api.types';
+import type { PagedList, PagedRequest } from '../types/api.types';
 
 /**
  * ApiServiceInterface - Contract chung cho tất cả API services

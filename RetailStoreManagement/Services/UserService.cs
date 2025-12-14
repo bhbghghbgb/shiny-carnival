@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Entities;
@@ -156,20 +157,58 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.GetQueryable()
+                .Include(u => u.Orders)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (user == null)
             {
-                return ApiResponse<bool>.Error("User not found", 404);
+                return ApiResponse<bool>.Error("Không tìm thấy người dùng", 404);
+            }
+
+            // Kiểm tra xem User có Orders không
+            var orderCount = user.Orders.Count;
+            if (orderCount > 0)
+            {
+                return ApiResponse<bool>.Error(
+                    $"Không thể xóa người dùng này vì đang có {orderCount} đơn hàng liên quan. " +
+                    "Vui lòng xóa hoặc chuyển các đơn hàng trước khi xóa người dùng.",
+                    400
+                );
             }
 
             await _unitOfWork.Users.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<bool>.Success(true, "User deleted successfully");
+            return ApiResponse<bool>.Success(true, "Xóa người dùng thành công");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Xử lý lỗi database constraint violation
+            if (dbEx.InnerException is PostgresException pgEx)
+            {
+                // Lỗi foreign key constraint violation (23503) hoặc not null constraint (23502)
+                if (pgEx.SqlState == "23503" || pgEx.SqlState == "23502")
+                {
+                    return ApiResponse<bool>.Error(
+                        "Không thể xóa người dùng này vì đang có đơn hàng liên quan. " +
+                        "Vui lòng xóa hoặc chuyển các đơn hàng trước khi xóa người dùng.",
+                        400
+                    );
+                }
+            }
+
+            return ApiResponse<bool>.Error(
+                "Lỗi khi xóa người dùng. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+                500
+            );
         }
         catch (Exception ex)
         {
-            return ApiResponse<bool>.Error(ex.Message);
+            return ApiResponse<bool>.Error(
+                $"Lỗi không xác định: {ex.Message}",
+                500
+            );
         }
     }
 

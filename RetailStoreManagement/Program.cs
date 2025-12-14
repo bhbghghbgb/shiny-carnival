@@ -108,7 +108,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //     options.Cookie.SameSite = SameSiteMode.Lax; // Cho phép cookies với same-site requests
 // });
 
-builder.Services.AddControllers(options => { options.Filters.Add<ApiResponseFilter>(); });
+builder.Services.AddControllers(options => { options.Filters.Add<ApiResponseFilter>(); })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // builder.Services.AddOpenApi();

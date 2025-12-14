@@ -29,9 +29,13 @@ export function parseApiError(error: unknown): string {
       return 'Dữ liệu đã tồn tại trong hệ thống. Vui lòng kiểm tra lại.';
     }
     
-    // Generic database errors
-    if (message.includes('saving the entity changes') || message.includes('database')) {
-      return 'Lỗi khi lưu dữ liệu. Vui lòng thử lại hoặc liên hệ quản trị viên.';
+    // Foreign key constraint violations - xóa khi có dữ liệu liên quan
+    if (message.includes('không thể xóa') || 
+        message.includes('đang có') && message.includes('liên quan') ||
+        message.includes('foreign key') ||
+        message.includes('violates not-null constraint')
+    ) {
+      return message;
     }
     
     return message;

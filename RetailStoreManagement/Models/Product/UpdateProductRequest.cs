@@ -4,29 +4,19 @@ namespace RetailStoreManagement.Models.Product;
 
 public class UpdateProductRequest
 {
-    [Required]
-    public int Id { get; set; }
-
-    [Required]
-    public int CategoryId { get; set; }
-
-    [Required]
-    public int SupplierId { get; set; }
-
-    [Required]
     [MaxLength(100)]
-    public string ProductName { get; set; } = string.Empty;
+    public string? ProductName { get; set; }
 
-    [Required]
     [MaxLength(50)]
-    public string Barcode { get; set; } = string.Empty;
+    public string? Barcode { get; set; }
 
-    [Required]
     [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
-    public decimal Price { get; set; }
+    public decimal? Price { get; set; }
 
-    [Required]
     [MaxLength(20)]
-    public string Unit { get; set; } = "pcs";
+    public string? Unit { get; set; }
 
+    public int? CategoryId { get; set; }
+
+    public int? SupplierId { get; set; }
 }

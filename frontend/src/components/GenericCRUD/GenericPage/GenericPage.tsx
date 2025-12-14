@@ -1,10 +1,13 @@
 import { useCallback, useMemo, useState } from 'react'
 import type React from 'react'
-import { Alert, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, message } from 'antd'
+import { Alert, Button, Form, Input, InputNumber, Modal, Popconfirm, Select, Space, Table, message, DatePicker } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { ColumnsType, TablePaginationConfig, TableProps, ColumnType, ColumnGroupType } from 'antd/es/table'
 import type { GenericPageConfig } from './GenericPageConfig'
 import { DropDownWithFilter } from '../../common/DropDownWithFilter'
+import type { Dayjs } from 'dayjs'
+
+const { RangePicker } = DatePicker
 
 type Order = 'ascend' | 'descend' | undefined
 
@@ -198,8 +201,12 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields()
+            
             if (editingRecord) {
-                if (!onUpdate) return
+                if (!onUpdate) {
+                    console.warn('onUpdate is not provided')
+                    return
+                }
                 const payload = config.form.mapUpdatePayload
                     ? config.form.mapUpdatePayload(values, editingRecord)
                     : values
@@ -218,6 +225,15 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
             setEditingRecord(null)
         } catch (error: unknown) {
             if (error && typeof error === 'object' && 'errorFields' in error) {
+                // Validation errors - Ant Design will display them automatically
+                // But we should still show a message to user
+                const errorFields = (error as { errorFields?: Array<{ name: string[]; errors: string[] }> }).errorFields
+                if (errorFields && errorFields.length > 0) {
+                    const firstError = errorFields[0]?.errors?.[0]
+                    if (firstError) {
+                        message.error(firstError)
+                    }
+                }
                 return
             }
             const msg = error instanceof Error ? error.message : 'Thao tác không thành công'
@@ -295,6 +311,43 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                             fetchOptions={field.fetchOptions}
                             queryKeyPrefix={field.queryKeyPrefix || field.name}
                             fetchOnEmpty={field.fetchOnEmpty}
+                        />
+                    </Form.Item>
+                )
+            }
+
+            if (field.type === 'dateRange') {
+                // Merge default validation with custom rules
+                const dateRangeRules = [
+                    {
+                        required: true,
+                        message: 'Vui lòng chọn khoảng thời gian',
+                        validator: (_: any, value: [Dayjs, Dayjs] | null | undefined) => {
+                            if (!value || !Array.isArray(value) || value.length !== 2 || !value[0] || !value[1]) {
+                                return Promise.reject(new Error('Vui lòng chọn khoảng thời gian'))
+                            }
+                            return Promise.resolve()
+                        },
+                    },
+                    ...(field.rules || []),
+                ]
+                
+                return (
+                    <Form.Item
+                        key={field.name}
+                        label={field.label}
+                        name={fieldName}
+                        rules={dateRangeRules}
+                    >
+                        <RangePicker
+                            style={{ width: '100%' }}
+                            showTime
+                            format="DD/MM/YYYY HH:mm"
+                            placeholder={
+                                field.placeholder
+                                    ? (field.placeholder.split(',') as [string, string])
+                                    : (['Ngày bắt đầu', 'Ngày kết thúc'] as [string, string])
+                            }
                         />
                     </Form.Item>
                 )
@@ -399,7 +452,7 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                                 : `Thêm ${config.entity.displayName}`
                         }
                         open={isModalVisible}
-                        onOk={hasCustomForm ? undefined : (editingRecord ? handleSubmit : undefined)}
+                        onOk={hasCustomForm ? undefined : handleSubmit}
                         onCancel={closeModal}
                         confirmLoading={editingRecord ? updateLoading : createLoading}
                         destroyOnClose
@@ -421,7 +474,14 @@ export function GenericPage<TData extends { id?: string | number }, TCreate, TUp
                                         onClose={onClearFormError}
                                     />
                                 )}
-                                <Form form={form} layout="vertical" onFinish={editingRecord ? handleSubmit : undefined}>
+                                <Form 
+                                    form={form} 
+                                    layout="vertical" 
+                                    onFinish={(values) => {
+                                        console.log('Form onFinish called', values)
+                                        handleSubmit()
+                                    }}
+                                >
                                     {renderFormFields}
                                 </Form>
                             </>

@@ -51,7 +51,13 @@ export const useSupplierManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa nhà cung cấp thất bại: ${parseApiError(error)}`)
+            const errorMessage = parseApiError(error)
+            // Nếu message từ backend đã rõ ràng (có chứa "không thể xóa" hoặc "đang có"), dùng trực tiếp
+            if (errorMessage.includes('không thể xóa') || errorMessage.includes('đang có')) {
+                setPageErrorMessage(errorMessage)
+            } else {
+                setPageErrorMessage(`Xóa nhà cung cấp thất bại: ${errorMessage}`)
+            }
         },
     })
 
@@ -108,7 +114,7 @@ export const useSupplierManagementPage = () => {
     }
 
     const handleUpdate = async (record: SupplierEntity, values: UpdateSupplierRequest) => {
-        await updateSupplier.mutateAsync({ ...values, id: record.id })
+        await updateSupplier.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: SupplierEntity) => deleteSupplier.mutateAsync(record.id)
