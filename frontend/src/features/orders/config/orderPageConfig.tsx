@@ -3,15 +3,14 @@ import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericP
 import type { OrderEntity } from '../types/entity'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
-import { Tag, Button, Space } from 'antd'
-import { EyeOutlined } from '@ant-design/icons'
+import { Tag } from 'antd'
 import { API_CONFIG } from '../../../config/api.config'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import type { CustomerEntity } from '../../customers/types/entity'
 import { productApiService } from '../../products/api/ProductApiService'
 import type { ProductEntity } from '../../products/types/entity'
 
-const columns: ColumnsType<OrderEntity> = [
+export const orderColumns: ColumnsType<OrderEntity> = [
     {
         title: 'Mã đơn hàng',
         dataIndex: 'id',
@@ -70,7 +69,7 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
         displayNamePlural: 'Đơn hàng',
     },
     table: {
-        columns,
+        columns: orderColumns,
         rowKey: 'id',
     },
     form: {

@@ -1,6 +1,10 @@
+import { useState } from 'react'
+import { Button } from 'antd'
+import { EyeOutlined } from '@ant-design/icons'
 import { CustomerHeader } from '../components/CustomerHeader'
 import { CustomerStatistics } from '../components/CustomerStatistics'
 import { CustomerSearchFilter } from '../components/CustomerSearchFilter'
+import { CustomerDetailModal } from '../components/CustomerDetailModal'
 import { useCustomerManagementPage } from '../hooks/useCustomerManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
 import { customerPageConfig } from '../config/customerPageConfig'
@@ -8,6 +12,8 @@ import type { CustomerEntity } from '../types/entity'
 import type { CreateCustomerRequest, UpdateCustomerRequest } from '../types/api'
 
 export function CustomerManagementPage() {
+    const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     const {
         customers,
         total,
@@ -35,6 +41,16 @@ export function CustomerManagementPage() {
         clearPageError,
         clearFormError,
     } = useCustomerManagementPage()
+
+    const handleViewDetail = (customer: CustomerEntity) => {
+        setSelectedCustomerId(customer.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedCustomerId(null)
+    }
 
     return (
         <div style={{ padding: '24px' }}>
@@ -75,6 +91,20 @@ export function CustomerManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <CustomerDetailModal
+                customerId={selectedCustomerId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )
