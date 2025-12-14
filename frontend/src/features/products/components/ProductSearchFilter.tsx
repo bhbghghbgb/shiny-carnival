@@ -4,33 +4,48 @@ import {
     FilterOutlined,
     SortAscendingOutlined,
 } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { categoryApiService } from '../../categories/api'
 import { supplierApiService } from '../../suppliers/api'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CategoryEntity } from '../../categories/types/entity'
 import type { SupplierEntity } from '../../suppliers/types/entity'
 
 const { Text } = Typography
 
-async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await categoryApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((c: CategoryEntity) => ({ label: c.categoryName ?? `#${c.id}`, value: c.id }))
+// Sử dụng TanStack Query để fetch options
+function createFetchCategoryOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const categoryQueryKeys = createQueryKeys('categories')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...categoryQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => categoryApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((c: CategoryEntity) => ({ label: c.categoryName ?? `#${c.id}`, value: c.id }))
+    }
 }
 
-async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await supplierApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((s: SupplierEntity) => ({ label: s.name ?? `#${s.id}`, value: s.id }))
+function createFetchSupplierOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const supplierQueryKeys = createQueryKeys('suppliers')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...supplierQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => supplierApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((s: SupplierEntity) => ({ label: s.name ?? `#${s.id}`, value: s.id }))
+    }
 }
 
 interface ProductSearchFilterProps {
@@ -64,6 +79,10 @@ export const ProductSearchFilter = ({
     onSortChange,
     onClearFilters,
 }: ProductSearchFilterProps) => {
+    const queryClient = useQueryClient()
+    const fetchCategoryOptions = createFetchCategoryOptions(queryClient)
+    const fetchSupplierOptions = createFetchSupplierOptions(queryClient)
+
     const handleSortChange = (value: string) => {
         const [field, order] = value.split('-')
         onSortChange(field, order as 'ascend' | 'descend')

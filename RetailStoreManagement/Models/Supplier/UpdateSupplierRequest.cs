@@ -4,13 +4,11 @@ namespace RetailStoreManagement.Models.Supplier;
 
 public class UpdateSupplierRequest
 {
-    [Required]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public string? Name { get; set; }
 
-    [Required]
     [MaxLength(20)]
-    public string Phone { get; set; } = string.Empty;
+    public string? Phone { get; set; }
 
     [MaxLength(100)]
     public string? Email { get; set; }

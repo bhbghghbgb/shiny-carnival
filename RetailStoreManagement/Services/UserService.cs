@@ -7,6 +7,7 @@ using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.User;
+using RetailStoreManagement.Enums;
 using BCrypt.Net;
 
 namespace RetailStoreManagement.Services;
@@ -71,7 +72,10 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(id);
+            var user = await _unitOfWork.Users.GetQueryable()
+                .Include(u => u.Orders)
+                .FirstOrDefaultAsync(u => u.Id == id);
+            
             if (user == null)
             {
                 return ApiResponse<UserResponseDto>.Error("User not found", 404);
@@ -124,17 +128,26 @@ public class UserService : IUserService
                 return ApiResponse<UserResponseDto>.Error("User not found", 404);
             }
 
-            // Check if username already exists (excluding current user)
-            var existingUser = await _unitOfWork.Users.GetQueryable()
-                .FirstOrDefaultAsync(u => u.Username == request.Username && u.Id != id);
-
-            if (existingUser != null)
+            // Check if username already exists (excluding current user) - only if username is being updated
+            if (!string.IsNullOrEmpty(request.Username))
             {
-                return ApiResponse<UserResponseDto>.Error("Username already exists", 409);
+                var existingUser = await _unitOfWork.Users.GetQueryable()
+                    .FirstOrDefaultAsync(u => u.Username == request.Username && u.Id != id);
+
+                if (existingUser != null)
+                {
+                    return ApiResponse<UserResponseDto>.Error("Username already exists", 409);
+                }
             }
 
-            _mapper.Map(request, user);
-
+            // Only map non-null fields
+            if (!string.IsNullOrEmpty(request.Username))
+                user.Username = request.Username;
+            if (!string.IsNullOrEmpty(request.FullName))
+                user.FullName = request.FullName;
+            if (request.Role.HasValue)
+                user.Role = (UserRole)request.Role.Value;
+            
             // Hash password if provided
             if (!string.IsNullOrEmpty(request.Password))
             {

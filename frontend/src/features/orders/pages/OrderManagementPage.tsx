@@ -47,6 +47,7 @@ export function OrderManagementPage() {
 
         createOrder,
         updateOrderStatus,
+        deleteOrder,
         pageErrorMessage,
         formErrorMessage,
         clearPageError,
@@ -69,7 +70,7 @@ export function OrderManagementPage() {
                 config={orderPageConfig}
                 data={orders}
                 total={total}
-                loading={createOrder.isPending || updateOrderStatus.isPending}
+                loading={createOrder.isPending || updateOrderStatus.isPending || deleteOrder.isPending}
                 page={page}
                 pageSize={pageSize}
                 sortField={sortField}
@@ -81,7 +82,7 @@ export function OrderManagementPage() {
                 onDelete={handleDelete}
                 createLoading={createOrder.isPending}
                 updateLoading={updateOrderStatus.isPending}
-                deleteLoading={false}
+                deleteLoading={deleteOrder.isPending}
                 pageErrorMessage={pageErrorMessage}
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}

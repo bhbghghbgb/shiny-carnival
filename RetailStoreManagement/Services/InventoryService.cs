@@ -116,7 +116,12 @@ public class InventoryService : IInventoryService
                 return ApiResponse<InventoryResponseDto>.Error("Inventory not found", 404);
             }
 
-            var newQuantity = inventory.Quantity + request.QuantityChange;
+            if (!request.QuantityChange.HasValue)
+            {
+                return ApiResponse<InventoryResponseDto>.Error("QuantityChange is required", 400);
+            }
+
+            var newQuantity = inventory.Quantity + request.QuantityChange.Value;
             if (newQuantity < 0)
             {
                 return ApiResponse<InventoryResponseDto>.Error("Insufficient inventory quantity", 400);
@@ -133,9 +138,9 @@ public class InventoryService : IInventoryService
             {
                 ProductId = productId,
                 UserId = userId,
-                QuantityChange = request.QuantityChange,
+                QuantityChange = request.QuantityChange!.Value,
                 QuantityAfter = newQuantity,
-                Reason = request.Reason
+                Reason = request.Reason ?? string.Empty
             };
             await _unitOfWork.InventoryHistories.AddAsync(history);
 

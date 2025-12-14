@@ -1,4 +1,8 @@
+import { EyeOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { UserDetailModal } from '../components/UserDetailModal'
 import { UserHeader } from '../components/UserHeader'
 import { UserSearchFilter } from '../components/UserSearchFilter'
 import { UserStatistics } from '../components/UserStatistics'
@@ -9,6 +13,8 @@ import type { UserNoPass } from '../types/entity'
 
 
 export function UserManagementPage() {
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     const {
         users,
         totalUsers,
@@ -36,6 +42,16 @@ export function UserManagementPage() {
         clearPageError,
         clearFormError,
     } = useUserManagementPage()
+
+    const handleViewDetail = (user: UserNoPass) => {
+        setSelectedUserId(user.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedUserId(null)
+    }
 
     const handleCreate = async (values: CreateUserRequest) => {
         await createUser.mutateAsync(values)
@@ -92,6 +108,20 @@ export function UserManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <UserDetailModal
+                userId={selectedUserId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )

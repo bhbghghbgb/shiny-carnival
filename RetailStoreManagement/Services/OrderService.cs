@@ -318,6 +318,11 @@ public class OrderService : IOrderService
                 return ApiResponse<OrderResponseDto>.Error("Order not found", 404);
             }
 
+            if (string.IsNullOrEmpty(request.Status))
+            {
+                return ApiResponse<OrderResponseDto>.Error("Status is required", 400);
+            }
+
             var newStatus = request.Status.ToLower() switch
             {
                 "pending" => OrderStatus.Pending,
@@ -577,15 +582,20 @@ public class OrderService : IOrderService
                 return ApiResponse<OrderItemResponseDto>.Error("Product not found", 404);
             }
 
-            var quantityChange = request.Quantity - orderItem.Quantity;
+            if (!request.Quantity.HasValue)
+            {
+                return ApiResponse<OrderItemResponseDto>.Error("Quantity is required", 400);
+            }
+
+            var quantityChange = request.Quantity.Value - orderItem.Quantity;
             if (product.Inventory == null || product.Inventory.Quantity < quantityChange)
             {
                 return ApiResponse<OrderItemResponseDto>.Error("Insufficient stock", 400);
             }
 
             var oldSubtotal = orderItem.Subtotal;
-            orderItem.Quantity = request.Quantity;
-            orderItem.Subtotal = orderItem.Price * request.Quantity;
+            orderItem.Quantity = request.Quantity.Value;
+            orderItem.Subtotal = orderItem.Price * request.Quantity.Value;
             await _unitOfWork.OrderItems.UpdateAsync(orderItem);
 
             // Update order total
@@ -632,6 +642,55 @@ public class OrderService : IOrderService
             await _unitOfWork.SaveChangesAsync();
 
             return ApiResponse<bool>.Success(true, "Order item deleted successfully");
+        }
+        catch (Exception ex)
+        {
+            return ApiResponse<bool>.Error(ex.Message);
+        }
+    }
+
+    public async Task<ApiResponse<bool>> DeleteOrderAsync(int id)
+    {
+        try
+        {
+            var order = await _unitOfWork.Orders.GetQueryable()
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product)
+                        .ThenInclude(p => p.Inventory)
+                .Include(o => o.Promotion)
+                .FirstOrDefaultAsync(o => o.Id == id);
+
+            if (order == null)
+            {
+                return ApiResponse<bool>.Error("Order not found", 404);
+            }
+
+            // If order is paid, restore inventory before deleting
+            if (order.Status == OrderStatus.Paid)
+            {
+                foreach (var orderItem in order.OrderItems)
+                {
+                    if (orderItem.Product?.Inventory != null)
+                    {
+                        orderItem.Product.Inventory.Quantity += orderItem.Quantity;
+                        orderItem.Product.Inventory.UpdatedAt = DateTime.UtcNow;
+                        await _unitOfWork.Inventory.UpdateAsync(orderItem.Product.Inventory);
+                    }
+                }
+            }
+
+            // If order has promotion and discount was applied, decrement used_count
+            if (order.Promotion != null && order.DiscountAmount > 0)
+            {
+                order.Promotion.UsedCount = Math.Max(0, order.Promotion.UsedCount - 1);
+                await _unitOfWork.Promotions.UpdateAsync(order.Promotion);
+            }
+
+            // Delete order (cascade delete will automatically delete OrderItems and Payments)
+            await _unitOfWork.Orders.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+
+            return ApiResponse<bool>.Success(true, "Order deleted successfully");
         }
         catch (Exception ex)
         {
