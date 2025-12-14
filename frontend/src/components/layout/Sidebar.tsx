@@ -17,7 +17,7 @@ type MenuItem = Required<MenuProps>['items'][number]
 const items: MenuItem[] = [
   { key: '1', icon: <UserOutlined />, label: <Link to={ENDPOINTS.AUTH.PROFILE as any}>Hồ sơ</Link> },
   { key: '2', icon: <ShoppingCartOutlined />, label: <Link to={ENDPOINTS.STAFF.ORDER as any}>Order</Link> }, 
-    { key: '3', icon: <QrcodeOutlined />, label: <Link to={ENDPOINTS.ADMIN.QR_SCANNER as any}>QR Scanner</Link> },
+  { key: '3', icon: <QrcodeOutlined />, label: <Link to={ENDPOINTS.STAFF.QR_SCANNER as any}>QR Scanner</Link> },
   {
     key: 'sub1',
     label: 'Management',

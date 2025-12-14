@@ -9,9 +9,6 @@ export function createAdminLayoutRoute(parentRoute: AnyRoute) {
     path: 'admin',
     component: () => <Outlet />, // Render Outlet để hiển thị các route con
     beforeLoad: async () => {
-      // TODO: TEMP DISABLE AUTH CHECK FOR TESTING
-      // return;
-
       // Lấy state từ auth store
       const { isAuthenticated, isAdmin } = useAuthStore.getState();
 

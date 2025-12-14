@@ -1,6 +1,8 @@
 import type { ModuleRoutes } from '../type/types';
 import { StaffOrderPage } from '../../../features/orders/pages/StaffOrderPage';
 import { PendingComponent } from '../../../components/feedback/PendingComponent';
+import { QRScannerPage } from '../../../features/qr-scanner/QRScannerPage';
+import { ErrorComponent } from '../../../components/feedback/ErrorComponent';
 
 // Staff module routes configuration with hierarchical structure
 export const staffRoutes: ModuleRoutes<any> = {
@@ -14,9 +16,21 @@ export const staffRoutes: ModuleRoutes<any> = {
           path: 'order',
           component: StaffOrderPage,
           pendingComponent: PendingComponent,
+          errorComponent: ErrorComponent,
           meta: {
             title: 'Tạo đơn hàng',
             description: 'Trang tạo đơn hàng cho nhân viên',
+            requiresAuth: true,
+          },
+        },
+        {
+          path: 'qr-scanner',
+          component: QRScannerPage,
+          pendingComponent: PendingComponent,
+          errorComponent: ErrorComponent,
+          meta: {
+            title: 'Scan QR Code',
+            description: 'Trang scan QR Code',
             requiresAuth: true,
           },
         },

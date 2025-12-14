@@ -92,7 +92,7 @@ const adminModuleRoutes: ModuleRoutes<any>[] = [
 
 // Staff routes (có sidebar)
 const staffModuleRoutes: ModuleRoutes<any>[] = [
-  staffRoutes,
+  staffRoutes
 ];
 
 // Build auth routes với authLayoutRoute (không có sidebar)
@@ -119,8 +119,6 @@ const adminRoutes = buildRoutesFromConfig(
 // 3. Gắn các route auth đã tạo vào authLayoutRoute
 authLayoutRoute.addChildren(authRoutesBuilt);
 
-// 4. Gắn các route home đã tạo vào mainLayoutRoute
-mainLayoutRoute.addChildren(homeRoutesBuilt);
 
 // 5. Gắn các route admin đã tạo vào adminLayoutRoute
 adminLayoutRoute.addChildren(adminRoutes);
