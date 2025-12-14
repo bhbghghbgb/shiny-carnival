@@ -8,7 +8,7 @@ import { productApiService } from '../../products/api/ProductApiService'
 import { useOrderStore, type DraftOrderItem } from '../store/orderStore'
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CustomerEntity } from '../../customers/types/entity'
-import type { ProductDetailsDto } from '../../products/types/entity'
+import type { ProductEntity, ProductDetailsDto } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { QRScanner } from '../../qr-scanner/components/QRScanner'
@@ -58,12 +58,11 @@ export function CreateOrderForm({
 
     // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
     const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
-    const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
             // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
             const product = await queryClient.fetchQuery<ProductDetailsDto>({
                 queryKey: productQueryKeys.detail(productId),
-                queryFn: () => productApiService.getProductDetails(productId),
+                queryFn: () => productApiService.getById(productId),
             })
             return product
         } catch (error) {
@@ -82,11 +81,6 @@ export function CreateOrderForm({
             message.warning('Số lượng phải lớn hơn 0')
             return
         }
-
-        // Kiểm tra sản phẩm đã tồn tại chưa để hiển thị thông báo phù hợp
-        const currentDraftOrder = useOrderStore.getState().draftOrder
-        const existingItem = currentDraftOrder.orderItems.find(item => item.productId === selectedProduct)
-        const isExisting = !!existingItem
 
         // Fetch product details để lấy thông tin mới nhất (bao gồm giá có thể đã thay đổi)
         const product = await fetchProductDetails(selectedProduct)
@@ -435,4 +429,3 @@ export function CreateOrderForm({
         </div>
     )
 }
-
