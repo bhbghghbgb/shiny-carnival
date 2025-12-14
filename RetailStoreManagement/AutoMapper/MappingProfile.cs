@@ -63,6 +63,12 @@ public class MappingProfile : Profile
 
         CreateMap<UpdateProductRequest, ProductEntity>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.ProductName, opt => opt.Condition(src => !string.IsNullOrEmpty(src.ProductName)))
+            .ForMember(dest => dest.Barcode, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Barcode)))
+            .ForMember(dest => dest.Price, opt => opt.Condition(src => src.Price.HasValue))
+            .ForMember(dest => dest.Unit, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Unit)))
+            .ForMember(dest => dest.CategoryId, opt => opt.Condition(src => src.CategoryId.HasValue))
+            .ForMember(dest => dest.SupplierId, opt => opt.Condition(src => src.SupplierId.HasValue))
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())

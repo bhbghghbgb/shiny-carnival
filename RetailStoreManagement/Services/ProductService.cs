@@ -181,13 +181,16 @@ public class ProductService : IProductService
                 return ApiResponse<ProductResponseDto>.Error("Product not found", 404);
             }
 
-            // Check if barcode already exists (excluding current product)
-            var existingProduct = await _unitOfWork.Products.GetQueryable()
-                .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.Id != id);
-
-            if (existingProduct != null)
+            // Check if barcode already exists (excluding current product) - only if barcode is being updated
+            if (!string.IsNullOrEmpty(request.Barcode))
             {
-                return ApiResponse<ProductResponseDto>.Error("Barcode already exists", 409);
+                var existingProduct = await _unitOfWork.Products.GetQueryable()
+                    .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.Id != id);
+
+                if (existingProduct != null)
+                {
+                    return ApiResponse<ProductResponseDto>.Error("Barcode already exists", 409);
+                }
             }
 
             _mapper.Map(request, product);
