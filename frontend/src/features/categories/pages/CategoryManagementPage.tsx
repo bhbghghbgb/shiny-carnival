@@ -1,11 +1,11 @@
-import { CategoryHeader } from '../components/CategoryHeader'
-import { CategoryStatistics } from '../components/CategoryStatistics'
-import { CategorySearchFilter } from '../components/CategorySearchFilter'
-import { useCategoryManagementPage } from '../hooks/useCategoryManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { CategoryHeader } from '../components/CategoryHeader'
+import { CategorySearchFilter } from '../components/CategorySearchFilter'
+import { CategoryStatistics } from '../components/CategoryStatistics'
 import { categoryPageConfig } from '../config/categoryPageConfig'
-import type { CategoryEntity } from '../types/entity'
+import { useCategoryManagementPage } from '../hooks/useCategoryManagementPage'
 import type { CreateCategoryRequest, UpdateCategoryRequest } from '../types/api'
+import type { CategoryEntity } from '../types/entity'
 
 export function CategoryManagementPage() {
     const {
@@ -59,7 +59,7 @@ export function CategoryManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <CategoryHeader onAddCategory={openCreate} />}
+                renderHeader={() => <CategoryHeader categories={categories} />}
                 statisticsSlot={
                     <CategoryStatistics
                         totalCategories={total}

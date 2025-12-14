@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { CustomerHeader } from '../components/CustomerHeader'
-import { CustomerStatistics } from '../components/CustomerStatistics'
-import { CustomerSearchFilter } from '../components/CustomerSearchFilter'
-import { CustomerDetailModal } from '../components/CustomerDetailModal'
-import { useCustomerManagementPage } from '../hooks/useCustomerManagementPage'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { CustomerDetailModal } from '../components/CustomerDetailModal'
+import { CustomerHeader } from '../components/CustomerHeader'
+import { CustomerSearchFilter } from '../components/CustomerSearchFilter'
+import { CustomerStatistics } from '../components/CustomerStatistics'
 import { customerPageConfig } from '../config/customerPageConfig'
-import type { CustomerEntity } from '../types/entity'
+import { useCustomerManagementPage } from '../hooks/useCustomerManagementPage'
 import type { CreateCustomerRequest, UpdateCustomerRequest } from '../types/api'
+import type { CustomerEntity } from '../types/entity'
 
 export function CustomerManagementPage() {
     const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null)
@@ -75,7 +75,7 @@ export function CustomerManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <CustomerHeader onAddCustomer={openCreate} />}
+                renderHeader={() => <CustomerHeader customers={customers} />}
                 statisticsSlot={
                     <CustomerStatistics
                         totalCustomers={total}

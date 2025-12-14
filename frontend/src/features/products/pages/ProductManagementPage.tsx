@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { ProductHeader } from '../components/ProductHeader'
-import { ProductStatistics } from '../components/ProductStatistics'
-import { ProductSearchFilter } from '../components/ProductSearchFilter'
-import { ProductDetailModal } from '../components/ProductDetailModal'
-import { useProductManagementPage } from '../hooks/useProductManagementPage'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { ProductDetailModal } from '../components/ProductDetailModal'
+import { ProductHeader } from '../components/ProductHeader'
+import { ProductSearchFilter } from '../components/ProductSearchFilter'
+import { ProductStatistics } from '../components/ProductStatistics'
 import { productPageConfig } from '../config/productPageConfig'
-import type { ProductEntity } from '../types/entity'
+import { useProductManagementPage } from '../hooks/useProductManagementPage'
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
+import type { ProductEntity } from '../types/entity'
 
 export function ProductManagementPage() {
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
@@ -86,7 +86,7 @@ export function ProductManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <ProductHeader onAddProduct={openCreate} />}
+                renderHeader={() => <ProductHeader products={products} />}
                 statisticsSlot={
                     <ProductStatistics
                         totalProducts={total}
