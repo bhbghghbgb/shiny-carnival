@@ -18,14 +18,15 @@ public class TopCustomersSearchRequestValidator : BasePagedRequestValidator<TopC
         // Base validation (Page, PageSize) được kế thừa từ BasePagedRequestValidator
 
         // Validation cho StartDate
+        // Cho phép dates trong tương lai một chút để tránh timezone issues
         RuleFor(x => x.StartDate)
-            .LessThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage("StartDate cannot be in the future");
+            .LessThanOrEqualTo(DateTime.UtcNow.AddDays(1))
+            .WithMessage("StartDate cannot be more than 1 day in the future");
 
         // Validation cho EndDate
         RuleFor(x => x.EndDate)
-            .LessThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage("EndDate cannot be in the future");
+            .LessThanOrEqualTo(DateTime.UtcNow.AddDays(1))
+            .WithMessage("EndDate cannot be more than 1 day in the future");
 
         // Validation cho date range
         RuleFor(x => x)

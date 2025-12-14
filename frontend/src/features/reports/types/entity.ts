@@ -11,3 +11,25 @@ export interface RevenueReportDto {
     totalDiscount: number;
   }[];
 }
+
+/**
+ * TopProductDto - DTO từ backend cho top products report
+ */
+export interface TopProductDto {
+  productId: number;
+  productName: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+  orderCount: number;
+}
+
+/**
+ * TopCustomerDto - DTO từ backend cho top customers report
+ */
+export interface TopCustomerDto {
+  customerId: number;
+  customerName: string;
+  totalOrders: number;
+  totalSpent: number;
+  lastOrderDate: string; // ISO date string
+}

@@ -13,13 +13,13 @@ public class TopProductsSearchRequest : BasePagedRequest
     /// <summary>
     /// Ngày bắt đầu của khoảng thời gian báo cáo
     /// </summary>
-    [Required]
+    [Required(ErrorMessage = "StartDate is required")]
     public DateTime StartDate { get; set; }
 
     /// <summary>
     /// Ngày kết thúc của khoảng thời gian báo cáo
     /// </summary>
-    [Required]
+    [Required(ErrorMessage = "EndDate is required")]
     public DateTime EndDate { get; set; }
 }
 

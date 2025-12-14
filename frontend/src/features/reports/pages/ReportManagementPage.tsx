@@ -1,20 +1,36 @@
-import React from 'react';
-import { getRouteApi } from '@tanstack/react-router';
+import { GenericPage } from '../../../components/GenericCRUD/GenericPage';
+import { ReportStatistics } from '../components/ReportStatistics';
+import { reportPageConfig } from '../config/reportPageConfig';
 
-const routeApi = getRouteApi('/admin/reports');
-
-export const ReportManagementPage: React.FC = () => {
-  const { reports } = routeApi.useLoaderData();
-  const params = routeApi.useParams();
-
-  console.log('Reports:', reports);
- console.log('Route params:', params);
+/**
+ * ReportManagementPage - Trang quản lý báo cáo
+ * 
+ * Sử dụng GenericPage nhưng không có Table, chỉ hiển thị các Statistic
+ * Dữ liệu được fetch và hiển thị trong ReportStatistics component
+ * Table được ẩn bằng CSS vì không cần thiết cho trang báo cáo
+ */
+export function ReportManagementPage() {
+  // Dummy data để GenericPage hoạt động
+  const dummyData: Array<{ id: number }> = [];
 
   return (
-    <div>
-      <h1>Report Management</h1>
-      <p>This is a placeholder for the report management page.</p>
-      <p>It will contain a table for listing reports and a form for creating/editing them.</p>
+    <div style={{ padding: '24px' }}>
+      <GenericPage
+        config={reportPageConfig}
+        data={dummyData}
+        total={0}
+        loading={false}
+        page={1}
+        pageSize={10}
+        onCreate={undefined}
+        onUpdate={undefined}
+        onDelete={undefined}
+        renderHeader={() => (
+          <h1 style={{ marginBottom: 0 }}>Báo cáo & Thống kê</h1>
+        )}
+        statisticsSlot={<ReportStatistics />}
+        renderCustomForm={() => null}
+      />
     </div>
   );
-};
+}
