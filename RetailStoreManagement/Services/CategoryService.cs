@@ -149,13 +149,16 @@ public class CategoryService : ICategoryService
                 return ApiResponse<CategoryResponseDto>.Error("Category not found", 404);
             }
 
-            // Check if category name already exists (excluding current category)
-            var existingCategory = await _unitOfWork.Categories.GetQueryable()
-                .FirstOrDefaultAsync(c => c.CategoryName == request.CategoryName && c.Id != id);
-            
-            if (existingCategory != null)
+            // Check if category name already exists (excluding current category) - only if category name is being updated
+            if (!string.IsNullOrEmpty(request.CategoryName))
             {
-                return ApiResponse<CategoryResponseDto>.Error("Category name already exists", 409);
+                var existingCategory = await _unitOfWork.Categories.GetQueryable()
+                    .FirstOrDefaultAsync(c => c.CategoryName == request.CategoryName && c.Id != id);
+                
+                if (existingCategory != null)
+                {
+                    return ApiResponse<CategoryResponseDto>.Error("Category name already exists", 409);
+                }
             }
 
             _mapper.Map(request, category);

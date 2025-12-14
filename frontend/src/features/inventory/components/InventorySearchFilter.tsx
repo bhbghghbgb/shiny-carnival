@@ -4,21 +4,30 @@ import {
     FilterOutlined,
     SortAscendingOutlined,
 } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { productApiService } from '../../products/api/ProductApiService'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { ProductEntity } from '../../products/types/entity'
 
 const { Text } = Typography
 
-async function fetchProductOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await productApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((p: ProductEntity) => ({ label: p.productName ?? `#${p.id}`, value: p.id }))
+// Sử dụng TanStack Query để fetch options
+function createFetchProductOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const productQueryKeys = createQueryKeys('products')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...productQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => productApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((p: ProductEntity) => ({ label: p.productName ?? `#${p.id}`, value: p.id }))
+    }
 }
 
 interface InventorySearchFilterProps {
@@ -48,6 +57,9 @@ export const InventorySearchFilter = ({
     onSortChange,
     onClearFilters,
 }: InventorySearchFilterProps) => {
+    const queryClient = useQueryClient()
+    const fetchProductOptions = createFetchProductOptions(queryClient)
+
     const handleSortChange = (value: string) => {
         const [field, order] = value.split('-')
         onSortChange(field, order as 'ascend' | 'descend')

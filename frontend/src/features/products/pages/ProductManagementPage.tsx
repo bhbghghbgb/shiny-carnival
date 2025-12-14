@@ -18,7 +18,7 @@ export function ProductManagementPage() {
     const {
         products,
         total,
-        placeholderStats,
+        lowStockCount,
 
         searchText,
         sortField,
@@ -29,11 +29,13 @@ export function ProductManagementPage() {
         supplierId,
         minPrice,
         maxPrice,
+        onlyLowStock,
 
         handleSearch,
         handleCategoryFilter,
         handleSupplierFilter,
         handlePriceRangeChange,
+        handleLowStockFilter,
         handleSort,
         handlePageChange,
         clearFilters,
@@ -88,7 +90,7 @@ export function ProductManagementPage() {
                 statisticsSlot={
                     <ProductStatistics
                         totalProducts={total}
-                        lowStock={placeholderStats.lowStock}
+                        lowStock={lowStockCount}
                     />
                 }
                 filtersSlot={
@@ -98,12 +100,14 @@ export function ProductManagementPage() {
                         supplierId={supplierId}
                         minPrice={minPrice}
                         maxPrice={maxPrice}
+                        onlyLowStock={onlyLowStock}
                         sortField={sortField}
                         sortOrder={sortOrder}
                         onSearchChange={handleSearch}
                         onCategoryChange={handleCategoryFilter}
                         onSupplierChange={handleSupplierFilter}
                         onPriceRangeChange={handlePriceRangeChange}
+                        onLowStockChange={handleLowStockFilter}
                         onSortChange={handleSort}
                         onClearFilters={clearFilters}
                     />

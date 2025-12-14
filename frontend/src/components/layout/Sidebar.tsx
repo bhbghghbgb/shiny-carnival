@@ -5,6 +5,8 @@ import {
   DesktopOutlined,
   PieChartOutlined,
   QrcodeOutlined,
+  UserOutlined,
+  ShoppingCartOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Link } from "@tanstack/react-router";
@@ -13,10 +15,9 @@ import { ENDPOINTS } from '../../app/routes/type/routes.endpoint';
 type MenuItem = Required<MenuProps>['items'][number]
 
 const items: MenuItem[] = [
-  { key: '1', icon: <PieChartOutlined />, label: 'Dashboard' },
-  { key: '2', icon: <DesktopOutlined />, label: 'Products' },
-  { key: '3', icon: <ContainerOutlined />, label: 'Orders' },
-  { key: '4', icon: <QrcodeOutlined />, label: <Link to={ENDPOINTS.ADMIN.QR_SCANNER as any}>QR Scanner</Link> },
+  { key: '1', icon: <UserOutlined />, label: <Link to={ENDPOINTS.AUTH.PROFILE as any}>Hồ sơ</Link> },
+  { key: '2', icon: <ShoppingCartOutlined />, label: <Link to={ENDPOINTS.STAFF.ORDER as any}>Order</Link> }, 
+    { key: '3', icon: <QrcodeOutlined />, label: <Link to={ENDPOINTS.ADMIN.QR_SCANNER as any}>QR Scanner</Link> },
   {
     key: 'sub1',
     label: 'Management',

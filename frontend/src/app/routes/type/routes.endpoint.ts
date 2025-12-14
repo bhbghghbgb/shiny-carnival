@@ -41,10 +41,15 @@ export const ENDPOINTS = {
         },
 
         INVENTORY: {
-            LIST: '/admin/inventory',
-            DETAIL: '/admin/inventory/$id',
-            CREATE: '/admin/inventory/create',
-            EDIT: '/admin/inventory/$id/edit',
+          LIST: '/admin/inventory',
+          DETAIL: '/admin/inventory/$id',
+          CREATE: '/admin/inventory/create',
+          EDIT: '/admin/inventory/$id/edit',
         },
-    },
-} as const
+  },
+
+  STAFF: {
+    ROOT: '/staff',
+    ORDER: '/staff/order',
+  },
+} as const;

@@ -137,22 +137,46 @@ public class PromotionService : IPromotionService
                 return ApiResponse<PromotionResponseDto>.Error("Promotion not found", 404);
             }
 
-            // Check if promo code already exists (excluding current promotion)
-            var existingPromotion = await _unitOfWork.Promotions.GetQueryable()
-                .FirstOrDefaultAsync(p => p.PromoCode == request.PromoCode && p.Id != id);
-            
-            if (existingPromotion != null)
+            // Check if promo code already exists (excluding current promotion) - only if promo code is being updated
+            if (!string.IsNullOrEmpty(request.PromoCode))
             {
-                return ApiResponse<PromotionResponseDto>.Error("Promo code already exists", 409);
+                var existingPromotion = await _unitOfWork.Promotions.GetQueryable()
+                    .FirstOrDefaultAsync(p => p.PromoCode == request.PromoCode && p.Id != id);
+                
+                if (existingPromotion != null)
+                {
+                    return ApiResponse<PromotionResponseDto>.Error("Promo code already exists", 409);
+                }
             }
 
-            // Validate dates
-            if (request.StartDate >= request.EndDate)
+            // Validate dates - only if both dates are provided
+            if (request.StartDate.HasValue && request.EndDate.HasValue)
             {
-                return ApiResponse<PromotionResponseDto>.Error("Start date must be before end date", 400);
+                if (request.StartDate.Value >= request.EndDate.Value)
+                {
+                    return ApiResponse<PromotionResponseDto>.Error("Start date must be before end date", 400);
+                }
             }
 
-            _mapper.Map(request, promotion);
+            // Only map non-null fields
+            if (!string.IsNullOrEmpty(request.PromoCode))
+                promotion.PromoCode = request.PromoCode;
+            if (!string.IsNullOrEmpty(request.Description))
+                promotion.Description = request.Description;
+            if (!string.IsNullOrEmpty(request.DiscountType))
+                promotion.DiscountType = request.DiscountType == "percent" ? DiscountType.Percent : DiscountType.Fixed;
+            if (request.DiscountValue.HasValue)
+                promotion.DiscountValue = request.DiscountValue.Value;
+            if (request.StartDate.HasValue)
+                promotion.StartDate = DateOnly.FromDateTime(request.StartDate.Value);
+            if (request.EndDate.HasValue)
+                promotion.EndDate = DateOnly.FromDateTime(request.EndDate.Value);
+            if (request.MinOrderAmount.HasValue)
+                promotion.MinOrderAmount = request.MinOrderAmount.Value;
+            if (request.UsageLimit.HasValue)
+                promotion.UsageLimit = request.UsageLimit.Value;
+            if (!string.IsNullOrEmpty(request.Status))
+                promotion.Status = request.Status == "active" ? PromotionStatus.Active : PromotionStatus.Inactive;
 
             await _unitOfWork.Promotions.UpdateAsync(promotion);
             await _unitOfWork.SaveChangesAsync();
