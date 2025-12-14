@@ -4,13 +4,11 @@ namespace RetailStoreManagement.Models.Customer;
 
 public class UpdateCustomerRequest
 {
-    [Required]
     [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    public string? Name { get; set; }
 
-    [Required]
     [MaxLength(20)]
-    public string Phone { get; set; } = string.Empty;
+    public string? Phone { get; set; }
 
     [EmailAddress]
     [MaxLength(100)]
