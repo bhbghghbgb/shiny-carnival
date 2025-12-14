@@ -1,12 +1,14 @@
 import { FileExcelOutlined, FilePdfOutlined, ShoppingOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
 import { exportTablePdf } from '../../../utils/exportPdf';
-import { importTableExcel } from '../../../utils/importExcel';
+import { buildOptionMap, getIdFromOptionMap, importTableExcel } from '../../../utils/importExcel';
 import type { CreateProductRequest, ProductEntity } from '../api';
-import { productPageConfig } from '../config/productPageConfig';
+import { fetchCategoryOptions, fetchSupplierOptions, productPageConfig } from '../config/productPageConfig';
 import { useProductManagementPage } from '../hooks';
 
 const { Title, Text } = Typography
+const categoryMap = await buildOptionMap(fetchCategoryOptions);
+const supplierMap = await buildOptionMap(fetchSupplierOptions);
 
 interface ProductHeaderProps {
     products : ProductEntity[];
@@ -14,7 +16,7 @@ interface ProductHeaderProps {
 }
 
 export const ProductHeader = ({ products }: ProductHeaderProps) => {
-    const {createProduct} = useProductManagementPage()
+    const {createProduct} = useProductManagementPage()  
 
     const exportPDF = () => {
         exportTablePdf(productPageConfig,products,"products");
@@ -23,6 +25,16 @@ export const ProductHeader = ({ products }: ProductHeaderProps) => {
         await importTableExcel(file, payload => 
             createProduct.mutateAsync({
                 ...(payload as CreateProductRequest),
+                categoryId: getIdFromOptionMap(
+                    categoryMap,
+                    payload.category,
+                    'Danh mục'
+                ),
+                supplierId: getIdFromOptionMap(
+                    supplierMap,
+                    payload.supplier,
+                    'Nhà cung cấp'
+                ),
             })
         );
     };

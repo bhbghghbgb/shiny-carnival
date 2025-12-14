@@ -1,5 +1,30 @@
 import * as XLSX from "xlsx";
+import type { DropDownWithFilterOption } from "../components/common/DropDownWithFilter";
 
+export const buildOptionMap = async (
+    fetchOptions: (keyword: string) => Promise<DropDownWithFilterOption[]>
+  ): Promise<Map<string, number>> => {
+    const options = await fetchOptions('');
+    return new Map(
+      options.map(opt => [
+        opt.label.trim().toLowerCase(),
+        opt.value as number,
+      ])
+    );
+  };
+
+export const getIdFromOptionMap = (
+    map: Map<string, number>,
+    label: string,
+    fieldName: string
+  ): number => {
+    const id = map.get(label.trim().toLowerCase());
+    if (!id) {
+      throw new Error(`${fieldName} không hợp lệ: ${label}`);
+    }
+    return id;
+  };
+  
 export async function importTableExcel(
     file: File,
     onCreate: (payload: Record<string, any>, rowIndex: number) => Promise<any>

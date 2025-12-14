@@ -1,15 +1,15 @@
-import type { ColumnsType } from 'antd/es/table'
-import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
-import type { ProductEntity } from '../types/entity'
-import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
 import { Tag } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
 import { categoryApiService } from '../../categories/api'
-import { supplierApiService } from '../../suppliers/api'
 import type { CategoryEntity } from '../../categories/types/entity'
+import { supplierApiService } from '../../suppliers/api'
 import type { SupplierEntity } from '../../suppliers/types/entity'
+import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
+import type { ProductEntity } from '../types/entity'
 
-async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
+export async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
     const paged = await categoryApiService.getPaginated({
         search: keyword || undefined,
         page: 1,
@@ -19,7 +19,7 @@ async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilter
     return items.map((c: CategoryEntity) => ({ label: c.categoryName ?? `#${c.id}`, value: c.id }))
 }
 
-async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
+export async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
     const paged = await supplierApiService.getPaginated({
         search: keyword || undefined,
         page: 1,
