@@ -8,9 +8,10 @@ import { productApiService } from '../../products/api/ProductApiService'
 import { useOrderStore, type DraftOrderItem } from '../store/orderStore'
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CustomerEntity } from '../../customers/types/entity'
-import type { ProductEntity } from '../../products/types/entity'
+import type { ProductDetailsDto } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import { QRScanner } from '../../qr-scanner/components/QRScanner'
 
 const { Title, Text } = Typography
 
@@ -42,7 +43,7 @@ export function CreateOrderForm({
     // Load draft từ localStorage khi component mount (chỉ một lần)
     useEffect(() => {
         const draftOrder = useOrderStore.getState().draftOrder
-        const initialValues: any = {}
+        const initialValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>> = {}
         if (draftOrder.customerId) {
             initialValues.customerId = draftOrder.customerId
         }
@@ -56,10 +57,10 @@ export function CreateOrderForm({
     }, []) // Chỉ chạy một lần khi mount để load draft từ localStorage
 
     // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
-    const fetchProductDetails = async (productId: number): Promise<ProductEntity | null> => {
+    const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
             // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
-            const product = await queryClient.fetchQuery<ProductEntity>({
+            const product = await queryClient.fetchQuery<ProductDetailsDto>({
                 queryKey: productQueryKeys.detail(productId),
                 queryFn: () => productApiService.getById(productId),
             })
@@ -99,6 +100,8 @@ export function CreateOrderForm({
         const newItem: DraftOrderItem = {
             productId: product.id,
             productName: product.productName,
+            categoryName: product.categoryName || '',
+            barcode: product.barcode,
             price: product.price,
             quantity: quantity,
             subtotal: product.price * quantity,
@@ -179,7 +182,7 @@ export function CreateOrderForm({
 
     // Sync customer và promo code với draft khi form value thay đổi (sử dụng Form's onValuesChange)
     // Sử dụng getState() để đọc giá trị hiện tại và so sánh, tránh subscribe gây re-render
-    const handleFormValuesChange = (changedValues: any) => {
+    const handleFormValuesChange = (changedValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>>) => {
         const currentDraftOrder = useOrderStore.getState().draftOrder
 
         // Chỉ update store nếu giá trị thực sự thay đổi
@@ -204,6 +207,16 @@ export function CreateOrderForm({
             title: 'Sản phẩm',
             dataIndex: 'productName',
             key: 'productName',
+        },
+        {
+            title: 'Danh mục',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
+        },
+        {
+            title: 'Mã vạch',
+            dataIndex: 'barcode',
+            key: 'barcode',
         },
         {
             title: 'Đơn giá',
@@ -237,7 +250,7 @@ export function CreateOrderForm({
             title: 'Thao tác',
             key: 'action',
             align: 'center' as const,
-            render: (_: any, record: DraftOrderItem) => (
+            render: (_: unknown, record: DraftOrderItem) => (
                 <Button
                     type="text"
                     danger
@@ -252,9 +265,9 @@ export function CreateOrderForm({
         <div style={{ display: 'flex', gap: '24px', minHeight: '500px' }}>
             {/* Form bên trái */}
             <div style={{ flex: 1 }}>
-                <Form 
-                    form={form} 
-                    layout="vertical" 
+                <Form
+                    form={form}
+                    layout="vertical"
                     onFinish={handleSubmit}
                     onValuesChange={handleFormValuesChange}
                 >
@@ -357,6 +370,10 @@ export function CreateOrderForm({
                                 Thêm vào đơn hàng
                             </Button>
                         </Space>
+                    </Card>
+
+                    <Card title="Quét mã QR sản phẩm" size="small" style={{ marginBottom: 16 }}>
+                        <QRScanner />
                     </Card>
 
                     <Form.Item
