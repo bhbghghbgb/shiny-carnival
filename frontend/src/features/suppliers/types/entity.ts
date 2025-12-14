@@ -5,3 +5,7 @@ export interface SupplierEntity {
   email?: string | null;
   address?: string | null;
 }
+
+export interface SupplierDetailsDto extends SupplierEntity {
+  productCount: number;
+}
