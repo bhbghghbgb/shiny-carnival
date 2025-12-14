@@ -78,7 +78,13 @@ public partial class App : Application
 
                     // API Clients with Refit using Uno.Extensions
                     // These read from appsettings.json endpoints
-                    services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint");
+                    services.AddRefitClient<IAuthApi>(context, name: "AuthEndpoint",
+                        configure: (builder, options) =>
+                            builder.ConfigureHttpClient(client =>
+                            {
+                                // Configure the HttpClient here
+                            }).AddHttpMessageHandler<AuthHeaderHandler>()
+                    );
                     services.AddRefitClient<IProductApi>(context, name: "ProductEndpoint",
                         configure: (builder, options) =>
                             builder.ConfigureHttpClient(client =>
@@ -215,26 +221,27 @@ public partial class App : Application
         views.Register(
             new ViewMap(ViewModel: typeof(ShellModel)),
             new ViewMap<LoginPage2, LoginModel2>(),
-            new ViewMap<MainPage, MainModel>(),
-            new ViewMap<ProductListPage, ProductListModel>(),
-            new DataViewMap<ProductDetailPage, ProductDetailModel, ProductDetailModelData>(),
-            new ViewMap<CartPage, CartModel>(),
-            new ViewMap<OrderConfirmationPage, OrderConfirmationModel>()
+            new ViewMap<MainPage, MainModel>()
+            // new ViewMap<ProductListPage, ProductListModel>(),
+            // new DataViewMap<ProductDetailPage, ProductDetailModel, ProductDetailModelData>(),
+            // new ViewMap<CartPage, CartModel>(),
+            // new ViewMap<OrderConfirmationPage, OrderConfirmationModel>()
         );
 
         routes.Register(
             new RouteMap("", View: views.FindByViewModel<ShellModel>(),
                 Nested:
                 [
-                    new("Login", View: views.FindByViewModel<LoginModel>()),
-                    new("Main", View: views.FindByViewModel<MainModel>(), IsDefault: true,
-                        Nested:
-                        [
-                            new("ProductList", View: views.FindByViewModel<ProductListModel>(), IsDefault: true),
-                            new("ProductDetail", View: views.FindByViewModel<ProductDetailModel>()),
-                            new("Cart", View: views.FindByViewModel<CartModel>()),
-                            new("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationModel>()),
-                        ]),
+                    new RouteMap("Login", View: views.FindByViewModel<LoginModel>()),
+                    new RouteMap("Main", View: views.FindByViewModel<MainModel>(), IsDefault: true)
+                        // Nested:
+                        // [
+                        //     // new RouteMap("ProductList", View: views.FindByViewModel<ProductListModel>(),
+                        //     //     IsDefault: true),
+                        //     // new RouteMap("ProductDetail", View: views.FindByViewModel<ProductDetailModel>()),
+                        //     // new RouteMap("Cart", View: views.FindByViewModel<CartModel>()),
+                        //     // new RouteMap("OrderConfirmation", View: views.FindByViewModel<OrderConfirmationModel>()),
+                        // ]),
                 ]
             )
         );
@@ -272,6 +279,6 @@ public partial class App : Application
         var imageEndpoint = context.Configuration.GetSection("ImageEndpoint")["Url"];
         // Assuming you have a static property for this
         ProductImageUrlConverter.BaseImageUrl =
-            !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://10.0.0.2";
+            !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://localhost";
     }
 }

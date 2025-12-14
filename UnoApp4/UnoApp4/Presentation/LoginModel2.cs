@@ -2,7 +2,7 @@
 
 namespace UnoApp4.Presentation;
 
-public partial record LoginModel2
+public record LoginModel2
 {
     private readonly IAuthenticationService _authService;
     private readonly INavigator _navigator;
@@ -23,7 +23,7 @@ public partial record LoginModel2
 
     public ICommand LoginCommand => new AsyncRelayCommand(async () => await Login());
 
-    public async ValueTask Login()
+    private async ValueTask Login()
     {
         try
         {

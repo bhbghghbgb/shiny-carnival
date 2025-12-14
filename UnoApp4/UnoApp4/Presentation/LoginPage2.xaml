@@ -32,9 +32,9 @@
                           IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
                 <Button Content="Đăng nhập"
-                        uen:Navigation.Request="Login"
+                        Command="{Binding LoginCommand}"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                        HorizontalAlignment="Stretch"/>
+                        HorizontalAlignment="Stretch" />
 
                 <ProgressRing IsActive="{Binding IsBusy}"
                               Width="50"
