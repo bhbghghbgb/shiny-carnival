@@ -70,6 +70,13 @@ public class OrdersController : ControllerBase
         return StatusCode(result.StatusCode, result);
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteOrder(int id)
+    {
+        var result = await _orderService.DeleteOrderAsync(id);
+        return StatusCode(result.StatusCode, result);
+    }
+
     [HttpGet("total-revenue")]
     public async Task<IActionResult> GetTotalRevenue([FromQuery] OrderRevenueRequest? request)
     {

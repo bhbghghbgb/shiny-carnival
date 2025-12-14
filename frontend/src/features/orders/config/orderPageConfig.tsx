@@ -175,7 +175,7 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
     features: {
         enableCreate: true,
         enableEdit: true,
-        enableDelete: false, // Orders không có delete
+        enableDelete: true,
     },
 }
 

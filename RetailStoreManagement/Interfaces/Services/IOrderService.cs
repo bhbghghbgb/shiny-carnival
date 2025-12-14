@@ -13,6 +13,7 @@ public interface IOrderService
     Task<ApiResponse<OrderItemResponseDto>> AddOrderItemAsync(int orderId, AddOrderItemRequest request);
     Task<ApiResponse<OrderItemResponseDto>> UpdateOrderItemAsync(int orderId, int itemId, UpdateOrderItemRequest request);
     Task<ApiResponse<bool>> DeleteOrderItemAsync(int orderId, int itemId);
+    Task<ApiResponse<bool>> DeleteOrderAsync(int id);
     Task<byte[]> GenerateInvoicePdfAsync(int orderId);
     Task<ApiResponse<decimal>> GetTotalRevenueAsync(OrderRevenueRequest? request = null);
 }
