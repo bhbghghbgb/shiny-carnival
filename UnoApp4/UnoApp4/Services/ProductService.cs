@@ -1,8 +1,6 @@
-﻿using UnoApp3.Models.Common;
-using UnoApp3.Models.Product;
-using UnoApp4.Services.Api;
+﻿using UnoApp4.Services.Api;
 
-namespace UnoApp3.Services;
+namespace UnoApp4.Services;
 
 public class ProductService
 {
@@ -20,7 +18,7 @@ public class ProductService
             this.Log().LogInformation("SearchProductsAsync: calling API page {page} size {size}", request.PageIndex, request.PageSize);
             var response = await _productApi.GetProducts(request);
             this.Log().LogInformation("SearchProductsAsync: received {count} items", response?.Data?.Items?.Count ?? 0);
-            return response?.Data;
+            return response?.Data ?? throw new InvalidOperationException();
         }
         catch (Exception ex)
         {

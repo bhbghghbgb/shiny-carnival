@@ -1,6 +1,5 @@
 ﻿using Refit;
-using System.Threading.Tasks;
-using System.Net.Http;
+using UnoApp4.Models;
 
 namespace UnoApp4.Services.Api;
 
@@ -10,12 +9,10 @@ public interface IAuthApi
     Task<Models.ApiResponse<LoginResponse>> Login([Body] LoginRequest request);
 
     [Post("/Auth/refresh")]
+    [Headers("Authorization: Bearer")]
     Task<Models.ApiResponse<RefreshTokenResponse>> RefreshToken([Body] RefreshTokenRequest request);
 
     [Post("/Auth/logout")]
-    Task<Models.ApiResponse<object>> Logout([Body] RefreshTokenRequest request);
-
-    // Get user profile
-    [Get("/Auth/profile")]
-    Task<Models.ApiResponse<UserDto>> GetProfile();
+    [Headers("Authorization: Bearer")]
+    Task<Models.ApiResponse<LogoutResponse>> Logout([Body] LogoutRequest request);
 }
