@@ -8,7 +8,7 @@ import { productApiService } from '../../products/api/ProductApiService'
 import { useOrderStore, type DraftOrderItem } from '../store/orderStore'
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CustomerEntity } from '../../customers/types/entity'
-import type { ProductEntity } from '../../products/types/entity'
+import type { ProductEntity, ProductDetailsDto } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 
@@ -56,12 +56,13 @@ export function CreateOrderForm({
     }, []) // Chỉ chạy một lần khi mount để load draft từ localStorage
 
     // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
-    const fetchProductDetails = async (productId: number): Promise<ProductEntity | null> => {
+    const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
             // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
-            const product = await queryClient.fetchQuery<ProductEntity>({
+            // Sử dụng getProductDetails để lấy đầy đủ thông tin bao gồm categoryName
+            const product = await queryClient.fetchQuery<ProductDetailsDto>({
                 queryKey: productQueryKeys.detail(productId),
-                queryFn: () => productApiService.getById(productId),
+                queryFn: () => productApiService.getProductDetails(productId),
             })
             return product
         } catch (error) {
@@ -81,34 +82,56 @@ export function CreateOrderForm({
             return
         }
 
-        // Kiểm tra sản phẩm đã tồn tại chưa (đọc từ store bằng getState())
+        // Kiểm tra sản phẩm đã tồn tại chưa để hiển thị thông báo phù hợp
         const currentDraftOrder = useOrderStore.getState().draftOrder
         const existingItem = currentDraftOrder.orderItems.find(item => item.productId === selectedProduct)
-        if (existingItem) {
-            message.warning('Sản phẩm đã có trong đơn hàng. Vui lòng xóa và thêm lại nếu muốn thay đổi số lượng.')
-            return
-        }
+        const isExisting = !!existingItem
 
-        // Fetch product details
+        // Fetch product details để lấy thông tin mới nhất (bao gồm giá có thể đã thay đổi)
         const product = await fetchProductDetails(selectedProduct)
         if (!product) {
             message.error('Không thể lấy thông tin sản phẩm')
             return
         }
 
-        const newItem: DraftOrderItem = {
-            productId: product.id,
-            productName: product.productName,
-            price: product.price,
-            quantity: quantity,
-            subtotal: product.price * quantity,
+        // Nếu sản phẩm đã tồn tại và giá thay đổi, cần cập nhật giá và số lượng
+        if (isExisting && existingItem.price !== product.price) {
+            // Xóa item cũ và thêm lại với giá mới và số lượng = số lượng cũ + số lượng mới
+            useOrderStore.getState().removeDraftOrderItem(selectedProduct)
+            const totalQuantity = existingItem.quantity + quantity
+            const newItem: DraftOrderItem = {
+                productId: product.id,
+                productName: product.productName,
+                categoryName: product.categoryName || '',
+                barcode: product.barcode || '',
+                price: product.price,
+                quantity: totalQuantity,
+                subtotal: product.price * totalQuantity,
+            }
+            useOrderStore.getState().addDraftOrderItem(newItem)
+            message.success(`Đã cập nhật giá và tăng số lượng sản phẩm "${product.productName}"`)
+        } else {
+            // Thêm sản phẩm mới hoặc tăng số lượng nếu đã tồn tại (store tự xử lý)
+            const newItem: DraftOrderItem = {
+                productId: product.id,
+                productName: product.productName,
+                categoryName: product.categoryName || '',
+                barcode: product.barcode || '',
+                price: product.price,
+                quantity: quantity,
+                subtotal: product.price * quantity,
+            }
+            useOrderStore.getState().addDraftOrderItem(newItem)
+            if (isExisting) {
+                message.success(`Đã tăng số lượng sản phẩm "${product.productName}"`)
+            } else {
+                message.success('Đã thêm sản phẩm vào đơn hàng')
+            }
         }
 
-        useOrderStore.getState().addDraftOrderItem(newItem)
         setSelectedProduct(null)
         setQuantity(1)
         form.setFieldsValue({ productId: undefined, quantity: 1 })
-        message.success('Đã thêm sản phẩm vào đơn hàng')
     }
 
     const handleRemoveProduct = (productId: number) => {
