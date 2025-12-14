@@ -33,7 +33,8 @@ public class CustomerService : ICustomerService
             {
                 query = query.Where(c => c.Name.Contains(request.Search) ||
                                         c.Phone.Contains(request.Search) ||
-                                        (c.Email != null && c.Email.Contains(request.Search)));
+                                        (c.Email != null && c.Email.Contains(request.Search)) ||
+                                        (c.Address != null && c.Address.Contains(request.Search)));
             }
 
             // Apply sorting
@@ -50,6 +51,7 @@ public class CustomerService : ICustomerService
                     Name = c.Name,
                     Phone = c.Phone,
                     Email = c.Email,
+                    Address = c.Address,
                     LastOrderDate = c.Orders.OrderByDescending(o => o.OrderDate).FirstOrDefault() != null
                         ? c.Orders.OrderByDescending(o => o.OrderDate).First().OrderDate
                         : (DateTime?)null
