@@ -18,16 +18,12 @@ public partial class CartViewModel : BaseViewModel
     [ObservableProperty] private ObservableCollection<CartItemDisplay> _cartItems;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsCheckoutEnabled))]
     private bool _hasItems;
-
-    [ObservableProperty] private Dictionary<int, ProductListDto> _productCache;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TotalAmountFormatted))]
     private decimal _totalAmount;
 
-    public bool IsCheckoutEnabled => HasItems;
     public string TotalAmountFormatted => $"{TotalAmount:N0} đ";
 
     public CartViewModel(
@@ -40,9 +36,11 @@ public partial class CartViewModel : BaseViewModel
         _productService = productService;
         Title = "Giỏ hàng";
         CartItems = new ObservableCollection<CartItemDisplay>();
-        ProductCache = new Dictionary<int, ProductListDto>();
-
-        LoadCartCommand.Execute(null);
+        
+        this.PropertyChanged += (s, e) =>
+        {
+            this.Log().LogDebug($"PropertyChanged: {e.PropertyName} on thread {Environment.CurrentManagedThreadId}");
+        };
     }
 
     [RelayCommand]
@@ -55,12 +53,11 @@ public partial class CartViewModel : BaseViewModel
         try
         {
             CartItems.Clear();
-            ProductCache.Clear();
             TotalAmount = 0;
             HasItems = false;
 
             var items = await _cartRepository.GetCartItemsAsync();
-            HasItems = items.Count > 0;
+            // HasItems = items.Count > 0;
 
             foreach (var item in items)
             {
@@ -76,19 +73,12 @@ public partial class CartViewModel : BaseViewModel
                         ProductName = product.ProductName,
                         Price = product.Price
                     });
-
-                    var productDto = new ProductListDto
-                    {
-                        Id = product.Id,
-                        ProductName = product.ProductName,
-                        Price = product.Price,
-                        Unit = product.Unit
-                    };
-
-                    ProductCache[item.ProductId] = productDto;
+            
                     TotalAmount += product.Price * item.Quantity;
                 }
             }
+            
+            HasItems = items.Count > 0;
         }
         finally
         {

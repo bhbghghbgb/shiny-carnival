@@ -23,18 +23,78 @@ namespace UnoApp3.Views;
 /// </summary>
 public sealed partial class CartPage : Page
 {
+    private bool _hasLoadedCart;
+
+    public CartViewModel? ViewModel => DataContext as CartViewModel;
+
     public CartPage()
     {
         this.InitializeComponent();
-        this.Loaded += CartPage_Loaded;
+        this.DataContextChanged += OnDataContextChanged;
     }
 
-    private async void CartPage_Loaded(object sender, RoutedEventArgs e)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        if (DataContext is CartViewModel vm)
+        base.OnNavigatedTo(e);
+
+        this.Log().LogDebug($"CartPage.OnNavigatedTo - DataContext is null: {DataContext == null}");
+
+        // If the ViewModel is already available, trigger the load.
+        if (ViewModel != null && !_hasLoadedCart)
         {
-            await vm.LoadCartCommand.ExecuteAsync(null);
+            this.Log().LogDebug("DataContext available immediately, loading cart");
+            _ = LoadCartWhenReady();
+        }
+        else if (ViewModel == null)
+        {
+            this.Log().LogDebug("DataContext not ready, will wait for DataContextChanged");
         }
     }
-}
 
+    private async void OnDataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    {
+        this.Log().LogDebug(
+            $"CartPage.DataContextChanged - New DataContext type: {args.NewValue?.GetType().Name}");
+
+        if (ViewModel != null && !_hasLoadedCart)
+        {
+            this.Log().LogDebug("CartViewModel now available, loading cart");
+            await LoadCartWhenReady();
+        }
+    }
+
+    private async Task LoadCartWhenReady()
+    {
+        // Wait up to 5 seconds for ViewModel (optional if needed)
+        int attempts = 0;
+        const int maxAttempts = 50; // 50 * 100ms = 5000ms
+
+        while (ViewModel == null && attempts < maxAttempts)
+        {
+            this.Log().LogDebug($"Waiting for CartViewModel... Attempt {attempts + 1}");
+            await Task.Delay(100);
+            attempts++;
+        }
+
+        if (ViewModel != null)
+        {
+            this.Log().LogDebug($"ViewModel ready after {attempts * 100}ms, executing LoadCartCommand");
+
+            // Only load once per navigation
+            _hasLoadedCart = true;
+
+            // Trigger the view model load command
+            ViewModel.LoadCartCommand.Execute(null);
+        }
+        else
+        {
+            this.Log().LogDebug($"ERROR: CartViewModel still null after {maxAttempts * 100}ms!");
+        }
+    }
+
+    protected override void OnNavigatedFrom(NavigationEventArgs e)
+    {
+        base.OnNavigatedFrom(e);
+        this.DataContextChanged -= OnDataContextChanged;
+    }
+}

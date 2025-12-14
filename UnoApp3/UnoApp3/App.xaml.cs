@@ -38,10 +38,12 @@ public partial class App : Application
                     // Configure log levels for different categories of logging
                     logBuilder
                         .SetMinimumLevel(
-                            context.HostingEnvironment.IsDevelopment() ? LogLevel.Information : LogLevel.Warning)
+                            // context.HostingEnvironment.IsDevelopment() ? LogLevel.Information : LogLevel.Warning)
+                            context.HostingEnvironment.IsDevelopment() ? LogLevel.Debug : LogLevel.Information)
 
                         // Default filters for core Uno Platform namespaces
-                        .CoreLogLevel(LogLevel.Warning);
+                        // .CoreLogLevel(LogLevel.Warning);
+                        .CoreLogLevel(LogLevel.Information);
 
                     // Uno Platform namespace filter groups
                     // Uncomment individual methods to see more detailed logging

@@ -15,12 +15,9 @@ public partial class BaseViewModel : ObservableObject
 
     protected INavigator Navigator { get; }
     
-    // protected DispatcherQueue Dispatcher { get; }
-
     public BaseViewModel(INavigator navigator)
     {
         Navigator = navigator;
-        // Dispatcher = DispatcherQueue.GetForCurrentThread();
     }
 
     [RelayCommand]
