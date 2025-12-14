@@ -1,14 +1,45 @@
-import type { ColumnsType } from 'antd/es/table'
-import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
-import type { OrderEntity } from '../types/entity'
-import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
-import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { Tag } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
 import { API_CONFIG } from '../../../config/api.config'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import type { CustomerEntity } from '../../customers/types/entity'
 import { productApiService } from '../../products/api/ProductApiService'
 import type { ProductEntity } from '../../products/types/entity'
+import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
+import type { OrderEntity } from '../types/entity'
+
+export const fetchCustomerOptions = async (
+    keyword: string
+  ): Promise<DropDownWithFilterOption[]> => {
+    const paged = await customerApiService.getPaginated({
+      search: keyword || undefined,
+      page: 1,
+      pageSize: 1000, // import → lấy nhiều
+    })
+    const items = paged.items ?? []
+    return items.map((c: CustomerEntity) => ({
+      label: `${c.name ?? 'N/A'} - ${c.phone ?? 'N/A'}`,
+      value: c.id,
+    }))
+  }
+  
+  export const fetchProductOptions = async (
+    keyword: string
+  ): Promise<DropDownWithFilterOption[]> => {
+    const paged = await productApiService.getPaginated({
+      search: keyword || undefined,
+      page: 1,
+      pageSize: 1000,
+    })
+    const items = paged.items ?? []
+    return items.map((p: ProductEntity) => ({
+      label: `${p.productName ?? `#${p.id}`}`,
+      value: p.id,
+    }))
+  }
+  
 
 export const orderColumns: ColumnsType<OrderEntity> = [
     {
@@ -177,4 +208,3 @@ export const orderPageConfig: GenericPageConfig<OrderEntity, CreateOrderRequest,
         enableDelete: true,
     },
 }
-

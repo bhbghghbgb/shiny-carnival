@@ -58,11 +58,12 @@ export function CreateOrderForm({
 
     // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
     const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
+    const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
             // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
             const product = await queryClient.fetchQuery<ProductDetailsDto>({
                 queryKey: productQueryKeys.detail(productId),
-                queryFn: () => productApiService.getById(productId),
+                queryFn: () => productApiService.getProductDetails(productId),
             })
             return product
         } catch (error) {
@@ -82,15 +83,12 @@ export function CreateOrderForm({
             return
         }
 
-        // Kiểm tra sản phẩm đã tồn tại chưa (đọc từ store bằng getState())
+        // Kiểm tra sản phẩm đã tồn tại chưa để hiển thị thông báo phù hợp
         const currentDraftOrder = useOrderStore.getState().draftOrder
         const existingItem = currentDraftOrder.orderItems.find(item => item.productId === selectedProduct)
-        if (existingItem) {
-            message.warning('Sản phẩm đã có trong đơn hàng. Vui lòng xóa và thêm lại nếu muốn thay đổi số lượng.')
-            return
-        }
+        const isExisting = !!existingItem
 
-        // Fetch product details
+        // Fetch product details để lấy thông tin mới nhất (bao gồm giá có thể đã thay đổi)
         const product = await fetchProductDetails(selectedProduct)
         if (!product) {
             message.error('Không thể lấy thông tin sản phẩm')
@@ -111,7 +109,6 @@ export function CreateOrderForm({
         setSelectedProduct(null)
         setQuantity(1)
         form.setFieldsValue({ productId: undefined, quantity: 1 })
-        message.success('Đã thêm sản phẩm vào đơn hàng')
     }
 
     const handleRemoveProduct = (productId: number) => {

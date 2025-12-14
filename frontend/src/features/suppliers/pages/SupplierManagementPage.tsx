@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { SupplierHeader } from '../components/SupplierHeader'
-import { SupplierStatistics } from '../components/SupplierStatistics'
-import { SupplierSearchFilter } from '../components/SupplierSearchFilter'
-import { SupplierDetailModal } from '../components/SupplierDetailModal'
-import { useSupplierManagementPage } from '../hooks/useSupplierManagementPage'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { SupplierDetailModal } from '../components/SupplierDetailModal'
+import { SupplierHeader } from '../components/SupplierHeader'
+import { SupplierSearchFilter } from '../components/SupplierSearchFilter'
+import { SupplierStatistics } from '../components/SupplierStatistics'
 import { supplierPageConfig } from '../config/supplierPageConfig'
-import type { SupplierEntity } from '../types/entity'
+import { useSupplierManagementPage } from '../hooks/useSupplierManagementPage'
 import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api'
+import type { SupplierEntity } from '../types/entity'
 
 export function SupplierManagementPage() {
     const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null)
@@ -75,7 +75,7 @@ export function SupplierManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <SupplierHeader onAddSupplier={openCreate} />}
+                renderHeader={() => <SupplierHeader suppliers={suppliers} />}
                 statisticsSlot={
                     <SupplierStatistics
                         totalSuppliers={total}
