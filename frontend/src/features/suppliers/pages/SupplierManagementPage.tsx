@@ -1,4 +1,8 @@
+import { EyeOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { SupplierDetailModal } from '../components/SupplierDetailModal'
 import { SupplierHeader } from '../components/SupplierHeader'
 import { SupplierSearchFilter } from '../components/SupplierSearchFilter'
 import { SupplierStatistics } from '../components/SupplierStatistics'
@@ -8,6 +12,8 @@ import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api'
 import type { SupplierEntity } from '../types/entity'
 
 export function SupplierManagementPage() {
+    const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     const {
         suppliers,
         total,
@@ -35,6 +41,16 @@ export function SupplierManagementPage() {
         clearPageError,
         clearFormError,
     } = useSupplierManagementPage()
+
+    const handleViewDetail = (supplier: SupplierEntity) => {
+        setSelectedSupplierId(supplier.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedSupplierId(null)
+    }
 
     return (
         <div style={{ padding: '24px' }}>
@@ -78,6 +94,20 @@ export function SupplierManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <SupplierDetailModal
+                supplierId={selectedSupplierId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )

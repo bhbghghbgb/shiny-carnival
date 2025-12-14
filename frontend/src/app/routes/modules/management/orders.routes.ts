@@ -10,7 +10,9 @@ export const ordersRoutes: object = {};
 const generatedModule: ModuleRoutes<any> = {
   moduleName: 'orders',
   basePath: '/orders',
-  routes: generateManagementRouteConfigs(orderAdminDefinition),
+  routes: [
+    ...generateManagementRouteConfigs(orderAdminDefinition),
+  ],
 };
 
 // Gán các thuộc tính từ config đã tạo vào object tạm thời

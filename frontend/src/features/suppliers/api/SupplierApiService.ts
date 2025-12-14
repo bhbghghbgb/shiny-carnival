@@ -4,6 +4,8 @@ import { API_CONFIG } from '../../../config/api.config'
 import type { SupplierEntity } from '../types/entity'
 import type { CreateSupplierRequest, UpdateSupplierRequest } from '../types/api'
 
+import type { SupplierDetailsDto } from '../types/entity'
+
 export class SupplierApiService extends BaseApiService<
   SupplierEntity,
   CreateSupplierRequest,
@@ -14,6 +16,10 @@ export class SupplierApiService extends BaseApiService<
       endpoint: API_CONFIG.ENDPOINTS.ADMIN.SUPPLIERS,
       axiosInstance: axiosClient,
     })
+  }
+
+  async getSupplierDetails(id: number): Promise<SupplierDetailsDto> {
+    return this.getById(id) as Promise<SupplierDetailsDto>
   }
 }
 

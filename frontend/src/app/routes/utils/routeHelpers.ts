@@ -1,5 +1,5 @@
 // frontend/src/app/routes/utils/routeHelpers.ts
-import { type RouteComponent, type RouteOptions } from '@tanstack/react-router';
+import { type RouteComponent, type RouteOptions } from '@tanstack/react-router'
 // Import các kiểu dữ liệu cần thiết, bao gồm cả kiểu phân cấp mới
 import {
   type ModuleRouteConfig,
@@ -45,30 +45,37 @@ function resolvePath(basePath: string, relativePath: string): string {
 }
 
 // Hàm helper để tạo config, giờ đây trả về kiểu phân cấp
-function createHierarchicalRouteConfig<TLoaderData, TParams, TSearch extends BaseSearch, TRouterContext>(
-  config: Partial<ModuleRouteConfig<TLoaderData, TParams, TSearch, TRouterContext>> & {
-    path: string;
-    component: RouteComponent;
-    children?: HierarchicalModuleRouteConfig[];
-  },
-  customConfig: Partial<RouteOptions<any>> = {}
-): HierarchicalModuleRouteConfig {
-  const baseConfig: Partial<HierarchicalModuleRouteConfig> = {
-    searchSchema: baseSearchSchema,
-    pendingComponent: PendingComponent,
-    errorComponent: ErrorComponent,
-    meta: {
-      requiresAuth: true,
-      ...config.meta,
+function createHierarchicalRouteConfig<
+    TLoaderData,
+    TParams,
+    TSearch extends BaseSearch,
+    TRouterContext,
+>(
+    config: Partial<
+        ModuleRouteConfig<TLoaderData, TParams, TSearch, TRouterContext>
+    > & {
+        path: string
+        component: RouteComponent
+        children?: HierarchicalModuleRouteConfig[]
     },
-  };
+    customConfig: Partial<RouteOptions<any>> = {}
+): HierarchicalModuleRouteConfig {
+    const baseConfig: Partial<HierarchicalModuleRouteConfig> = {
+        searchSchema: baseSearchSchema,
+        pendingComponent: PendingComponent,
+        errorComponent: ErrorComponent,
+        meta: {
+            requiresAuth: true,
+            ...config.meta,
+        },
+    }
 
-  // Hợp nhất các config lại với nhau
-  return {
-    ...baseConfig,
-    ...config,
-    ...customConfig,
-  } as HierarchicalModuleRouteConfig;
+    // Hợp nhất các config lại với nhau
+    return {
+        ...baseConfig,
+        ...config,
+        ...customConfig,
+    } as HierarchicalModuleRouteConfig
 }
 
 /**
@@ -153,21 +160,24 @@ export function generateManagementRouteConfigs<
   TSearch extends BaseSearch,
   TRouterContext
 >(
-  definition: ManagementRouteDefinition<TLoaderData, TSearch, TRouterContext>,
-  customRouteConfig: Partial<RouteOptions<any>> = {}
+    definition: ManagementRouteDefinition<TLoaderData, TSearch, TRouterContext>,
+    customRouteConfig: Partial<RouteOptions<any>> = {}
 ): HierarchicalModuleRouteConfig[] {
-  const adminConfig = createHierarchicalRouteConfig({
-    path: definition.path,
-    component: definition.component,
-    searchSchema: definition.searchSchema,
-    loader: definition.loader,
-    meta: {
-      title: `Quản trị ${definition.entityName}`,
-      requiresAuth: true,
-    },
-  }, customRouteConfig);
+    const adminConfig = createHierarchicalRouteConfig(
+        {
+            path: definition.path,
+            component: definition.component,
+            searchSchema: definition.searchSchema,
+            loader: definition.loader,
+            meta: {
+                title: `Quản trị ${definition.entityName}`,
+                requiresAuth: true,
+            },
+        },
+        customRouteConfig
+    )
 
-  return [adminConfig];
+    return [adminConfig]
 }
 
 // ============================================================================

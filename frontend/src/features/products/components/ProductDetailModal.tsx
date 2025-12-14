@@ -106,3 +106,4 @@ export function ProductDetailModal({ productId, open, onClose }: ProductDetailMo
     )
 }
 
+
