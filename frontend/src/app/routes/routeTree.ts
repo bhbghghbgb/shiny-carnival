@@ -6,9 +6,7 @@ import { authLayoutRoute } from './layout/auth.layout';
 import { mainLayoutRoute } from './layout/main.layout';
 import { createAdminLayoutRoute } from './layout/admin.layout';
 import { createStaffLayoutRoute } from './layout/staff.layout';
-import { homeRoutes } from './modules/home.routes';
 import { authRoutes } from './modules/auth.routes';
-import { qrScannerRoutes } from './modules/qr-scanner.routes';
 import { staffRoutes } from './modules/staff.routes';
 // ... import các module routes khác như trong file gốc
 import { productsRoutes } from './modules/management/products.routes';
