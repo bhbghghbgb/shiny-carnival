@@ -476,7 +476,7 @@ export function CreateOrderForm({
                             <Button type="primary" htmlType="submit" loading={loading}>
                                 Tạo đơn hàng
                             </Button>
-                            <Button onClick={onCancel}>Hủy</Button>
+                            <Button onClick={handleCancel}>Hủy</Button>
                         </Space>
                     </Form.Item>
                 </Form>
