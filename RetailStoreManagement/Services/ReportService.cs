@@ -6,6 +6,7 @@ using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Report;
 using RetailStoreManagement.Enums;
+using static RetailStoreManagement.Common.ReportConstants;
 
 namespace RetailStoreManagement.Services;
 
@@ -95,8 +96,8 @@ public class ReportService : IReportService
             {
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
-                Page = 1,
-                PageSize = 10
+                Page = ReportConstants.DEFAULT_TOP_ITEMS_PAGE,
+                PageSize = ReportConstants.DEFAULT_TOP_ITEMS_PAGE_SIZE
             };
             var topProducts = await GetTopProductsAsync(topProductsRequest);
 
@@ -104,8 +105,8 @@ public class ReportService : IReportService
             {
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
-                Page = 1,
-                PageSize = 10
+                Page = ReportConstants.DEFAULT_TOP_ITEMS_PAGE,
+                PageSize = ReportConstants.DEFAULT_TOP_ITEMS_PAGE_SIZE
             };
             var topCustomers = await GetTopCustomersAsync(topCustomersRequest);
 

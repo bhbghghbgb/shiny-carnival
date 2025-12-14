@@ -1,36 +1,52 @@
-import { Card, Row, Col, Space, Typography, Input, InputNumber, Select, Button } from 'antd'
+import { Card, Row, Col, Space, Typography, Input, InputNumber, Select, Button, Checkbox } from 'antd'
 import {
     SearchOutlined,
     FilterOutlined,
     SortAscendingOutlined,
+    WarningOutlined,
 } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
 import { categoryApiService } from '../../categories/api'
 import { supplierApiService } from '../../suppliers/api'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CategoryEntity } from '../../categories/types/entity'
 import type { SupplierEntity } from '../../suppliers/types/entity'
 
 const { Text } = Typography
 
-async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await categoryApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((c: CategoryEntity) => ({ label: c.categoryName ?? `#${c.id}`, value: c.id }))
+// Sử dụng TanStack Query để fetch options
+function createFetchCategoryOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const categoryQueryKeys = createQueryKeys('categories')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...categoryQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => categoryApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((c: CategoryEntity) => ({ label: c.categoryName ?? `#${c.id}`, value: c.id }))
+    }
 }
 
-async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
-    const paged = await supplierApiService.getPaginated({
-        search: keyword || undefined,
-        page: 1,
-        pageSize: 20,
-    })
-    const items = paged.items ?? []
-    return items.map((s: SupplierEntity) => ({ label: s.name ?? `#${s.id}`, value: s.id }))
+function createFetchSupplierOptions(queryClient: ReturnType<typeof useQueryClient>) {
+    return async (keyword: string): Promise<DropDownWithFilterOption[]> => {
+        const supplierQueryKeys = createQueryKeys('suppliers')
+        const paged = await queryClient.fetchQuery({
+            queryKey: [...supplierQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+            queryFn: () => supplierApiService.getPaginated({
+                search: keyword || undefined,
+                page: 1,
+                pageSize: 20,
+            }),
+        })
+        const items = paged.items ?? []
+        return items.map((s: SupplierEntity) => ({ label: s.name ?? `#${s.id}`, value: s.id }))
+    }
 }
 
 interface ProductSearchFilterProps {
@@ -39,12 +55,14 @@ interface ProductSearchFilterProps {
     supplierId?: number
     minPrice?: number
     maxPrice?: number
+    onlyLowStock?: boolean
     sortField: string
     sortOrder: 'ascend' | 'descend'
     onSearchChange: (value: string) => void
     onCategoryChange: (value?: number) => void
     onSupplierChange: (value?: number) => void
     onPriceRangeChange: (min?: number, max?: number) => void
+    onLowStockChange: (checked: boolean) => void
     onSortChange: (field: string, order: 'ascend' | 'descend') => void
     onClearFilters: () => void
 }
@@ -55,15 +73,21 @@ export const ProductSearchFilter = ({
     supplierId,
     minPrice,
     maxPrice,
+    onlyLowStock,
     sortField,
     sortOrder,
     onSearchChange,
     onCategoryChange,
     onSupplierChange,
     onPriceRangeChange,
+    onLowStockChange,
     onSortChange,
     onClearFilters,
 }: ProductSearchFilterProps) => {
+    const queryClient = useQueryClient()
+    const fetchCategoryOptions = createFetchCategoryOptions(queryClient)
+    const fetchSupplierOptions = createFetchSupplierOptions(queryClient)
+
     const handleSortChange = (value: string) => {
         const [field, order] = value.split('-')
         onSortChange(field, order as 'ascend' | 'descend')
@@ -146,6 +170,19 @@ export const ProductSearchFilter = ({
                         onChange={(value) => onPriceRangeChange(minPrice, value ?? undefined)}
                         style={{ width: '100%', marginTop: '8px' }}
                     />
+                </Col>
+            </Row>
+            <Row gutter={16} align="middle" style={{ marginTop: '8px' }}>
+                <Col span={6}>
+                    <Checkbox
+                        checked={onlyLowStock || false}
+                        onChange={(e) => onLowStockChange(e.target.checked)}
+                    >
+                        <Space>
+                            <WarningOutlined style={{ color: '#faad14' }} />
+                            <Text strong>Chỉ hiển thị tồn kho thấp</Text>
+                        </Space>
+                    </Checkbox>
                 </Col>
             </Row>
             <Row gutter={16} align="middle" style={{ marginTop: '16px' }}>

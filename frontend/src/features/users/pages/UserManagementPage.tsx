@@ -1,6 +1,10 @@
+import { useState } from 'react'
+import { Button } from 'antd'
+import { EyeOutlined } from '@ant-design/icons'
 import { UserHeader } from '../components/UserHeader'
 import { UserStatistics } from '../components/UserStatistics'
 import { UserSearchFilter } from '../components/UserSearchFilter'
+import { UserDetailModal } from '../components/UserDetailModal'
 import { useUserManagementPage } from '../hooks/useUserManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
 import { userPageConfig } from '../config/userPageConfig'
@@ -9,6 +13,8 @@ import type { UserNoPass } from '../types/entity'
 
 
 export function UserManagementPage() {
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     const {
         users,
         totalUsers,
@@ -36,6 +42,16 @@ export function UserManagementPage() {
         clearPageError,
         clearFormError,
     } = useUserManagementPage()
+
+    const handleViewDetail = (user: UserNoPass) => {
+        setSelectedUserId(user.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedUserId(null)
+    }
 
     const handleCreate = async (values: CreateUserRequest) => {
         await createUser.mutateAsync(values)
@@ -92,6 +108,20 @@ export function UserManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <UserDetailModal
+                userId={selectedUserId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )

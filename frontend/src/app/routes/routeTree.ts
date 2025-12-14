@@ -5,6 +5,7 @@ import { queryClient } from '../../lib/query/queryClient';
 import { authLayoutRoute } from './layout/auth.layout';
 import { mainLayoutRoute } from './layout/main.layout';
 import { createAdminLayoutRoute } from './layout/admin.layout';
+import { createStaffLayoutRoute } from './layout/staff.layout';
 import { homeRoutes } from './modules/home.routes';
 import { authRoutes } from './modules/auth.routes';
 import { qrScannerRoutes } from './modules/qr-scanner.routes';
@@ -73,10 +74,7 @@ const authModuleRoutes: ModuleRoutes<any>[] = [
   authRoutes,
 ];
 
-// Home routes (có sidebar)
-const homeModuleRoutes: ModuleRoutes<any>[] = [
-  homeRoutes,
-];
+
 
 // Admin routes (có sidebar)
 const adminModuleRoutes: ModuleRoutes<any>[] = [
@@ -92,6 +90,11 @@ const adminModuleRoutes: ModuleRoutes<any>[] = [
   suppliersRoutes,
 ];
 
+// Staff routes (có sidebar)
+const staffModuleRoutes: ModuleRoutes<any>[] = [
+  staffRoutes,
+];
+
 // Build auth routes với authLayoutRoute (không có sidebar)
 // Lưu ý: authLayoutRoute đã có path '/auth', nên chỉ build các children routes
 const authRoutesConfig = authModuleRoutes.flatMap(m => m.routes as HierarchicalModuleRouteConfig[]);
@@ -103,12 +106,6 @@ const authRoutesBuilt = authRoutesConfig.flatMap(config => {
   // Nếu không có children, build route chính
   return buildRoutesFromConfig([config], authLayoutRoute);
 });
-
-// Build home routes với mainLayoutRoute (có sidebar)
-const homeRoutesBuilt = buildRoutesFromConfig(
-  homeModuleRoutes.flatMap(m => m.routes as HierarchicalModuleRouteConfig[]),
-  mainLayoutRoute,
-);
 
 // Tạo adminLayoutRoute với mainLayoutRoute làm parent để đảm bảo sidebar hiển thị
 const adminLayoutRoute = createAdminLayoutRoute(mainLayoutRoute);
@@ -122,14 +119,29 @@ const adminRoutes = buildRoutesFromConfig(
 // 3. Gắn các route auth đã tạo vào authLayoutRoute
 authLayoutRoute.addChildren(authRoutesBuilt);
 
-// 4. Gắn các route home đã tạo vào mainLayoutRoute
-mainLayoutRoute.addChildren(homeRoutesBuilt);
 
 // 5. Gắn các route admin đã tạo vào adminLayoutRoute
 adminLayoutRoute.addChildren(adminRoutes);
 
-// 6. Gắn adminLayoutRoute vào mainLayoutRoute để có sidebar
-mainLayoutRoute.addChildren([adminLayoutRoute]);
+// Tạo staffLayoutRoute với mainLayoutRoute làm parent để đảm bảo sidebar hiển thị
+const staffLayoutRoute = createStaffLayoutRoute(mainLayoutRoute);
+
+// Build staff routes với staffLayoutRoute
+const staffRoutesConfig = staffModuleRoutes.flatMap(m => m.routes as HierarchicalModuleRouteConfig[]);
+const staffRoutesBuilt = staffRoutesConfig.flatMap(config => {
+  // Nếu config có children, build trực tiếp các children với staffLayoutRoute
+  if (config.children && config.children.length > 0) {
+    return buildRoutesFromConfig(config.children, staffLayoutRoute);
+  }
+  // Nếu không có children, build route chính
+  return buildRoutesFromConfig([config], staffLayoutRoute);
+});
+
+// Gắn các route staff đã tạo vào staffLayoutRoute
+staffLayoutRoute.addChildren(staffRoutesBuilt);
+
+// 6. Gắn adminLayoutRoute và staffLayoutRoute vào mainLayoutRoute để có sidebar
+mainLayoutRoute.addChildren([adminLayoutRoute, staffLayoutRoute]);
 
 // 7. Xây dựng cây routing cuối cùng
 const routeTree = rootRoute.addChildren([

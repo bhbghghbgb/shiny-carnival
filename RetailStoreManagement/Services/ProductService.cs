@@ -7,6 +7,7 @@ using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Product;
+using static RetailStoreManagement.Common.InventoryConstants;
 
 namespace RetailStoreManagement.Services;
 
@@ -55,6 +56,12 @@ public class ProductService : IProductService
             if (request.MaxPrice.HasValue)
             {
                 query = query.Where(p => p.Price <= request.MaxPrice.Value);
+            }
+
+            // Apply low stock filter
+            if (request.OnlyLowStock == true)
+            {
+                query = query.Where(p => p.Inventory != null && p.Inventory.Quantity < LOW_STOCK_THRESHOLD);
             }
 
             // Apply sorting
@@ -181,13 +188,16 @@ public class ProductService : IProductService
                 return ApiResponse<ProductResponseDto>.Error("Product not found", 404);
             }
 
-            // Check if barcode already exists (excluding current product)
-            var existingProduct = await _unitOfWork.Products.GetQueryable()
-                .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.Id != id);
-
-            if (existingProduct != null)
+            // Check if barcode already exists (excluding current product) - only if barcode is being updated
+            if (!string.IsNullOrEmpty(request.Barcode))
             {
-                return ApiResponse<ProductResponseDto>.Error("Barcode already exists", 409);
+                var existingProduct = await _unitOfWork.Products.GetQueryable()
+                    .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.Id != id);
+
+                if (existingProduct != null)
+                {
+                    return ApiResponse<ProductResponseDto>.Error("Barcode already exists", 409);
+                }
             }
 
             _mapper.Map(request, product);

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using static RetailStoreManagement.Common.ValidationConstants;
 
 namespace RetailStoreManagement.Models.Promotion;
 
@@ -8,6 +9,6 @@ public class ValidatePromoRequest
     public string PromoCode { get; set; } = string.Empty;
 
     [Required]
-    [Range(0.01, double.MaxValue)]
+    [Range((double)MIN_PRICE, double.MaxValue)]
     public decimal OrderAmount { get; set; }
 }

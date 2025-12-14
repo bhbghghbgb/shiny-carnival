@@ -9,4 +9,11 @@ export interface CreateProductRequest {
     unit: string;
 }
 
-export type UpdateProductRequest = CreateProductRequest;
+export interface UpdateProductRequest {
+    categoryId?: number;
+    supplierId?: number;
+    productName?: string;
+    barcode?: string;
+    price?: number;
+    unit?: string;
+}
