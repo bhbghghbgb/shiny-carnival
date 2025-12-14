@@ -1,19 +1,20 @@
 using System.ComponentModel.DataAnnotations;
+using static RetailStoreManagement.Common.ValidationConstants;
 
 namespace RetailStoreManagement.Models.Product;
 
 public class UpdateProductRequest
 {
-    [MaxLength(100)]
+    [MaxLength(MAX_LENGTH_NAME)]
     public string? ProductName { get; set; }
 
-    [MaxLength(50)]
+    [MaxLength(MAX_LENGTH_CODE)]
     public string? Barcode { get; set; }
 
-    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+    [Range((double)MIN_PRICE, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
     public decimal? Price { get; set; }
 
-    [MaxLength(20)]
+    [MaxLength(MAX_LENGTH_UNIT)]
     public string? Unit { get; set; }
 
     public int? CategoryId { get; set; }

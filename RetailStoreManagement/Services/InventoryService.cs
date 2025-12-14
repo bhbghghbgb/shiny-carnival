@@ -6,6 +6,7 @@ using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Inventory;
+using static RetailStoreManagement.Common.InventoryConstants;
 
 namespace RetailStoreManagement.Services;
 
@@ -13,7 +14,6 @@ public class InventoryService : IInventoryService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private const int LOW_STOCK_THRESHOLD = 10;
 
     public InventoryService(IUnitOfWork unitOfWork, IMapper mapper)
     {
@@ -67,7 +67,7 @@ public class InventoryService : IInventoryService
                     Barcode = i.Product.Barcode ?? string.Empty,
                     Quantity = i.Quantity,
                     UpdatedAt = i.UpdatedAt ?? i.CreatedAt,
-                    Status = i.Quantity == 0 ? "out_of_stock" : (i.Quantity < 10 ? "low_stock" : "in_stock")
+                    Status = i.Quantity == 0 ? "out_of_stock" : (i.Quantity < LOW_STOCK_THRESHOLD ? "low_stock" : "in_stock")
                 });
 
             // Use PagedList.CreateAsync for database-level pagination

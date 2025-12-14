@@ -7,6 +7,7 @@ using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Product;
+using static RetailStoreManagement.Common.InventoryConstants;
 
 namespace RetailStoreManagement.Services;
 
@@ -55,6 +56,12 @@ public class ProductService : IProductService
             if (request.MaxPrice.HasValue)
             {
                 query = query.Where(p => p.Price <= request.MaxPrice.Value);
+            }
+
+            // Apply low stock filter
+            if (request.OnlyLowStock == true)
+            {
+                query = query.Where(p => p.Inventory != null && p.Inventory.Quantity < LOW_STOCK_THRESHOLD);
             }
 
             // Apply sorting
