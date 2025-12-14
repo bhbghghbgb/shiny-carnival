@@ -29,6 +29,6 @@
         <!-- <OverrideTargetFramework Condition="''!='hint: TvOS'">net9.0-tvos</OverrideTargetFramework> -->
         <!-- <OverrideTargetFramework Condition="''!='hint: TvOS'">net9.0-tvos</OverrideTargetFramework> -->
          <OverrideTargetFramework Condition="''!='hint: Desktop'">net10.0-desktop</OverrideTargetFramework>
-<!--         <OverrideTargetFramework Condition="''!='hint: Android'">net10.0-android</OverrideTargetFramework>-->
+         <OverrideTargetFramework Condition="''!='hint: Android'">net10.0-android</OverrideTargetFramework>
     </PropertyGroup>
 </Project>
