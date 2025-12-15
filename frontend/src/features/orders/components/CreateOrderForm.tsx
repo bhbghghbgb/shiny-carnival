@@ -11,6 +11,7 @@ import type { CustomerEntity } from '../../customers/types/entity'
 import type { ProductEntity, ProductDetailsDto } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import { QRScanner } from '../../qr-scanner/components/QRScanner'
 
 const { Title, Text } = Typography
 
@@ -42,7 +43,7 @@ export function CreateOrderForm({
     // Load draft từ localStorage khi component mount (chỉ một lần)
     useEffect(() => {
         const draftOrder = useOrderStore.getState().draftOrder
-        const initialValues: any = {}
+        const initialValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>> = {}
         if (draftOrder.customerId) {
             initialValues.customerId = draftOrder.customerId
         }
@@ -59,10 +60,9 @@ export function CreateOrderForm({
     const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
             // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
-            // Sử dụng getProductDetails để lấy đầy đủ thông tin bao gồm categoryName
             const product = await queryClient.fetchQuery<ProductDetailsDto>({
                 queryKey: productQueryKeys.detail(productId),
-                queryFn: () => productApiService.getProductDetails(productId),
+                queryFn: () => productApiService.getById(productId),
             })
             return product
         } catch (error) {
@@ -82,11 +82,6 @@ export function CreateOrderForm({
             return
         }
 
-        // Kiểm tra sản phẩm đã tồn tại chưa để hiển thị thông báo phù hợp
-        const currentDraftOrder = useOrderStore.getState().draftOrder
-        const existingItem = currentDraftOrder.orderItems.find(item => item.productId === selectedProduct)
-        const isExisting = !!existingItem
-
         // Fetch product details để lấy thông tin mới nhất (bao gồm giá có thể đã thay đổi)
         const product = await fetchProductDetails(selectedProduct)
         if (!product) {
@@ -94,41 +89,17 @@ export function CreateOrderForm({
             return
         }
 
-        // Nếu sản phẩm đã tồn tại và giá thay đổi, cần cập nhật giá và số lượng
-        if (isExisting && existingItem.price !== product.price) {
-            // Xóa item cũ và thêm lại với giá mới và số lượng = số lượng cũ + số lượng mới
-            useOrderStore.getState().removeDraftOrderItem(selectedProduct)
-            const totalQuantity = existingItem.quantity + quantity
-            const newItem: DraftOrderItem = {
-                productId: product.id,
-                productName: product.productName,
-                categoryName: product.categoryName || '',
-                barcode: product.barcode || '',
-                price: product.price,
-                quantity: totalQuantity,
-                subtotal: product.price * totalQuantity,
-            }
-            useOrderStore.getState().addDraftOrderItem(newItem)
-            message.success(`Đã cập nhật giá và tăng số lượng sản phẩm "${product.productName}"`)
-        } else {
-            // Thêm sản phẩm mới hoặc tăng số lượng nếu đã tồn tại (store tự xử lý)
-            const newItem: DraftOrderItem = {
-                productId: product.id,
-                productName: product.productName,
-                categoryName: product.categoryName || '',
-                barcode: product.barcode || '',
-                price: product.price,
-                quantity: quantity,
-                subtotal: product.price * quantity,
-            }
-            useOrderStore.getState().addDraftOrderItem(newItem)
-            if (isExisting) {
-                message.success(`Đã tăng số lượng sản phẩm "${product.productName}"`)
-            } else {
-                message.success('Đã thêm sản phẩm vào đơn hàng')
-            }
+        const newItem: DraftOrderItem = {
+            productId: product.id,
+            productName: product.productName,
+            categoryName: product.categoryName || '',
+            barcode: product.barcode,
+            price: product.price,
+            quantity: quantity,
+            subtotal: product.price * quantity,
         }
 
+        useOrderStore.getState().addDraftOrderItem(newItem)
         setSelectedProduct(null)
         setQuantity(1)
         form.setFieldsValue({ productId: undefined, quantity: 1 })
@@ -202,7 +173,7 @@ export function CreateOrderForm({
 
     // Sync customer và promo code với draft khi form value thay đổi (sử dụng Form's onValuesChange)
     // Sử dụng getState() để đọc giá trị hiện tại và so sánh, tránh subscribe gây re-render
-    const handleFormValuesChange = (changedValues: any) => {
+    const handleFormValuesChange = (changedValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>>) => {
         const currentDraftOrder = useOrderStore.getState().draftOrder
 
         // Chỉ update store nếu giá trị thực sự thay đổi
@@ -227,6 +198,16 @@ export function CreateOrderForm({
             title: 'Sản phẩm',
             dataIndex: 'productName',
             key: 'productName',
+        },
+        {
+            title: 'Danh mục',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
+        },
+        {
+            title: 'Mã vạch',
+            dataIndex: 'barcode',
+            key: 'barcode',
         },
         {
             title: 'Đơn giá',
@@ -260,7 +241,7 @@ export function CreateOrderForm({
             title: 'Thao tác',
             key: 'action',
             align: 'center' as const,
-            render: (_: any, record: DraftOrderItem) => (
+            render: (_: unknown, record: DraftOrderItem) => (
                 <Button
                     type="text"
                     danger
@@ -275,9 +256,9 @@ export function CreateOrderForm({
         <div style={{ display: 'flex', gap: '24px', minHeight: '500px' }}>
             {/* Form bên trái */}
             <div style={{ flex: 1 }}>
-                <Form 
-                    form={form} 
-                    layout="vertical" 
+                <Form
+                    form={form}
+                    layout="vertical"
                     onFinish={handleSubmit}
                     onValuesChange={handleFormValuesChange}
                 >
@@ -382,6 +363,10 @@ export function CreateOrderForm({
                         </Space>
                     </Card>
 
+                    <Card title="Quét mã QR sản phẩm" size="small" style={{ marginBottom: 16 }}>
+                        <QRScanner />
+                    </Card>
+
                     <Form.Item
                         name="promoCode"
                         label="Mã khuyến mãi"
@@ -444,4 +429,3 @@ export function CreateOrderForm({
         </div>
     )
 }
-
