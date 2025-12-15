@@ -1,13 +1,26 @@
-import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePdfOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Row, Space, Typography } from 'antd'
+import { exportTablePdf } from '../../../utils/exportPdf'
+import { importOrderExcel } from '../../../utils/importOrderExcel'
+import { orderPageConfig } from '../config/orderPageConfig'
+import { useOrderManagementPage } from '../hooks'
+import type { OrderEntity } from '../types/entity'
 
 const { Title, Text } = Typography
 
 interface OrderHeaderProps {
-    onAddOrder: () => void
+    orders: OrderEntity[]
 }
 
-export const OrderHeader = ({ onAddOrder }: OrderHeaderProps) => {
+export const OrderHeader = ({ orders }: OrderHeaderProps) => {
+    const {createOrder} = useOrderManagementPage()
+
+    const exportPDF = () => {
+        exportTablePdf(orderPageConfig,orders,"orders");
+    };
+    const importExcel = async (file: File) => {
+        importOrderExcel(file, createOrder.mutateAsync)
+    };
     return (
         <Card
             style={{
@@ -33,20 +46,47 @@ export const OrderHeader = ({ onAddOrder }: OrderHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
-                        <Button
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
+                    <Button
                             type="primary"
                             size="large"
-                            icon={<PlusOutlined />}
-                            onClick={onAddOrder}
+                            icon={<FileExcelOutlined />}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
                                 paddingLeft: '20px',
                                 paddingRight: '20px',
+                                background: '#4caf50',
                                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
                             }}
                         >
-                            Thêm
+                            Import Excel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FilePdfOutlined />}
+                            onClick={exportPDF}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#d9534f',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Export PDF
                         </Button>
                     </Space>
                 </Col>

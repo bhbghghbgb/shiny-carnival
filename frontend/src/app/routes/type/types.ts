@@ -3,6 +3,7 @@ import {
   type ErrorRouteComponent,
 } from '@tanstack/react-router';
 import { z } from 'zod';
+import type { AllowedRoles } from '../utils/routeGuards';
 
 // Base search schema cho pagination
 export const baseSearchSchema = z.object({
@@ -98,6 +99,7 @@ export interface ManagementRouteDefinition<
   component: RouteComponent;
   loader: (ctx: LoaderContext<Record<string, never>, TSearch, TRouterContext>) => Promise<TLoaderData> | TLoaderData;
   searchSchema: z.ZodSchema<TSearch>;
+  allowedRoles?: AllowedRoles[]; // Roles được phép truy cập route (mặc định: ['admin'])
 }
 
 // Interface cho "Bản thiết kế CRUD"
@@ -123,5 +125,6 @@ export interface CrudModuleDefinition<
   searchSchemas: {
     list: z.ZodSchema<TListSearch>;
   };
+  allowedRoles?: AllowedRoles[]; // Roles được phép truy cập route (mặc định: ['admin'])
 }
 

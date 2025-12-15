@@ -15,6 +15,7 @@ const productSearchSchema = baseSearchSchema.extend({
   supplierId: z.number().optional(), // Filter theo supplier
   minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
+  onlyLowStock: z.boolean().optional(), // Filter chỉ sản phẩm tồn kho thấp
   sortField: z.string().catch('id'), // Default: 'id'
   sortOrder: z.enum(['ascend', 'descend']).catch('descend'), // Default: 'descend'
 });
@@ -34,6 +35,7 @@ function buildPagedRequest(search: ProductSearch): PagedRequest {
     ...(search.supplierId !== undefined && { supplierId: search.supplierId }),
     ...(search.minPrice !== undefined && { minPrice: search.minPrice }),
     ...(search.maxPrice !== undefined && { maxPrice: search.maxPrice }),
+    ...(search.onlyLowStock !== undefined && { onlyLowStock: search.onlyLowStock }),
   };
 }
 
@@ -67,6 +69,7 @@ export const productAdminDefinition: ManagementRouteDefinition<
   component: ProductManagementPage,
   searchSchema: productSearchSchema,
   loader: (ctx) => fetchProducts(ctx),
+  allowedRoles: ['admin', 'staff'], // Admin và Staff đều truy cập được
 };
 
 export function createProductsQueryOptions(search: ProductSearch) {

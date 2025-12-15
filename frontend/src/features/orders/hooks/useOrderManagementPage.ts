@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
 import type { OrderSearch } from '../../../app/routes/modules/management/definition/orders.definition'
 import { createOrdersQueryOptions } from '../../../app/routes/modules/management/definition/orders.definition'
-import { useCreateOrder, useUpdateOrderStatus } from './useOrders'
+import { useCreateOrder, useUpdateOrderStatus, useDeleteOrder } from './useOrders'
 import type { OrderEntity } from '../types/entity'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
 import type { OrderStatus } from '../../../config/api.config'
@@ -76,6 +76,23 @@ export const useOrderManagementPage = () => {
         },
         onError: (error: Error) => {
             setFormErrorMessage(`Cập nhật trạng thái đơn hàng thất bại: ${parseApiError(error)}`)
+        },
+    })
+
+    const deleteOrder = useDeleteOrder({
+        onSuccess: () => {
+            // Invalidate orders list query với exact queryKey từ current search
+            queryClient.invalidateQueries({ 
+                queryKey: ordersQueryOptions.queryKey 
+            })
+            // Invalidate total revenue query khi xóa order (có thể ảnh hưởng đến doanh thu)
+            queryClient.invalidateQueries({ queryKey: ['orders', 'total-revenue'] })
+            // Invalidate router loader để trigger refetch
+            router.invalidate()
+            setPageErrorMessage(null)
+        },
+        onError: (error: Error) => {
+            setPageErrorMessage(`Xóa đơn hàng thất bại: ${parseApiError(error)}`)
         },
     })
 
@@ -186,6 +203,10 @@ export const useOrderManagementPage = () => {
         await updateOrderStatus.mutateAsync({ id: record.id, data: values })
     }
 
+    const handleDelete = async (record: OrderEntity) => {
+        await deleteOrder.mutateAsync(record.id)
+    }
+
     return {
         orders,
         total,
@@ -213,10 +234,11 @@ export const useOrderManagementPage = () => {
 
         handleCreate,
         handleUpdate,
-        handleDelete: undefined, // Orders không có delete
+        handleDelete,
 
         createOrder,
         updateOrderStatus,
+        deleteOrder,
         pageErrorMessage,
         formErrorMessage,
         clearPageError: () => setPageErrorMessage(null),

@@ -1,13 +1,19 @@
-import { CustomerHeader } from '../components/CustomerHeader'
-import { CustomerStatistics } from '../components/CustomerStatistics'
-import { CustomerSearchFilter } from '../components/CustomerSearchFilter'
-import { useCustomerManagementPage } from '../hooks/useCustomerManagementPage'
+import { EyeOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { CustomerDetailModal } from '../components/CustomerDetailModal'
+import { CustomerHeader } from '../components/CustomerHeader'
+import { CustomerSearchFilter } from '../components/CustomerSearchFilter'
+import { CustomerStatistics } from '../components/CustomerStatistics'
 import { customerPageConfig } from '../config/customerPageConfig'
-import type { CustomerEntity } from '../types/entity'
+import { useCustomerManagementPage } from '../hooks/useCustomerManagementPage'
 import type { CreateCustomerRequest, UpdateCustomerRequest } from '../types/api'
+import type { CustomerEntity } from '../types/entity'
 
 export function CustomerManagementPage() {
+    const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     const {
         customers,
         total,
@@ -36,6 +42,16 @@ export function CustomerManagementPage() {
         clearFormError,
     } = useCustomerManagementPage()
 
+    const handleViewDetail = (customer: CustomerEntity) => {
+        setSelectedCustomerId(customer.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedCustomerId(null)
+    }
+
     return (
         <div style={{ padding: '24px' }}>
             <GenericPage<CustomerEntity, CreateCustomerRequest, UpdateCustomerRequest>
@@ -59,7 +75,7 @@ export function CustomerManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <CustomerHeader onAddCustomer={openCreate} />}
+                renderHeader={() => <CustomerHeader customers={customers} />}
                 statisticsSlot={
                     <CustomerStatistics
                         totalCustomers={total}
@@ -75,6 +91,20 @@ export function CustomerManagementPage() {
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <CustomerDetailModal
+                customerId={selectedCustomerId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )

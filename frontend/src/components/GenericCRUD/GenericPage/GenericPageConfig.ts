@@ -2,7 +2,7 @@ import type { ColumnsType } from 'antd/es/table'
 import type { Rule } from 'antd/es/form'
 import type { DropDownWithFilterOption } from '../../common/DropDownWithFilter'
 
-export type GenericFieldType = 'text' | 'password' | 'select' | 'number' | 'remote-select'
+export type GenericFieldType = 'text' | 'password' | 'select' | 'number' | 'remote-select' | 'dateRange'
 
 export interface GenericSelectOption {
     label: string

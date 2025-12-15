@@ -1,7 +1,7 @@
 import { BaseApiService } from '../../../lib/api/base';
 import axiosClient from '../../../lib/api/axios';
 import { API_CONFIG } from '../../../config/api.config';
-import type { UserEntity } from '../types/entity';
+import type { UserEntity, UserDetailsDto } from '../types/entity';
 import type { CreateUserRequest, UpdateUserRequest } from '../types/api';
 import type { PagedRequest } from '../../../lib/api/types/api.types';
 
@@ -58,6 +58,19 @@ export class UserApiService extends BaseApiService<
     } catch {
       return false;
     }
+  }
+
+  /**
+   * GET user details: GET /api/admin/users/{id}
+   * Lấy chi tiết người dùng
+   * 
+   * Sử dụng getById() từ BaseApiService với type assertion để trả về UserDetailsDto
+   * thay vì UserEntity (vì backend trả về UserResponseDto)
+   */
+  async getUserDetails(id: number): Promise<UserDetailsDto> {
+    // Sử dụng getById() từ BaseApiService và cast type sang UserDetailsDto
+    // vì backend trả về UserResponseDto với createdAt là string
+    return this.getById(id) as unknown as Promise<UserDetailsDto>
   }
 }
 

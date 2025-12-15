@@ -1,11 +1,11 @@
-import { InventoryHeader } from '../components/InventoryHeader'
-import { InventoryStatistics } from '../components/InventoryStatistics'
-import { InventorySearchFilter } from '../components/InventorySearchFilter'
-import { useInventoryManagementPage } from '../hooks/useInventoryManagementPage'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { InventoryHeader } from '../components/InventoryHeader'
+import { InventorySearchFilter } from '../components/InventorySearchFilter'
+import { InventoryStatistics } from '../components/InventoryStatistics'
 import { inventoryPageConfig } from '../config/inventoryPageConfig'
-import type { InventoryEntity } from '../types/inventoryEntity'
+import { useInventoryManagementPage } from '../hooks/useInventoryManagementPage'
 import type { UpdateInventoryRequest } from '../types/api'
+import type { InventoryEntity } from '../types/inventoryEntity'
 
 export function InventoryManagementPage() {
     const {
@@ -61,7 +61,7 @@ export function InventoryManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                headerSlot={<InventoryHeader />}
+                renderHeader={() =><InventoryHeader inventories={inventories}/>}
                 statisticsSlot={
                     <InventoryStatistics
                         totalItems={total}

@@ -9,12 +9,13 @@ export const homeRoutes: ModuleRoutes<any> = {
   basePath: '/',
   routes: [
     {
-      path: '', // Index route - sẽ match path của parent (mainLayoutRoute có path '/')
+      path: '/',
       component: HomePage,
       pendingComponent: PendingComponent,
       errorComponent: ErrorComponent,
       meta: {
-        requiresAuth: false, // Trang chủ không yêu cầu đăng nhập
+        requiresAuth: false,
+        title: 'Trang chủ',
       },
     },
   ],

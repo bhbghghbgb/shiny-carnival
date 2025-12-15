@@ -57,6 +57,7 @@ export const supplierAdminDefinition: ManagementRouteDefinition<
   component: SupplierManagementPage,
   searchSchema: supplierSearchSchema,
   loader: (ctx) => fetchSuppliers(ctx),
+  allowedRoles: ['admin', 'staff'], // Admin và Staff đều truy cập được
 };
 
 export function createSuppliersQueryOptions(search: SupplierSearch) {

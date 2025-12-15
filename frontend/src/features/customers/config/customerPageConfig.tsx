@@ -3,7 +3,7 @@ import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericP
 import type { CustomerEntity } from '../types/entity'
 import type { CreateCustomerRequest, UpdateCustomerRequest } from '../types/api'
 
-const columns: ColumnsType<CustomerEntity> = [
+export const customerColumns: ColumnsType<CustomerEntity> = [
     {
         title: 'Tên khách hàng',
         dataIndex: 'name',
@@ -30,7 +30,7 @@ export const customerPageConfig: GenericPageConfig<CustomerEntity, CreateCustome
         displayNamePlural: 'Khách hàng',
     },
     table: {
-        columns,
+        columns: customerColumns,
         rowKey: 'id',
     },
     form: {
@@ -99,10 +99,7 @@ export const customerPageConfig: GenericPageConfig<CustomerEntity, CreateCustome
             email: record.email,
             address: record.address,
         }),
-        mapUpdatePayload: (values, record) => ({
-            ...values,
-            id: record.id,
-        }),
+        mapUpdatePayload: (values) => values,
     },
     features: {
         enableCreate: true,

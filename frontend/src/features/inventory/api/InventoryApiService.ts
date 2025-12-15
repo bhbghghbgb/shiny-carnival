@@ -3,8 +3,6 @@ import axiosClient from '../../../lib/api/axios'
 import { API_CONFIG } from '../../../config/api.config'
 import type { InventoryEntity } from '../types/inventoryEntity'
 import type { UpdateInventoryRequest, LowStockAlert } from '../types/api'
-import type { ApiResponse } from '../../../lib/api/types/api.types'
-import { unwrapResponse } from '../../../lib/api/base/apiResponseAdapter'
 
 export class InventoryApiService extends BaseApiService<
   InventoryEntity,
@@ -22,35 +20,41 @@ export class InventoryApiService extends BaseApiService<
    * GET inventory by productId
    * Backend endpoint: GET /api/admin/inventory/{productId}
    * Khác với BaseApiService.getById() vì endpoint dùng productId thay vì id
+   * 
+   * Sử dụng custom() method từ BaseApiService vì endpoint pattern khác
    */
   async getByProductId(productId: number): Promise<InventoryEntity> {
-    const response = await this.axios.get<ApiResponse<InventoryEntity>>(
+    return this.custom<InventoryEntity>(
+      'get',
       API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_BY_PRODUCT(productId)
     )
-    return unwrapResponse(response)
   }
 
   /**
    * PATCH update inventory by productId
    * Backend endpoint: PATCH /api/admin/inventory/{productId}
    * Khác với BaseApiService.patch() vì endpoint dùng productId thay vì id
+   * 
+   * Sử dụng custom() method từ BaseApiService vì endpoint pattern khác
    */
   async updateByProductId(productId: number, data: UpdateInventoryRequest): Promise<InventoryEntity> {
-    const response = await this.axios.patch<ApiResponse<InventoryEntity>>(
+    return this.custom<InventoryEntity>(
+      'patch',
       API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_BY_PRODUCT(productId),
       data
     )
-    return unwrapResponse(response)
   }
   /**
    * GET low stock alerts
    * Backend endpoint: GET /api/admin/inventory/low-stock
+   * 
+   * Sử dụng custom() method từ BaseApiService vì endpoint không theo pattern CRUD chuẩn
    */
   async getLowStockAlerts(): Promise<LowStockAlert[]> {
-    const response = await this.axios.get<ApiResponse<LowStockAlert[]>>(
+    return this.custom<LowStockAlert[]>(
+      'get',
       API_CONFIG.ENDPOINTS.ADMIN.INVENTORY_LOW_STOCK
-    );
-    return unwrapResponse(response);
+    )
   }
 }
 

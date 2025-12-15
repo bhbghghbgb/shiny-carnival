@@ -5,6 +5,8 @@ import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint'
 import type { ProductSearch } from '../../../app/routes/modules/management/definition/products.definition'
 import { createProductsQueryOptions } from '../../../app/routes/modules/management/definition/products.definition'
 import { useCreateProduct, useUpdateProduct, useDeleteProduct } from './useProducts'
+import { inventoryApiService } from '../../inventory/api/InventoryApiService'
+import type { LowStockAlert } from '../../inventory/types/api'
 import type { ProductEntity } from '../types/entity'
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
 import { parseApiError } from '../../../lib/api/utils/parseApiError'
@@ -16,8 +18,15 @@ export const useProductManagementPage = () => {
     const productsQueryOptions = createProductsQueryOptions(search)
     const { data: pagedList } = useSuspenseQuery(productsQueryOptions)
 
+    // Fetch low stock alerts from API
+    const { data: lowStockAlerts } = useSuspenseQuery<LowStockAlert[]>({
+        queryKey: ['inventory', 'low-stock'],
+        queryFn: () => inventoryApiService.getLowStockAlerts(),
+    })
+
     const products: ProductEntity[] = pagedList.items || []
     const total = pagedList.totalCount || products.length
+    const lowStockCount = lowStockAlerts?.length ?? 0
 
     const navigate = useNavigate({ from: ENDPOINTS.ADMIN.PRODUCTS })
     const router = useRouter()
@@ -51,7 +60,13 @@ export const useProductManagementPage = () => {
             setPageErrorMessage(null)
         },
         onError: (error: Error) => {
-            setPageErrorMessage(`Xóa sản phẩm thất bại: ${parseApiError(error)}`)
+            const errorMessage = parseApiError(error)
+            // Nếu message từ backend đã rõ ràng (có chứa "không thể xóa" hoặc "đang có"), dùng trực tiếp
+            if (errorMessage.includes('không thể xóa') || errorMessage.includes('đang có')) {
+                setPageErrorMessage(errorMessage)
+            } else {
+                setPageErrorMessage(`Xóa sản phẩm thất bại: ${errorMessage}`)
+            }
         },
     })
 
@@ -64,6 +79,7 @@ export const useProductManagementPage = () => {
     const supplierId = search?.supplierId
     const minPrice = search?.minPrice
     const maxPrice = search?.maxPrice
+    const onlyLowStock = search?.onlyLowStock
 
     const handleSearch = (value: string) => {
         navigate({
@@ -106,6 +122,16 @@ export const useProductManagementPage = () => {
         })
     }
 
+    const handleLowStockFilter = (checked: boolean) => {
+        navigate({
+            search: (prev: ProductSearch) => ({
+                ...prev,
+                onlyLowStock: checked || undefined,
+                page: 1,
+            }),
+        })
+    }
+
     const handlePageChange = (nextPage: number, nextPageSize: number) => {
         navigate({
             search: (prev: ProductSearch) => ({
@@ -136,15 +162,11 @@ export const useProductManagementPage = () => {
                 supplierId: undefined,
                 minPrice: undefined,
                 maxPrice: undefined,
+                onlyLowStock: undefined,
                 sortField: 'id',
                 sortOrder: 'descend',
             },
         })
-    }
-
-    const placeholderStats = {
-        totalProducts: total,
-        lowStock: 'Chờ API',
     }
 
     const handleCreate = async (values: CreateProductRequest) => {
@@ -152,7 +174,7 @@ export const useProductManagementPage = () => {
     }
 
     const handleUpdate = async (record: ProductEntity, values: UpdateProductRequest) => {
-        await updateProduct.mutateAsync({ ...values, id: record.id })
+        await updateProduct.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: ProductEntity) => deleteProduct.mutateAsync(record.id)
@@ -160,7 +182,7 @@ export const useProductManagementPage = () => {
     return {
         products,
         total,
-        placeholderStats,
+        lowStockCount,
 
         searchText,
         sortField,
@@ -171,11 +193,13 @@ export const useProductManagementPage = () => {
         supplierId,
         minPrice,
         maxPrice,
+        onlyLowStock,
 
         handleSearch,
         handleCategoryFilter,
         handleSupplierFilter,
         handlePriceRangeChange,
+        handleLowStockFilter,
         handleSort,
         handlePageChange,
         clearFilters,

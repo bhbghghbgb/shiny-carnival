@@ -6,6 +6,7 @@ using RetailStoreManagement.Entities;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Inventory;
+using static RetailStoreManagement.Common.InventoryConstants;
 
 namespace RetailStoreManagement.Services;
 
@@ -13,7 +14,6 @@ public class InventoryService : IInventoryService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private const int LOW_STOCK_THRESHOLD = 10;
 
     public InventoryService(IUnitOfWork unitOfWork, IMapper mapper)
     {
@@ -67,7 +67,7 @@ public class InventoryService : IInventoryService
                     Barcode = i.Product.Barcode ?? string.Empty,
                     Quantity = i.Quantity,
                     UpdatedAt = i.UpdatedAt ?? i.CreatedAt,
-                    Status = i.Quantity == 0 ? "out_of_stock" : (i.Quantity < 10 ? "low_stock" : "in_stock")
+                    Status = i.Quantity == 0 ? "out_of_stock" : (i.Quantity < LOW_STOCK_THRESHOLD ? "low_stock" : "in_stock")
                 });
 
             // Use PagedList.CreateAsync for database-level pagination
@@ -116,7 +116,12 @@ public class InventoryService : IInventoryService
                 return ApiResponse<InventoryResponseDto>.Error("Inventory not found", 404);
             }
 
-            var newQuantity = inventory.Quantity + request.QuantityChange;
+            if (!request.QuantityChange.HasValue)
+            {
+                return ApiResponse<InventoryResponseDto>.Error("QuantityChange is required", 400);
+            }
+
+            var newQuantity = inventory.Quantity + request.QuantityChange.Value;
             if (newQuantity < 0)
             {
                 return ApiResponse<InventoryResponseDto>.Error("Insufficient inventory quantity", 400);
@@ -133,9 +138,9 @@ public class InventoryService : IInventoryService
             {
                 ProductId = productId,
                 UserId = userId,
-                QuantityChange = request.QuantityChange,
+                QuantityChange = request.QuantityChange!.Value,
                 QuantityAfter = newQuantity,
-                Reason = request.Reason
+                Reason = request.Reason ?? string.Empty
             };
             await _unitOfWork.InventoryHistories.AddAsync(history);
 

@@ -1,17 +1,24 @@
-import { ProductHeader } from '../components/ProductHeader'
-import { ProductStatistics } from '../components/ProductStatistics'
-import { ProductSearchFilter } from '../components/ProductSearchFilter'
-import { useProductManagementPage } from '../hooks/useProductManagementPage'
+import { EyeOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { ProductDetailModal } from '../components/ProductDetailModal'
+import { ProductHeader } from '../components/ProductHeader'
+import { ProductSearchFilter } from '../components/ProductSearchFilter'
+import { ProductStatistics } from '../components/ProductStatistics'
 import { productPageConfig } from '../config/productPageConfig'
-import type { ProductEntity } from '../types/entity'
+import { useProductManagementPage } from '../hooks/useProductManagementPage'
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
+import type { ProductEntity } from '../types/entity'
 
 export function ProductManagementPage() {
+    const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+
     const {
         products,
         total,
-        placeholderStats,
+        lowStockCount,
 
         searchText,
         sortField,
@@ -22,11 +29,13 @@ export function ProductManagementPage() {
         supplierId,
         minPrice,
         maxPrice,
+        onlyLowStock,
 
         handleSearch,
         handleCategoryFilter,
         handleSupplierFilter,
         handlePriceRangeChange,
+        handleLowStockFilter,
         handleSort,
         handlePageChange,
         clearFilters,
@@ -43,6 +52,16 @@ export function ProductManagementPage() {
         clearPageError,
         clearFormError,
     } = useProductManagementPage()
+
+    const handleViewDetail = (product: ProductEntity) => {
+        setSelectedProductId(product.id)
+        setIsDetailModalOpen(true)
+    }
+
+    const handleCloseDetailModal = () => {
+        setIsDetailModalOpen(false)
+        setSelectedProductId(null)
+    }
 
     return (
         <div style={{ padding: '24px' }}>
@@ -67,11 +86,11 @@ export function ProductManagementPage() {
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <ProductHeader onAddProduct={openCreate} />}
+                renderHeader={() => <ProductHeader products={products} />}
                 statisticsSlot={
                     <ProductStatistics
                         totalProducts={total}
-                        lowStock={placeholderStats.lowStock}
+                        lowStock={lowStockCount}
                     />
                 }
                 filtersSlot={
@@ -81,16 +100,32 @@ export function ProductManagementPage() {
                         supplierId={supplierId}
                         minPrice={minPrice}
                         maxPrice={maxPrice}
+                        onlyLowStock={onlyLowStock}
                         sortField={sortField}
                         sortOrder={sortOrder}
                         onSearchChange={handleSearch}
                         onCategoryChange={handleCategoryFilter}
                         onSupplierChange={handleSupplierFilter}
                         onPriceRangeChange={handlePriceRangeChange}
+                        onLowStockChange={handleLowStockFilter}
                         onSortChange={handleSort}
                         onClearFilters={clearFilters}
                     />
                 }
+                renderCustomActions={(record) => (
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetail(record)}
+                    >
+                        Chi tiết
+                    </Button>
+                )}
+            />
+            <ProductDetailModal
+                productId={selectedProductId}
+                open={isDetailModalOpen}
+                onClose={handleCloseDetailModal}
             />
         </div>
     )

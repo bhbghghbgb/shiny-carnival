@@ -1,15 +1,15 @@
-import type { ColumnsType } from 'antd/es/table'
-import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
-import type { ProductEntity } from '../types/entity'
-import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
 import { Tag } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import type { GenericPageConfig } from '../../../components/GenericCRUD/GenericPage'
 import { categoryApiService } from '../../categories/api'
-import { supplierApiService } from '../../suppliers/api'
 import type { CategoryEntity } from '../../categories/types/entity'
+import { supplierApiService } from '../../suppliers/api'
 import type { SupplierEntity } from '../../suppliers/types/entity'
+import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
+import type { ProductEntity } from '../types/entity'
 
-async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
+export async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
     const paged = await categoryApiService.getPaginated({
         search: keyword || undefined,
         page: 1,
@@ -19,7 +19,7 @@ async function fetchCategoryOptions(keyword: string): Promise<DropDownWithFilter
     return items.map((c: CategoryEntity) => ({ label: c.categoryName ?? `#${c.id}`, value: c.id }))
 }
 
-async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
+export async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilterOption[]> {
     const paged = await supplierApiService.getPaginated({
         search: keyword || undefined,
         page: 1,
@@ -29,7 +29,7 @@ async function fetchSupplierOptions(keyword: string): Promise<DropDownWithFilter
     return items.map((s: SupplierEntity) => ({ label: s.name ?? `#${s.id}`, value: s.id }))
 }
 
-const columns: ColumnsType<ProductEntity> = [
+export const productColumns: ColumnsType<ProductEntity> = [
     {
         title: 'Tên sản phẩm',
         dataIndex: 'productName',
@@ -81,7 +81,7 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
         displayNamePlural: 'Sản phẩm',
     },
     table: {
-        columns,
+        columns: productColumns,
         rowKey: 'id',
     },
     form: {
@@ -136,31 +136,26 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
                 name: 'productName',
                 label: 'Tên sản phẩm',
                 type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập tên sản phẩm' }],
             },
             {
                 name: 'barcode',
                 label: 'Barcode',
                 type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập barcode' }],
             },
             {
                 name: 'price',
                 label: 'Giá',
                 type: 'number',
-                rules: [{ required: true, message: 'Vui lòng nhập giá' }],
             },
             {
                 name: 'unit',
                 label: 'Đơn vị',
                 type: 'text',
-                rules: [{ required: true, message: 'Vui lòng nhập đơn vị' }],
             },
             {
                 name: 'categoryId',
                 label: 'Danh mục',
                 type: 'remote-select',
-                rules: [{ required: true, message: 'Vui lòng chọn danh mục' }],
                 placeholder: 'Chọn danh mục',
                 fetchOptions: fetchCategoryOptions,
                 queryKeyPrefix: 'category-select',
@@ -170,7 +165,6 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
                 name: 'supplierId',
                 label: 'Nhà cung cấp',
                 type: 'remote-select',
-                rules: [{ required: true, message: 'Vui lòng chọn nhà cung cấp' }],
                 placeholder: 'Chọn nhà cung cấp',
                 fetchOptions: fetchSupplierOptions,
                 queryKeyPrefix: 'supplier-select',
@@ -186,10 +180,28 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
             categoryId: record.categoryId,
             supplierId: record.supplierId,
         }),
-        mapUpdatePayload: (values, record) => ({
-            ...values,
-            id: record.id as number,
-        }),
+        mapUpdatePayload: (values) => {
+            const payload: UpdateProductRequest = {}
+            if (values.productName !== undefined && values.productName !== '') {
+                payload.productName = values.productName
+            }
+            if (values.barcode !== undefined && values.barcode !== '') {
+                payload.barcode = values.barcode
+            }
+            if (values.price !== undefined && values.price !== null) {
+                payload.price = values.price
+            }
+            if (values.unit !== undefined && values.unit !== '') {
+                payload.unit = values.unit
+            }
+            if (values.categoryId !== undefined && values.categoryId !== null) {
+                payload.categoryId = values.categoryId
+            }
+            if (values.supplierId !== undefined && values.supplierId !== null) {
+                payload.supplierId = values.supplierId
+            }
+            return payload
+        },
     },
     features: {
         enableCreate: true,

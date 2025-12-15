@@ -3,6 +3,7 @@ import {
   useApiPaginated,
   useApiDetail,
   useApiCreate,
+  useApiDelete,
 } from '../../../hooks/useApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderApiService } from '../api/OrderApiService';
@@ -87,6 +88,17 @@ export const useUpdateOrderStatus = (options?: {
     onError: (error) => {
       userOnError?.(error);
     },
+  });
+};
+
+/**
+ * useDeleteOrder - DELETE order
+ */
+export const useDeleteOrder = (options?: Parameters<typeof useApiDelete<OrderEntity>>[0]['options']) => {
+  return useApiDelete<OrderEntity>({
+    apiService: orderApiService,
+    entity: ENTITY,
+    options,
   });
 };
 

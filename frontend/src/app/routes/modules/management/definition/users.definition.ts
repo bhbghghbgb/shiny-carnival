@@ -98,6 +98,7 @@ export const userAdminDefinition: ManagementRouteDefinition<
   component: UserManagementPage,
   searchSchema: userSearchSchema,
   loader: (ctx) => fetchUsers(ctx),
+  allowedRoles: ['admin'], // Chỉ Admin được truy cập
 };
 
 // Export helper để component có thể tạo query options tương tự

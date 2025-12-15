@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { OrderHeader } from '../components/OrderHeader'
-import { OrderStatistics } from '../components/OrderStatistics'
-import { OrderSearchFilter } from '../components/OrderSearchFilter'
-import { OrderDetailModal } from '../components/OrderDetailModal'
-import { CreateOrderForm } from '../components/CreateOrderForm'
-import { useOrderManagementPage } from '../hooks/useOrderManagementPage'
+import { Button } from 'antd'
+import { useState } from 'react'
 import { GenericPage } from '../../../components/GenericCRUD/GenericPage'
+import { CreateOrderForm } from '../components/CreateOrderForm'
+import { OrderDetailModal } from '../components/OrderDetailModal'
+import { OrderHeader } from '../components/OrderHeader'
+import { OrderSearchFilter } from '../components/OrderSearchFilter'
+import { OrderStatistics } from '../components/OrderStatistics'
 import { orderPageConfig } from '../config/orderPageConfig'
-import type { OrderEntity } from '../types/entity'
+import { useOrderManagementPage } from '../hooks/useOrderManagementPage'
 import type { CreateOrderRequest, UpdateOrderStatusRequest } from '../types/api'
+import type { OrderEntity } from '../types/entity'
 
 export function OrderManagementPage() {
     const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
@@ -47,6 +47,7 @@ export function OrderManagementPage() {
 
         createOrder,
         updateOrderStatus,
+        deleteOrder,
         pageErrorMessage,
         formErrorMessage,
         clearPageError,
@@ -69,7 +70,7 @@ export function OrderManagementPage() {
                 config={orderPageConfig}
                 data={orders}
                 total={total}
-                loading={createOrder.isPending || updateOrderStatus.isPending}
+                loading={createOrder.isPending || updateOrderStatus.isPending || deleteOrder.isPending}
                 page={page}
                 pageSize={pageSize}
                 sortField={sortField}
@@ -81,12 +82,12 @@ export function OrderManagementPage() {
                 onDelete={handleDelete}
                 createLoading={createOrder.isPending}
                 updateLoading={updateOrderStatus.isPending}
-                deleteLoading={false}
+                deleteLoading={deleteOrder.isPending}
                 pageErrorMessage={pageErrorMessage}
                 onClearPageError={clearPageError}
                 formErrorMessage={formErrorMessage}
                 onClearFormError={clearFormError}
-                renderHeader={({ openCreate }) => <OrderHeader onAddOrder={openCreate} />}
+                renderHeader={() => <OrderHeader orders={orders} />}
                 statisticsSlot={
                     <OrderStatistics
                         totalOrders={total}
