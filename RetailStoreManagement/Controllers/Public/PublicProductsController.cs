@@ -32,6 +32,13 @@ public class PublicProductsController : ControllerBase
         var result = await _productService.GetProductByIdAsync(id);
         return StatusCode(result.StatusCode, result);
     }
+
+    [HttpPost("by-ids")]
+    public async Task<ActionResult<ApiResponse<List<ProductResponseDto>>>> GetProductsByIds([FromBody] List<int> ids)
+    {
+        var result = await _productService.GetProductsByIdsAsync(ids);
+        return StatusCode(result.StatusCode, result);
+    }
 }
 
 
