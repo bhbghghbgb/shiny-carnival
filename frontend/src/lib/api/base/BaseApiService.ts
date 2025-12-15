@@ -91,12 +91,37 @@ export class BaseApiService<TData = any, TCreate = any, TUpdate = any>
    * @returns Promise<PagedList<TData>>
    */
   async getPaginated(params?: PagedRequest): Promise<PagedList<TData>> {
-    const pascalParams = params ? toPascalCaseParams(params) : undefined;
-    const response = await this.axios.get<ApiResponse<PagedList<TData>>>(
-      this.endpoint,
-      { params: pascalParams }
-    );
-    return unwrapResponse(response);
+    try {
+      console.log(`🔍 [BaseApiService] getPaginated called:`, {
+        endpoint: this.endpoint,
+        params,
+      });
+      
+      const pascalParams = params ? toPascalCaseParams(params) : undefined;
+      console.log(`🔍 [BaseApiService] Converted params (PascalCase):`, pascalParams);
+      
+      const response = await this.axios.get<ApiResponse<PagedList<TData>>>(
+        this.endpoint,
+        { params: pascalParams }
+      );
+      
+      console.log(`✅ [BaseApiService] Response received:`, response);
+      
+      const unwrapped = unwrapResponse(response);
+      console.log(`✅ [BaseApiService] Unwrapped response:`, unwrapped);
+      
+      return unwrapped;
+    } catch (error) {
+      console.error(`❌ [BaseApiService] Error in getPaginated:`, {
+        endpoint: this.endpoint,
+        params,
+        error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
+        errorDetails: error,
+      });
+      throw error;
+    }
   }
 
   /**

@@ -9,7 +9,7 @@ namespace RetailStoreManagement.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/customers")]
-[Authorize(Roles = "Admin")] // Only Admin can access
+[Authorize] // Require authentication, specific roles checked at method level
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -20,6 +20,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Staff")] // Both Admin and Staff can get customers list
     public async Task<IActionResult> GetCustomers([FromQuery] CustomerSearchRequest request)
     {
         var result = await _customerService.GetCustomersAsync(request);
@@ -27,6 +28,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin,Staff")] // Both Admin and Staff can get customer details
     public async Task<IActionResult> GetCustomer(int id)
     {
         var result = await _customerService.GetCustomerByIdAsync(id);
@@ -34,6 +36,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")] // Only Admin can create customers
     public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerRequest request)
     {
         var result = await _customerService.CreateCustomerAsync(request);
@@ -41,6 +44,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")] // Only Admin can update customers
     public async Task<IActionResult> UpdateCustomer(int id, [FromBody] UpdateCustomerRequest request)
     {
         var result = await _customerService.UpdateCustomerAsync(id, request);
@@ -48,6 +52,7 @@ public class CustomersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")] // Only Admin can delete customers
     public async Task<IActionResult> DeleteCustomer(int id)
     {
         var result = await _customerService.DeleteCustomerAsync(id);

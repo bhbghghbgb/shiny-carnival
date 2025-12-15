@@ -33,9 +33,9 @@ let failedQueue: Array<{
 }> = [];
 
 // Kiểm tra xem có đang ở trang login không
-const isLoginPage = (): boolean => {
-  return window.location.pathname === ENDPOINTS.AUTH.LOGIN || 
-         window.location.pathname.startsWith(ENDPOINTS.AUTH.ROOT);
+// Chỉ check chính xác trang login, không phải tất cả các trang trong /auth/*
+const isLoginPage = (): boolean => { // Todo: Nên clean logic
+  return window.location.pathname === ENDPOINTS.AUTH.LOGIN;
 };
 
 // Kiểm tra xem request có phải là auth endpoint không (login, register, refresh, logout, etc.)

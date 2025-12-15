@@ -45,9 +45,25 @@ export const ProfileOrdersTable: React.FC<ProfileOrdersTableProps> = ({ userId }
         stack: error instanceof Error ? error.stack : undefined,
         error: error,
         params: params,
+        queryKey: queryOptions.queryKey,
       });
     },
+    // Thêm throwOnError để đảm bảo error được propagate
+    throwOnError: false,
   });
+
+  // Log error state khi có lỗi
+  React.useEffect(() => {
+    if (error) {
+      console.error('❌ [ProfileOrdersTable] Error state detected:', {
+        error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
+        errorDetails: error,
+        params,
+      });
+    }
+  }, [error, params]);
 
   const orders = data?.items ?? [];
   const total = data?.totalCount ?? 0;

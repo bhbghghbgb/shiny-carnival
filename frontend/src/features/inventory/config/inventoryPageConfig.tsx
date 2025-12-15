@@ -5,8 +5,13 @@ import type { UpdateInventoryRequest } from '../types/api'
 
 const columns: ColumnsType<InventoryEntity> = [
     {
-        title: 'Mã sản phẩm',
-        dataIndex: 'productId',
+        title: 'Tên sản phẩm',
+        dataIndex: 'productName',
+        sorter: true,
+    },
+    {
+        title: 'Mã vạch',
+        dataIndex: 'barcode',
         sorter: true,
     },
     {
@@ -14,6 +19,19 @@ const columns: ColumnsType<InventoryEntity> = [
         dataIndex: 'quantity',
         sorter: true,
         render: (value: number) => value?.toLocaleString(),
+    },
+    {
+        title: 'Trạng thái',
+        dataIndex: 'status',
+        render: (value: string) => {
+            const statusMap: Record<string, { label: string; color: string }> = {
+                in_stock: { label: 'Còn hàng', color: 'green' },
+                low_stock: { label: 'Sắp hết', color: 'orange' },
+                out_of_stock: { label: 'Hết hàng', color: 'red' },
+            }
+            const status = statusMap[value] || { label: value, color: 'default' }
+            return <span style={{ color: status.color, fontWeight: 'bold' }}>{status.label}</span>
+        },
     },
     {
         title: 'Cập nhật lần cuối',
