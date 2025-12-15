@@ -12,8 +12,9 @@ public class ProductListDto
     public string CategoryName { get; set; }
     public string SupplierName { get; set; }
     public int InventoryQuantity { get; set; }
-    
+
     public string ImageUrl { get; set; }
+
     // Computed properties for formatting
     public string PriceFormatted => $"{Price:N0} đ";
     public string InventoryFormatted => $"Tồn kho: {InventoryQuantity}";
@@ -36,6 +37,7 @@ public class ProductResponseDto
 
 public class ProductSearchRequest : PagedRequest
 {
+    public string? Search { get; set; }
     public int? CategoryId { get; set; }
     public int? SupplierId { get; set; }
     public decimal? MinPrice { get; set; }

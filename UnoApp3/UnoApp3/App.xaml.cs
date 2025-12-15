@@ -119,7 +119,7 @@ public partial class App : Application
             //     await navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
             // }
 
-            await navigator.NavigateViewModelAsync<LoginViewModel>(this, qualifier: Qualifiers.Nested);
+            await navigator.NavigateViewModelAsync<MainViewModel>(this, qualifier: Qualifiers.Nested);
             this.Log().LogInformation("Navigated to login page");
         });
         this.Log().LogInformation("Navigated Async");
@@ -153,7 +153,7 @@ public partial class App : Application
             new ViewMap<LoginPage, LoginViewModel>(),
             new ViewMap<MainPage, MainViewModel>(),
             new ViewMap<ProductListPage, ProductListViewModel>(),
-            new DataViewMap<ProductDetailPage, ProductDetailViewModel, ProductDetailViewModelData>(),
+            new ViewMap<ProductDetailPage, ProductDetailViewModel>(),
             new ViewMap<CartPage, CartViewModel>(),
             new ViewMap<OrderConfirmationPage, OrderConfirmationViewModel>()
         );
@@ -162,8 +162,8 @@ public partial class App : Application
             new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
                 Nested:
                 [
-                    new("Login", View: views.FindByViewModel<LoginViewModel>(), IsDefault: true),
-                    new("Main", View: views.FindByViewModel<MainViewModel>(),
+                    new("Login", View: views.FindByViewModel<LoginViewModel>()),
+                    new("Main", View: views.FindByViewModel<MainViewModel>(), IsDefault: true,
                         Nested:
                         [
                             new("ProductList", View: views.FindByViewModel<ProductListViewModel>(), IsDefault: true),

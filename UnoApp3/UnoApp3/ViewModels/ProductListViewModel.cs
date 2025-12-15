@@ -16,6 +16,10 @@ public partial class ProductListViewModel : BaseViewModel
     private readonly ICartRepository _cartRepository;
 
     [ObservableProperty] private string _searchText;
+    [ObservableProperty] private int _categoryId;
+    [ObservableProperty] private int _supplierId;
+    [ObservableProperty] private int _minPrice;
+    [ObservableProperty] private int _maxPrice;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasProducts))]
@@ -65,6 +69,7 @@ public partial class ProductListViewModel : BaseViewModel
 
             var request = new ProductSearchRequest
             {
+                Search = SearchText,
                 PageIndex = 1,
                 PageSize = 20,
                 SortColumn = "productName",

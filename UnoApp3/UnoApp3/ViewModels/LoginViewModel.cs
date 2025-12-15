@@ -9,27 +9,28 @@ public partial class LoginViewModel : BaseViewModel
 {
     private readonly AuthService _authService;
 
-    [ObservableProperty]
-    private string _username;
+    [ObservableProperty] private string _username;
 
-    [ObservableProperty]
-    private string _password;
+    [ObservableProperty] private string _password;
 
-    [ObservableProperty]
-    private bool _rememberMe;
+    [ObservableProperty] private bool _rememberMe;
 
-    public LoginViewModel(INavigator navigator, AuthService authService) 
+    public LoginViewModel(INavigator navigator, AuthService authService)
         : base(navigator)
     {
         _authService = authService;
         Title = "Đăng nhập";
+        Username = "";
+        Password = "";
+        RememberMe = false;
+        IsBusy = false;
     }
 
     [RelayCommand]
     private async Task Login()
     {
         IsBusy = true;
-        
+
         try
         {
             // TODO: Uncomment when API is ready
@@ -42,7 +43,7 @@ public partial class LoginViewModel : BaseViewModel
             // {
             //     // Show error message
             // }
-            
+
             // For now, navigate directly without login
             // Fixed: Added 'this' as first parameter
             await Navigator.NavigateRouteAsync(this, "Main");

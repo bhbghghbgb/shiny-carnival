@@ -2,18 +2,10 @@
 
 namespace UnoApp4.Presentation;
 
-public partial record LoginModel2
+public partial record LoginModel2(
+    IAuthenticationService AuthService,
+    INavigator Navigator)
 {
-    private readonly IAuthenticationService _authService;
-    private readonly INavigator _navigator;
-
-    public LoginModel2(
-        IAuthenticationService authService,
-        INavigator navigator)
-    {
-        _authService = authService;
-        _navigator = navigator;
-    }
 
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
@@ -26,7 +18,7 @@ public partial record LoginModel2
 
     public ICommand LoginCommand => new AsyncRelayCommand(async () => await Login());
 
-    private async ValueTask Login(CancellationToken ct = default)
+    public async ValueTask Login(CancellationToken ct = default)
     {
         await IsBusy.Set(true, ct);
         await IsBusyStr.Set("true", ct);
@@ -49,7 +41,7 @@ public partial record LoginModel2
                 ["RememberMe"] = RememberMe.ToString()
             };
 
-            var result = await _authService.LoginAsync(credentials);
+            var result = await AuthService.LoginAsync(credentials);
 
             if (result)
             {
@@ -78,7 +70,7 @@ public partial record LoginModel2
     public async ValueTask OnSuccessDialogPrimary(CancellationToken ct = default)
     {
         await ShowSuccessDialog.Set(false, ct);
-        await _navigator.NavigateViewModelAsync<MainModel>(this, qualifier: Qualifiers.ClearBackStack);
+        await Navigator.NavigateViewModelAsync<MainModel>(this, qualifier: Qualifiers.ClearBackStack);
     }
 
     public async ValueTask OnSuccessDialogClose(CancellationToken ct = default)
