@@ -202,7 +202,7 @@ public partial class App : Application
             {
                 this.Log().LogInformation("User not authenticated, navigating to Login page");
                 // await navigator.NavigateViewModelAsync<LoginModel>(this, qualifier: Qualifiers.Nested);
-                await navigator.NavigateViewModelAsync<LoginModel2>(this, qualifier: Qualifiers.Nested);
+                await navigator.NavigateViewModelAsync<Login2Model>(this, qualifier: Qualifiers.Nested);
             }
         });
         this.Log().LogInformation("Navigation completed");
@@ -215,7 +215,7 @@ public partial class App : Application
     {
         views.Register(
             new ViewMap(ViewModel: typeof(ShellModel)),
-            new ViewMap<LoginPage2, LoginModel2>(),
+            new ViewMap<Login2Page, Login2Model>(),
             new ViewMap<MainPage, MainModel>()
             // new ViewMap<ProductListPage, ProductListModel>(),
             // new DataViewMap<ProductDetailPage, ProductDetailModel, ProductDetailModelData>(),
@@ -227,7 +227,7 @@ public partial class App : Application
             new RouteMap("", View: views.FindByViewModel<ShellModel>(),
                 Nested:
                 [
-                    new RouteMap("Login", View: views.FindByViewModel<LoginModel2>()),
+                    new RouteMap("Login", View: views.FindByViewModel<Login2Model>()),
                     new RouteMap("Main", View: views.FindByViewModel<MainModel>(), IsDefault: true)
                     // Nested:
                     // [

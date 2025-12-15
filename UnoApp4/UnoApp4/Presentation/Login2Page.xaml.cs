@@ -20,9 +20,9 @@ namespace UnoApp4.Presentation;
 /// <summary>
 /// An empty page that can be used on its own or navigated to within a Frame.
 /// </summary>
-public sealed partial class LoginPage2 : Page
+public sealed partial class Login2Page : Page
 {
-    public LoginPage2()
+    public Login2Page()
     {
         this.InitializeComponent();
     }

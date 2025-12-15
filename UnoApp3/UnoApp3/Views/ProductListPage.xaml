@@ -9,7 +9,8 @@
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance Type=vm:ProductListViewModel}"
       x:Name="PageRoot"
-      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      NavigationCacheMode="Enabled">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -34,7 +35,7 @@
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Margin="0,0,12,0">
                 <TextBox.KeyboardAccelerators>
-                    <KeyboardAccelerator Key="Enter" Command="{Binding ApplyFiltersCommand}" />
+                    <KeyboardAccelerator Key="Enter" Invoked="OnEnterInvoked" />
                 </TextBox.KeyboardAccelerators>
             </TextBox>
 

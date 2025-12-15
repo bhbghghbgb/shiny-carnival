@@ -2,33 +2,32 @@
 
 namespace UnoApp4.Presentation;
 
-public partial record LoginModel2(
+public partial record Login2Model(
     IAuthenticationService AuthService,
     INavigator Navigator)
 {
-
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public bool RememberMe { get; set; }
 
     public IState<bool> IsBusy => State.Value(this, () => false);
-    public IState<string> IsBusyStr => State.Value(this, () => "false");
-    public IState<Option<string>> ErrorMessage => State<Option<string>>.Value(this, Option<string>.None);
+    public IState<string> ErrorMessage => State.Value(this, () => "");
     public IState<bool> ShowSuccessDialog => State.Value(this, () => false);
+
+    public IFeed<string> IsBusyStr => IsBusy.Select(b => $"IsBusy: {b}");
 
     public ICommand LoginCommand => new AsyncRelayCommand(async () => await Login());
 
     public async ValueTask Login(CancellationToken ct = default)
     {
         await IsBusy.Set(true, ct);
-        await IsBusyStr.Set("true", ct);
-        await ErrorMessage.Set(Option<string>.None(), ct); // Clear previous errors
+        await ErrorMessage.Set("", ct); // Clear previous errors
         try
         {
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
                 this.Log().LogWarning("Login attempted with empty credentials");
-                await ErrorMessage.Set(Option.Some("Vui lòng nhập tên đăng nhập và mật khẩu"), ct);
+                await ErrorMessage.Set("Vui lòng nhập tên đăng nhập và mật khẩu", ct);
                 return;
             }
 
@@ -52,18 +51,17 @@ public partial record LoginModel2(
             else
             {
                 this.Log().LogWarning("Login failed for user: {Username}", Username);
-                await ErrorMessage.Set(Option.Some("Tên đăng nhập hoặc mật khẩu không đúng"), ct);
+                await ErrorMessage.Set("Tên đăng nhập hoặc mật khẩu không đúng", ct);
             }
         }
         catch (Exception ex)
         {
             this.Log().LogError(ex, "Error during login for user: {Username}", Username);
-            await ErrorMessage.Set(Option.Some("Lỗi kết nối. Vui lòng thử lại."), ct);
+            await ErrorMessage.Set("Lỗi kết nối. Vui lòng thử lại.", ct);
         }
         finally
         {
             await IsBusy.Set(false, ct);
-            await IsBusyStr.Set("false", ct);
         }
     }
 

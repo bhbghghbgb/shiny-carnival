@@ -28,6 +28,7 @@
       <!-- Boolean to Visibility Converter -->
       <converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
       <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+      <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
 
       <converters:QuantityIsGreaterThanOneToBoolConverter x:Key="QuantityIsGreaterThanOneToBoolConverter" />
 

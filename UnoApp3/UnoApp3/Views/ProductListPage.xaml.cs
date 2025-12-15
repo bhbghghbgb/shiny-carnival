@@ -100,4 +100,10 @@ public sealed partial class ProductListPage : Page
             ViewModel?.ViewProductDetailCommand.Execute(product);
         }
     }
+    
+    private void OnEnterInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        ViewModel?.ApplyFiltersCommand.Execute(null);
+        args.Handled = true;
+    }
 }
