@@ -1,0 +1,97 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Setup TanStack Query và QueryClient Provider",
+        "description": "Cài đặt @tanstack/react-query, tạo QueryClient instance, và setup QueryClientProvider trong app root",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [],
+        "updatedAt": "2025-12-07T05:03:59.270Z"
+      },
+      {
+        "id": "2",
+        "title": "Tạo Base API Infrastructure",
+        "description": "Tạo ApiServiceInterface, BaseApiService class, apiResponseAdapter với unwrapResponse và handleApiError. Xử lý query params conversion từ camelCase sang PascalCase.",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "high",
+        "subtasks": [],
+        "updatedAt": "2025-12-07T05:05:47.264Z"
+      },
+      {
+        "id": "3",
+        "title": "Tạo Universal Hooks (useApi.ts)",
+        "description": "Tạo createQueryKeys factory và các universal hooks: useApiList, useApiPaginated, useApiDetail, useApiCreate, useApiUpdate, useApiPatch, useApiDelete, useApiCustomQuery, useApiCustomMutation",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "2"
+        ],
+        "priority": "high",
+        "subtasks": [],
+        "updatedAt": "2025-12-07T05:07:19.357Z"
+      },
+      {
+        "id": "4",
+        "title": "Tạo Pagination Hooks",
+        "description": "Tạo usePaginationWithRouter (URL sync cho Page components) và usePaginationLocal (local state cho Modal/Drawer). Hỗ trợ advanced filters (categoryId, supplierId, minPrice, maxPrice, etc.)",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "high",
+        "subtasks": [],
+        "updatedAt": "2025-12-07T05:17:23.586Z"
+      },
+      {
+        "id": "5",
+        "title": "Migrate Products Feature làm Example",
+        "description": "Tạo ProductApiService extends BaseApiService, tạo feature-level hooks (useProducts, useProduct, useCreateProduct, etc.), và migrate một component để sử dụng hooks mới",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          "4"
+        ],
+        "priority": "medium",
+        "subtasks": [],
+        "updatedAt": "2025-12-07T05:23:18.934Z"
+      },
+      {
+        "id": "6",
+        "title": "Tạo Documentation cho Implementation",
+        "description": "Tạo tài liệu chi tiết về implementation, bao gồm code examples, migration guide, và best practices",
+        "details": "",
+        "testStrategy": "",
+        "status": "in-progress",
+        "dependencies": [
+          "5"
+        ],
+        "priority": "low",
+        "subtasks": [],
+        "updatedAt": "2025-12-07T05:55:51.332Z"
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-12-07T05:55:51.332Z",
+      "taskCount": 6,
+      "completedCount": 5,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}
