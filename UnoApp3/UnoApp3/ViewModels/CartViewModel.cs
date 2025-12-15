@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.UI.Dispatching;
 using Uno.Extensions.Navigation;
 using UnoApp3.Data.Entities;
+using UnoApp3.Models.Order;
 using UnoApp3.Models.Product;
 using UnoApp3.Services;
 using UnoApp3.Services.Interfaces;
@@ -15,12 +16,16 @@ public partial class CartViewModel : BaseViewModel
 {
     private readonly ICartRepository _cartRepository;
     private readonly ProductService _productService;
+    private readonly OrderService _orderService;
     private readonly IMemoryCache _productCache;
     private readonly TimeSpan _cacheExpiry = TimeSpan.FromMinutes(10); // Adjust as needed
 
     [ObservableProperty] private ObservableCollection<CartItemDisplay> _cartItems;
 
     [ObservableProperty] private bool _hasItems;
+
+    // New property for checkout loading state
+    [ObservableProperty] private bool _isCheckingOut;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TotalAmountFormatted))]
@@ -32,11 +37,13 @@ public partial class CartViewModel : BaseViewModel
         INavigator navigator,
         ICartRepository cartRepository,
         ProductService productService,
+        OrderService orderService,
         IMemoryCache productCache)
         : base(navigator)
     {
         _cartRepository = cartRepository;
         _productService = productService;
+        _orderService = orderService;
         _productCache = productCache;
         Title = "Giỏ hàng";
         CartItems = new ObservableCollection<CartItemDisplay>();
@@ -168,9 +175,90 @@ public partial class CartViewModel : BaseViewModel
     [RelayCommand]
     private async Task Checkout()
     {
-        if (!CartItems.Any()) return;
+        if (!CartItems.Any() || IsCheckingOut) return;
+
+        IsCheckingOut = true;
+
+
+        try
+        {
+            // Prepare the order request
+            var orderRequest = new CreateOrderRequest
+            {
+                CustomerId = 2, // You'll need to get this from user authentication/context
+                PromoCode = string.Empty, // Optional: add promo code field in UI
+                OrderItems = CartItems.Select(item => new OrderItemInput
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity
+                }).ToList()
+            };
+
+            // Call the order service to create the order
+            var orderDetails = await _orderService.CreateOrderAsync(orderRequest);
+
+            if (orderDetails != null)
+            {
+                // Clear the cart after successful order creation
+                await ClearCartAfterOrder();
+
+                // Navigate to order confirmation page with order details
+                await Navigator.NavigateRouteAsync(this, "OrderConfirmation",
+                    data: new Dictionary<string, object> { ["order"] = orderDetails });
+            }
+            else
+            {
+                // Handle API error (order creation failed)
+                await ShowCheckoutError("Không thể tạo đơn hàng. Vui lòng thử lại sau.");
+            }
+        }
+        catch (Exception ex)
+        {
+            this.Log().LogError(ex, "Checkout failed");
+            await ShowCheckoutError($"Lỗi: {ex.Message}");
+        }
+        finally
+        {
+            IsCheckingOut = false;
+        }
 
         // Fixed: Added 'this' as first parameter
         await Navigator.NavigateRouteAsync(this, "OrderConfirmation");
+    }
+
+    private async Task ClearCartAfterOrder()
+    {
+        try
+        {
+            // Clear all items from cart
+            foreach (var item in CartItems)
+            {
+                await _cartRepository.RemoveFromCartAsync(item.ProductId);
+            }
+
+            // Clear local collection
+            CartItems.Clear();
+            TotalAmount = 0;
+            HasItems = false;
+        }
+        catch (Exception ex)
+        {
+            this.Log().LogError(ex, "Failed to clear cart after order");
+            // Don't throw here, order was already created
+        }
+    }
+
+    private async Task ShowCheckoutError(string errorMessage)
+    {
+        // You can use a dialog or show error inline
+        // For now, navigate to order confirmation with error
+        await Navigator.NavigateRouteAsync(this, "OrderConfirmation",
+            data: new Dictionary<string, object> { ["error"] = errorMessage });
+    }
+
+    [RelayCommand]
+    private async Task ContinueShopping()
+    {
+        await Navigator.NavigateRouteAsync(this, "ProductList", qualifier: Qualifiers.ClearBackStack);
     }
 }
