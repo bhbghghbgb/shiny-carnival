@@ -15,12 +15,28 @@ import type { ApiResponse } from '../types/api.types';
  * ```
  */
 export function unwrapResponse<T>(response: ApiResponse<T>): T {
+  console.log(`🔍 [unwrapResponse] Checking response:`, {
+    isError: response.isError,
+    data: response.data,
+    message: response.message,
+    statusCode: response.statusCode,
+  });
+  
   if (response.isError || response.data == null) {
     const error = new Error(response.message || 'API request failed') as Error & { responseData?: ApiResponse<T> };
     // Attach response data to error for debugging
     error.responseData = response;
+    
+    console.error(`❌ [unwrapResponse] Error detected:`, {
+      message: error.message,
+      responseData: response,
+      error: error,
+    });
+    
     throw error;
   }
+  
+  console.log(`✅ [unwrapResponse] Successfully unwrapped:`, response.data);
   return response.data;
 }
 

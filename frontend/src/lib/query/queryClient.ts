@@ -17,9 +17,31 @@ export const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
+      // Thêm logging chi tiết cho errors
+      onError: (error, query) => {
+        console.error('❌ [TanStack Query] Query Error:', {
+          queryKey: query.queryKey,
+          error: error,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorStack: error instanceof Error ? error.stack : undefined,
+          errorDetails: error,
+        });
+      },
     },
     mutations: {
       retry: 0, // Không retry mutations
+      // Thêm logging chi tiết cho mutation errors
+      onError: (error, variables, context, mutation) => {
+        console.error('❌ [TanStack Query] Mutation Error:', {
+          mutationKey: mutation.mutationKey,
+          variables: variables,
+          context: context,
+          error: error,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorStack: error instanceof Error ? error.stack : undefined,
+          errorDetails: error,
+        });
+      },
     },
   },
 });

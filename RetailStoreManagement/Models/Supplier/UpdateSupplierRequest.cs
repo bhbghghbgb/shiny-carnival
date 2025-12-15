@@ -1,23 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using static RetailStoreManagement.Common.ValidationConstants;
 
 namespace RetailStoreManagement.Models.Supplier;
 
 public class UpdateSupplierRequest
 {
-    [Required]
-    public int Id { get; set; }
+    [MaxLength(MAX_LENGTH_NAME)]
+    public string? Name { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string Name { get; set; } = string.Empty;
+    [MaxLength(MAX_LENGTH_PHONE)]
+    public string? Phone { get; set; }
 
-    [Required]
-    [MaxLength(20)]
-    public string Phone { get; set; } = string.Empty;
-
-    [MaxLength(100)]
+    [MaxLength(MAX_LENGTH_EMAIL)]
     public string? Email { get; set; }
 
-    [MaxLength(255)]
+    [MaxLength(MAX_LENGTH_ADDRESS)]
     public string? Address { get; set; }
 }

@@ -1,32 +1,23 @@
 using System.ComponentModel.DataAnnotations;
+using static RetailStoreManagement.Common.ValidationConstants;
 
 namespace RetailStoreManagement.Models.Product;
 
 public class UpdateProductRequest
 {
-    [Required]
-    public int Id { get; set; }
+    [MaxLength(MAX_LENGTH_NAME)]
+    public string? ProductName { get; set; }
 
-    [Required]
-    public int CategoryId { get; set; }
+    [MaxLength(MAX_LENGTH_CODE)]
+    public string? Barcode { get; set; }
 
-    [Required]
-    public int SupplierId { get; set; }
+    [Range((double)MIN_PRICE, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+    public decimal? Price { get; set; }
 
-    [Required]
-    [MaxLength(100)]
-    public string ProductName { get; set; } = string.Empty;
+    [MaxLength(MAX_LENGTH_UNIT)]
+    public string? Unit { get; set; }
 
-    [Required]
-    [MaxLength(50)]
-    public string Barcode { get; set; } = string.Empty;
+    public int? CategoryId { get; set; }
 
-    [Required]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
-    public decimal Price { get; set; }
-
-    [Required]
-    [MaxLength(20)]
-    public string Unit { get; set; } = "pcs";
-
+    public int? SupplierId { get; set; }
 }

@@ -1,9 +1,12 @@
-import { Modal, Descriptions, Table, Tag, Divider, Space, Typography } from 'antd'
+import { FilePdfOutlined } from '@ant-design/icons'
 import { useQuery } from '@tanstack/react-query'
-import { orderApiService } from '../api/OrderApiService'
-import type { OrderDetailsDto, OrderItemEntity } from '../types/entity'
+import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Typography } from 'antd'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { API_CONFIG } from '../../../config/api.config'
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
+import { orderApiService } from '../api/OrderApiService'
+import type { OrderDetailsDto, OrderItemEntity } from '../types/entity'
 
 const { Title, Text } = Typography
 
@@ -85,6 +88,45 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
         return methodMap[method] || method
     }
 
+    const printPDF = async () => {
+        const input = document.getElementById('order-detail-pdf')
+        if (!input) return
+    
+        const pdf = new jsPDF('p', 'mm', 'a4')
+    
+        const pageWidth = pdf.internal.pageSize.getWidth()
+        const pageHeight = pdf.internal.pageSize.getHeight()
+        const contentWidth = pageWidth - 15 * 2
+        const contentHeight = pageHeight
+
+        const drawHeader = () => {
+            pdf.setFontSize(14)
+            pdf.setFont('helvetica', 'bold')
+            pdf.text('CHI TIET DON HANG #'+ orderId, pageWidth / 2, 20, { align: 'center' })
+            pdf.setLineWidth(0.3)
+            pdf.line(15, 35, pageWidth - 15, 35)
+        }
+    
+        const canvas = await html2canvas(input, {scale: 2,useCORS: true,backgroundColor: '#ffffff',})
+        const imgData = canvas.toDataURL('image/jpeg', 1.0)
+        const imgHeight = (canvas.height * contentWidth) / canvas.width
+        let heightLeft = imgHeight
+        let position = 20
+
+        drawHeader()
+        pdf.addImage(imgData,'JPEG',15,position,contentWidth,imgHeight)
+    
+        heightLeft -= contentHeight
+        while (heightLeft > 0) {
+            pdf.addPage()
+            position = 20 - (imgHeight - heightLeft)
+            pdf.addImage(imgData,'JPEG',15,position,contentWidth,imgHeight)
+            heightLeft -= contentHeight
+        }
+        pdf.save(`don-hang-${orderId}.pdf`)
+    }
+    
+
     return (
         <Modal
             title={<Title level={4} style={{ margin: 0 }}>Chi tiết đơn hàng #{orderId}</Title>}
@@ -97,6 +139,8 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
             {isLoading ? (
                 <div style={{ textAlign: 'center', padding: '40px' }}>Đang tải...</div>
             ) : orderDetails ? (
+                <>
+                <div id="order-detail-pdf">
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     {/* Thông tin đơn hàng */}
                     <Descriptions title="Thông tin đơn hàng" bordered column={2}>
@@ -192,6 +236,25 @@ export function OrderDetailModal({ orderId, open, onClose }: OrderDetailModalPro
                         </>
                     )}
                 </Space>
+                </div>
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<FilePdfOutlined />}
+                    onClick={printPDF}
+                    style={{
+                        borderRadius: '8px',
+                        height: '40px',
+                        paddingLeft: '20px',
+                        paddingRight: '20px',
+                        marginTop:  '20px',
+                        background: '#d9534f',
+                        boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                    }}
+                >
+                    Export PDF
+                </Button>
+                </>
             ) : (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
                     Không tìm thấy thông tin đơn hàng

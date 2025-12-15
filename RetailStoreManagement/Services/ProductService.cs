@@ -1,11 +1,13 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using RetailStoreManagement.Common;
 using RetailStoreManagement.Entities;
 using RetailStoreManagement.Models.Common;
 using RetailStoreManagement.Interfaces;
 using RetailStoreManagement.Interfaces.Services;
 using RetailStoreManagement.Models.Product;
+using static RetailStoreManagement.Common.InventoryConstants;
 
 namespace RetailStoreManagement.Services;
 
@@ -54,6 +56,12 @@ public class ProductService : IProductService
             if (request.MaxPrice.HasValue)
             {
                 query = query.Where(p => p.Price <= request.MaxPrice.Value);
+            }
+
+            // Apply low stock filter
+            if (request.OnlyLowStock == true)
+            {
+                query = query.Where(p => p.Inventory != null && p.Inventory.Quantity < LOW_STOCK_THRESHOLD);
             }
 
             // Apply sorting
@@ -180,13 +188,16 @@ public class ProductService : IProductService
                 return ApiResponse<ProductResponseDto>.Error("Product not found", 404);
             }
 
-            // Check if barcode already exists (excluding current product)
-            var existingProduct = await _unitOfWork.Products.GetQueryable()
-                .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.Id != id);
-
-            if (existingProduct != null)
+            // Check if barcode already exists (excluding current product) - only if barcode is being updated
+            if (!string.IsNullOrEmpty(request.Barcode))
             {
-                return ApiResponse<ProductResponseDto>.Error("Barcode already exists", 409);
+                var existingProduct = await _unitOfWork.Products.GetQueryable()
+                    .FirstOrDefaultAsync(p => p.Barcode == request.Barcode && p.Id != id);
+
+                if (existingProduct != null)
+                {
+                    return ApiResponse<ProductResponseDto>.Error("Barcode already exists", 409);
+                }
             }
 
             _mapper.Map(request, product);
@@ -207,20 +218,58 @@ public class ProductService : IProductService
     {
         try
         {
-            var product = await _unitOfWork.Products.GetByIdAsync(id);
+            var product = await _unitOfWork.Products.GetQueryable()
+                .Include(p => p.OrderItems)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (product == null)
             {
-                return ApiResponse<bool>.Error("Product not found", 404);
+                return ApiResponse<bool>.Error("Không tìm thấy sản phẩm", 404);
+            }
+
+            // Kiểm tra xem Product có OrderItems không
+            var orderItemCount = product.OrderItems.Count;
+            if (orderItemCount > 0)
+            {
+                return ApiResponse<bool>.Error(
+                    $"Không thể xóa sản phẩm này vì đang có {orderItemCount} chi tiết đơn hàng liên quan. " +
+                    "Vui lòng xóa các đơn hàng liên quan trước khi xóa sản phẩm.",
+                    400
+                );
             }
 
             await _unitOfWork.Products.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
 
-            return ApiResponse<bool>.Success(true, "Product deleted successfully");
+            return ApiResponse<bool>.Success(true, "Xóa sản phẩm thành công");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            // Xử lý lỗi database constraint violation
+            if (dbEx.InnerException is PostgresException pgEx)
+            {
+                // Lỗi foreign key constraint violation (23503) hoặc not null constraint (23502)
+                if (pgEx.SqlState == "23503" || pgEx.SqlState == "23502")
+                {
+                    return ApiResponse<bool>.Error(
+                        "Không thể xóa sản phẩm này vì đang có chi tiết đơn hàng liên quan. " +
+                        "Vui lòng xóa các đơn hàng liên quan trước khi xóa sản phẩm.",
+                        400
+                    );
+                }
+            }
+
+            return ApiResponse<bool>.Error(
+                "Lỗi khi xóa sản phẩm. Vui lòng thử lại hoặc liên hệ quản trị viên.",
+                500
+            );
         }
         catch (Exception ex)
         {
-            return ApiResponse<bool>.Error(ex.Message);
+            return ApiResponse<bool>.Error(
+                $"Lỗi không xác định: {ex.Message}",
+                500
+            );
         }
     }
 }

@@ -1,13 +1,32 @@
-import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, UserOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePdfOutlined, UserOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Row, Space, Typography } from 'antd'
+import { exportTablePdf } from '../../../utils/exportPdf'
+import { importTableExcel } from '../../../utils/importExcel'
+import { customerPageConfig } from '../config/customerPageConfig'
+import { useCustomerManagementPage } from '../hooks'
+import type { CreateCustomerRequest } from '../types/api'
+import type { CustomerEntity } from '../types/entity'
 
 const { Title, Text } = Typography
 
 interface CustomerHeaderProps {
-    onAddCustomer: () => void
+    customers: CustomerEntity[],
 }
 
-export const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
+export const CustomerHeader = ({ customers }: CustomerHeaderProps) => {
+    const {createCustomer} = useCustomerManagementPage()
+
+
+    const exportPDF = () => {
+        exportTablePdf(customerPageConfig,customers,"customers");
+    };
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createCustomer.mutateAsync({
+                ...(payload as CreateCustomerRequest),
+            })
+        );
+    };
     return (
         <Card
             style={{
@@ -33,20 +52,47 @@ export const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
-                        <Button
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
+                    <Button
                             type="primary"
                             size="large"
-                            icon={<PlusOutlined />}
-                            onClick={onAddCustomer}
+                            icon={<FileExcelOutlined />}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
                                 paddingLeft: '20px',
                                 paddingRight: '20px',
+                                background: '#4caf50',
                                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
                             }}
                         >
-                            Thêm
+                            Import Excel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FilePdfOutlined />}
+                            onClick={exportPDF}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#d9534f',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Export PDF
                         </Button>
                     </Space>
                 </Col>
@@ -54,4 +100,3 @@ export const CustomerHeader = ({ onAddCustomer }: CustomerHeaderProps) => {
         </Card>
     )
 }
-

@@ -57,6 +57,7 @@ export const categoryAdminDefinition: ManagementRouteDefinition<
   component: CategoryManagementPage,
   searchSchema: categorySearchSchema,
   loader: (ctx) => fetchCategories(ctx),
+  allowedRoles: ['admin'], // Chỉ Admin được truy cập
 };
 
 export function createCategoriesQueryOptions(search: CategorySearch) {

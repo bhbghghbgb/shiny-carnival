@@ -1,13 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using static RetailStoreManagement.Common.ValidationConstants;
 
 namespace RetailStoreManagement.Models.Category;
 
 public class UpdateCategoryRequest
 {
-    [Required]
-    public int Id { get; set; }
-
-    [Required]
-    [MaxLength(100)]
-    public string CategoryName { get; set; } = string.Empty;
+    [MaxLength(MAX_LENGTH_NAME)]
+    public string? CategoryName { get; set; }
 }

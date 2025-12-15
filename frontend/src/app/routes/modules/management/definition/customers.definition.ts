@@ -56,6 +56,7 @@ export const customerAdminDefinition: ManagementRouteDefinition<
   component: CustomerManagementPage,
   searchSchema: customerSearchSchema,
   loader: (ctx) => fetchCustomers(ctx),
+  allowedRoles: ['admin'], // Chỉ Admin được truy cập
 };
 
 export function createCustomersQueryOptions(search: CustomerSearch) {

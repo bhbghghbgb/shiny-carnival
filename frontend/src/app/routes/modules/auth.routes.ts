@@ -3,8 +3,10 @@ import { LoginPage } from '../../../features/auth/pages/LoginPage';
 import { RegisterPage } from '../../../features/auth/pages/RegisterPage';
 import { ForgotPasswordPage } from '../../../features/auth/pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '../../../features/auth/pages/ResetPasswordPage';
-import { ProfilePage } from '../../../features/auth/pages/ProfilePage';
+import { ProfilePage } from '../../../features/profile/pages/ProfilePage';
+import { UnauthorizedPage } from '../../../features/auth/pages/UnauthorizedPage';
 import { PendingComponent } from '../../../components/feedback/PendingComponent';
+import { useAuthStore } from '../../../features/auth/store/authStore';
 
 // Auth module routes configuration with hierarchical structure
 export const authRoutes: ModuleRoutes<any> = {
@@ -58,10 +60,29 @@ export const authRoutes: ModuleRoutes<any> = {
           path: 'profile',
           component: ProfilePage,
           pendingComponent: PendingComponent,
+          beforeLoad: () => {
+            // Guard: Kiểm tra đăng nhập trước khi load trang
+            const { isAuthenticated } = useAuthStore.getState();
+            if (!isAuthenticated) {
+              // Trả về context rỗng, component sẽ xử lý hiển thị Alert
+              return {};
+            }
+            return {};
+          },
           meta: {
             title: 'Hồ sơ cá nhân',
-            description: 'Trang quản lý hồ sơ cá nhân',
+            description: 'Trang quản lý hồ sơ cá nhân và đơn hàng',
             requiresAuth: true,
+          },
+        },
+        {
+          path: 'unauthorized',
+          component: UnauthorizedPage,
+          pendingComponent: PendingComponent,
+          meta: {
+            title: 'Không có quyền truy cập',
+            description: 'Bạn không có quyền truy cập trang này',
+            requiresAuth: false,
           },
         },
       ],

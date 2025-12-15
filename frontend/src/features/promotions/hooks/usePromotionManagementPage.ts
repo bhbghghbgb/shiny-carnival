@@ -134,7 +134,7 @@ export const usePromotionManagementPage = () => {
     }
 
     const handleUpdate = async (record: PromotionEntity, values: UpdatePromotionRequest) => {
-        await updatePromotion.mutateAsync({ ...values, id: record.id })
+        await updatePromotion.mutateAsync({ id: record.id, data: values })
     }
 
     const handleDelete = (record: PromotionEntity) => deletePromotion.mutateAsync(record.id)

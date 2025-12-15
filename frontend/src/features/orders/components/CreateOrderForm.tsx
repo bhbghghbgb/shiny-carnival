@@ -1,14 +1,17 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Form, Input, InputNumber, Button, Space, Card, Table, Typography, Divider, message, Alert } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import { productApiService } from '../../products/api/ProductApiService'
 import { useOrderStore, type DraftOrderItem } from '../store/orderStore'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import type { CustomerEntity } from '../../customers/types/entity'
-import type { ProductEntity } from '../../products/types/entity'
+import type { ProductEntity, ProductDetailsDto } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import { QRScanner } from '../../qr-scanner/components/QRScanner'
 
 const { Title, Text } = Typography
 
@@ -30,6 +33,8 @@ export function CreateOrderForm({
     const [form] = Form.useForm()
     const [selectedProduct, setSelectedProduct] = useState<number | null>(null)
     const [quantity, setQuantity] = useState<number>(1)
+    const queryClient = useQueryClient()
+    const productQueryKeys = createQueryKeys('products')
 
     // ✅ Chỉ subscribe vào orderItems để re-render khi items thay đổi
     // Không subscribe vào customerId và promoCode vì chúng được quản lý bởi Form
@@ -38,7 +43,7 @@ export function CreateOrderForm({
     // Load draft từ localStorage khi component mount (chỉ một lần)
     useEffect(() => {
         const draftOrder = useOrderStore.getState().draftOrder
-        const initialValues: any = {}
+        const initialValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>> = {}
         if (draftOrder.customerId) {
             initialValues.customerId = draftOrder.customerId
         }
@@ -51,10 +56,14 @@ export function CreateOrderForm({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []) // Chỉ chạy một lần khi mount để load draft từ localStorage
 
-    // Fetch products để lấy thông tin khi thêm vào order
-    const fetchProductDetails = async (productId: number): Promise<ProductEntity | null> => {
+    // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
+    const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
-            const product = await productApiService.getById(productId)
+            // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
+            const product = await queryClient.fetchQuery<ProductDetailsDto>({
+                queryKey: productQueryKeys.detail(productId),
+                queryFn: () => productApiService.getById(productId),
+            })
             return product
         } catch (error) {
             console.error('Error fetching product:', error)
@@ -73,15 +82,7 @@ export function CreateOrderForm({
             return
         }
 
-        // Kiểm tra sản phẩm đã tồn tại chưa (đọc từ store bằng getState())
-        const currentDraftOrder = useOrderStore.getState().draftOrder
-        const existingItem = currentDraftOrder.orderItems.find(item => item.productId === selectedProduct)
-        if (existingItem) {
-            message.warning('Sản phẩm đã có trong đơn hàng. Vui lòng xóa và thêm lại nếu muốn thay đổi số lượng.')
-            return
-        }
-
-        // Fetch product details
+        // Fetch product details để lấy thông tin mới nhất (bao gồm giá có thể đã thay đổi)
         const product = await fetchProductDetails(selectedProduct)
         if (!product) {
             message.error('Không thể lấy thông tin sản phẩm')
@@ -91,6 +92,8 @@ export function CreateOrderForm({
         const newItem: DraftOrderItem = {
             productId: product.id,
             productName: product.productName,
+            categoryName: product.categoryName || '',
+            barcode: product.barcode,
             price: product.price,
             quantity: quantity,
             subtotal: product.price * quantity,
@@ -100,7 +103,6 @@ export function CreateOrderForm({
         setSelectedProduct(null)
         setQuantity(1)
         form.setFieldsValue({ productId: undefined, quantity: 1 })
-        message.success('Đã thêm sản phẩm vào đơn hàng')
     }
 
     const handleRemoveProduct = (productId: number) => {
@@ -114,6 +116,18 @@ export function CreateOrderForm({
             return
         }
         useOrderStore.getState().updateDraftOrderItemQuantity(productId, newQuantity)
+    }
+
+    const handleCancel = () => {
+        // Reset form
+        form.resetFields()
+        // Reset store (clear draft order)
+        useOrderStore.getState().clearDraftOrder()
+        // Reset local state
+        setSelectedProduct(null)
+        setQuantity(1)
+        // Call parent onCancel
+        onCancel()
     }
 
     const totalAmount = useMemo(() => {
@@ -159,7 +173,7 @@ export function CreateOrderForm({
 
     // Sync customer và promo code với draft khi form value thay đổi (sử dụng Form's onValuesChange)
     // Sử dụng getState() để đọc giá trị hiện tại và so sánh, tránh subscribe gây re-render
-    const handleFormValuesChange = (changedValues: any) => {
+    const handleFormValuesChange = (changedValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>>) => {
         const currentDraftOrder = useOrderStore.getState().draftOrder
 
         // Chỉ update store nếu giá trị thực sự thay đổi
@@ -184,6 +198,16 @@ export function CreateOrderForm({
             title: 'Sản phẩm',
             dataIndex: 'productName',
             key: 'productName',
+        },
+        {
+            title: 'Danh mục',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
+        },
+        {
+            title: 'Mã vạch',
+            dataIndex: 'barcode',
+            key: 'barcode',
         },
         {
             title: 'Đơn giá',
@@ -217,7 +241,7 @@ export function CreateOrderForm({
             title: 'Thao tác',
             key: 'action',
             align: 'center' as const,
-            render: (_: any, record: DraftOrderItem) => (
+            render: (_: unknown, record: DraftOrderItem) => (
                 <Button
                     type="text"
                     danger
@@ -232,9 +256,9 @@ export function CreateOrderForm({
         <div style={{ display: 'flex', gap: '24px', minHeight: '500px' }}>
             {/* Form bên trái */}
             <div style={{ flex: 1 }}>
-                <Form 
-                    form={form} 
-                    layout="vertical" 
+                <Form
+                    form={form}
+                    layout="vertical"
                     onFinish={handleSubmit}
                     onValuesChange={handleFormValuesChange}
                 >
@@ -257,14 +281,19 @@ export function CreateOrderForm({
                         <DropDownWithFilter
                             placeholder="Chọn khách hàng"
                             fetchOptions={async (keyword: string): Promise<DropDownWithFilterOption[]> => {
-                                const paged = await customerApiService.getPaginated({
-                                    search: keyword || undefined,
-                                    page: 1,
-                                    pageSize: 20,
+                                // Sử dụng TanStack Query để fetch và cache data
+                                const customerQueryKeys = createQueryKeys('customers')
+                                const paged = await queryClient.fetchQuery({
+                                    queryKey: [...customerQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+                                    queryFn: () => customerApiService.getPaginated({
+                                        search: keyword || undefined,
+                                        page: 1,
+                                        pageSize: 20,
+                                    }),
                                 })
                                 const items = paged.items ?? []
                                 return items.map((c: CustomerEntity) => ({
-                                    label: c.name ?? `#${c.id}`,
+                                    label: `${c.name ?? 'N/A'} - ${c.phone ?? 'N/A'}`,
                                     value: c.id,
                                 }))
                             }}
@@ -285,10 +314,14 @@ export function CreateOrderForm({
                                     value={selectedProduct}
                                     onChange={(value) => setSelectedProduct(value as number | null)}
                                     fetchOptions={async (keyword: string): Promise<DropDownWithFilterOption[]> => {
-                                        const paged = await productApiService.getPaginated({
-                                            search: keyword || undefined,
-                                            page: 1,
-                                            pageSize: 20,
+                                        // Sử dụng TanStack Query để fetch và cache data
+                                        const paged = await queryClient.fetchQuery({
+                                            queryKey: [...productQueryKeys.list(), { search: keyword, page: 1, pageSize: 20 }],
+                                            queryFn: () => productApiService.getPaginated({
+                                                search: keyword || undefined,
+                                                page: 1,
+                                                pageSize: 20,
+                                            }),
                                         })
                                         const items = paged.items ?? []
                                         return items.map((p: ProductEntity) => ({
@@ -330,6 +363,10 @@ export function CreateOrderForm({
                         </Space>
                     </Card>
 
+                    <Card title="Quét mã QR sản phẩm" size="small" style={{ marginBottom: 16 }}>
+                        <QRScanner />
+                    </Card>
+
                     <Form.Item
                         name="promoCode"
                         label="Mã khuyến mãi"
@@ -342,7 +379,7 @@ export function CreateOrderForm({
                             <Button type="primary" htmlType="submit" loading={loading}>
                                 Tạo đơn hàng
                             </Button>
-                            <Button onClick={onCancel}>Hủy</Button>
+                            <Button onClick={handleCancel}>Hủy</Button>
                         </Space>
                     </Form.Item>
                 </Form>
@@ -392,4 +429,3 @@ export function CreateOrderForm({
         </div>
     )
 }
-

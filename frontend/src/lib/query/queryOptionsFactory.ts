@@ -54,7 +54,25 @@ export function createPaginatedQueryOptions<TData = unknown>(
 
   return queryOptions<PagedList<TData>>({
     queryKey: [...queryKeys.lists(), 'paginated', params],
-    queryFn: () => apiService.getPaginated(params),
+    queryFn: async () => {
+      try {
+        console.log(`🔍 [QueryFactory] Fetching ${entity} with params:`, params);
+        const result = await apiService.getPaginated(params);
+        console.log(`✅ [QueryFactory] Successfully fetched ${entity}:`, result);
+        return result;
+      } catch (error) {
+        console.error(`❌ [QueryFactory] Error fetching ${entity}:`, {
+          entity,
+          params,
+          error,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorStack: error instanceof Error ? error.stack : undefined,
+          errorDetails: error,
+        });
+        // Re-throw để TanStack Query có thể handle
+        throw error;
+      }
+    },
     placeholderData: (previousData) => previousData, // Giữ data cũ khi fetch trang mới
   });
 }

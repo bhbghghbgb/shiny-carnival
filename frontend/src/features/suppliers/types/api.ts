@@ -7,4 +7,4 @@ export interface CreateSupplierRequest {
   address?: string | null;
 }
 
-export interface UpdateSupplierRequest extends SupplierEntity { }
+export type UpdateSupplierRequest = Omit<SupplierEntity, 'id'>;

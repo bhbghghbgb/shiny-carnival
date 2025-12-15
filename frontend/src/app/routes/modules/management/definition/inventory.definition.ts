@@ -62,6 +62,7 @@ export const inventoryAdminDefinition: ManagementRouteDefinition<
   component: InventoryManagementPage,
   searchSchema: inventorySearchSchema,
   loader: (ctx) => fetchInventories(ctx),
+  allowedRoles: ['admin', 'staff'], // Admin và Staff đều truy cập được
 };
 
 export function createInventoriesQueryOptions(search: InventorySearch) {

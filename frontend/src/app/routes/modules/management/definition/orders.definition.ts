@@ -68,6 +68,7 @@ export const orderAdminDefinition: ManagementRouteDefinition<
   component: OrderManagementPage,
   searchSchema: orderSearchSchema,
   loader: (ctx) => fetchOrders(ctx),
+  allowedRoles: ['admin'], // Chỉ Admin được truy cập
 };
 
 export function createOrdersQueryOptions(search: OrderSearch) {

@@ -70,11 +70,14 @@ export const useAuthStore = create<AuthState>()(
         },
 
         isAdmin: () => {
-          return get().hasRole(0);
+          const { user } = get();
+          return user?.role === 0;
         },
 
         isStaff: () => {
-          return get().hasRole(1);
+          const { user } = get();
+          // Chỉ return true nếu user thực sự là Staff (role === 1), không phải Admin
+          return user?.role === 1;
         }
       }),
       {

@@ -10,6 +10,7 @@ public class PromotionListDto
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string Status { get; set; } = string.Empty;
+    public int UsageLimit { get; set; }
     public int UsedCount { get; set; }
     public int RemainingUsage { get; set; }
 }

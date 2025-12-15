@@ -1,13 +1,30 @@
-import { Button, Card, Row, Col, Space, Typography } from 'antd'
-import { PlusOutlined, FolderOutlined } from '@ant-design/icons'
+import { FileExcelOutlined, FilePdfOutlined, FolderOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Row, Space, Typography } from 'antd'
+import { exportTablePdf } from '../../../utils/exportPdf'
+import { importTableExcel } from '../../../utils/importExcel'
+import { categoryPageConfig } from '../config/categoryPageConfig'
+import { useCategoryManagementPage } from '../hooks'
+import type { CreateCategoryRequest } from '../types/api'
+import type { CategoryEntity } from '../types/entity'
 
 const { Title, Text } = Typography
 
 interface CategoryHeaderProps {
-    onAddCategory: () => void
+    categories: CategoryEntity[],
 }
 
-export const CategoryHeader = ({ onAddCategory }: CategoryHeaderProps) => {
+export const CategoryHeader = ({ categories }: CategoryHeaderProps) => {
+    const {createCategory} =useCategoryManagementPage()
+    const exportPDF = () => {
+        exportTablePdf(categoryPageConfig,categories,"category");
+    };
+    const importExcel = async (file: File) => {
+        await importTableExcel(file, payload => 
+            createCategory.mutateAsync({
+                ...(payload as CreateCategoryRequest),
+            })
+        );
+    };
     return (
         <Card
             style={{
@@ -33,20 +50,47 @@ export const CategoryHeader = ({ onAddCategory }: CategoryHeaderProps) => {
                 </Col>
                 <Col>
                     <Space>
-                        <Button
+                    <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx, .xls"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) importExcel(file);
+                            }}
+                        />
+                    <Button
                             type="primary"
                             size="large"
-                            icon={<PlusOutlined />}
-                            onClick={onAddCategory}
+                            icon={<FileExcelOutlined />}
+                            onClick={() => document.getElementById("importExcelInput")?.click()}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',
                                 paddingLeft: '20px',
                                 paddingRight: '20px',
+                                background: '#4caf50',
                                 boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
                             }}
                         >
-                            Thêm
+                            Import Excel
+                        </Button>
+                        <Button
+                            type="primary"
+                            size="large"
+                            icon={<FilePdfOutlined />}
+                            onClick={exportPDF}
+                            style={{
+                                borderRadius: '8px',
+                                height: '40px',
+                                paddingLeft: '20px',
+                                paddingRight: '20px',
+                                background: '#d9534f',
+                                boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)',
+                            }}
+                        >
+                            Export PDF
                         </Button>
                     </Space>
                 </Col>
