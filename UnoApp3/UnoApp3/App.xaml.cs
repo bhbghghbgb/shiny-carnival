@@ -215,5 +215,7 @@ public partial class App : Application
         // Assuming you have a static property for this
         ProductImageUrlConverter.BaseImageUrl =
             !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://10.0.0.2";
+        
+        services.AddMemoryCache();
     }
 }

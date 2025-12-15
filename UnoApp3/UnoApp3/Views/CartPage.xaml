@@ -157,5 +157,13 @@
                         HorizontalAlignment="Stretch" />
             </StackPanel>
         </Border>
+
+        <!-- Progress Ring when loading -->
+        <ProgressRing Grid.Row="1" Grid.RowSpan="3"
+                      IsActive="{Binding IsBusy}"
+                      Width="50"
+                      Height="50"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center" />
     </Grid>
 </Page>

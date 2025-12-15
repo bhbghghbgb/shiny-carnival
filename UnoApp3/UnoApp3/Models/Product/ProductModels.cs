@@ -36,6 +36,7 @@ public class ProductResponseDto
 
 public class ProductSearchRequest : PagedRequest
 {
+    public string? Search { get; set; }
     public int? CategoryId { get; set; }
     public int? SupplierId { get; set; }
     public decimal? MinPrice { get; set; }

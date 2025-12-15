@@ -17,7 +17,8 @@ public class ProductService
     {
         try
         {
-            this.Log().LogInformation("SearchProductsAsync: calling API page {page} size {size}", request.PageIndex, request.PageSize);
+            this.Log().LogInformation("SearchProductsAsync: calling API page {page} size {size}", request.Page,
+                request.PageSize);
             var response = await _productApi.GetProducts(request);
             this.Log().LogInformation("SearchProductsAsync: received {count} items", response?.Data?.Items?.Count ?? 0);
             return response?.Data;
@@ -47,5 +48,20 @@ public class ProductService
     public string GetProductImageUrl(int productId, string baseUrl)
     {
         return $"{baseUrl}/images/{productId}";
+    }
+
+    // NEW: Batch fetch for performance
+    public async Task<Dictionary<int, ProductResponseDto>> GetProductsByIdsAsync(List<int> productIds)
+    {
+        if (productIds.Count == 0) return new Dictionary<int, ProductResponseDto>();
+
+        // Option 1: If API supports batch endpoint
+        // var response = await GetProductsByIdsAsync(productIds);
+        // return response.Data?.ToDictionary(p => p.Id, p => p) ?? new();
+
+        // Option 2: Parallel individual calls (still better than waterfall)
+        var tasks = productIds.Select(id => GetProductAsync(id));
+        var products = await Task.WhenAll(tasks);
+        return products.Where(p => p != null).ToDictionary(p => p.Id, p => p);
     }
 }

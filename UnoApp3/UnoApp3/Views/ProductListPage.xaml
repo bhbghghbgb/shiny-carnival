@@ -5,6 +5,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:utu="using:Uno.Toolkit.UI"
       xmlns:vm="using:UnoApp3.ViewModels"
+      xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance Type=vm:ProductListViewModel}"
       x:Name="PageRoot"
@@ -15,6 +16,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Header with search and cart button -->
@@ -29,26 +31,32 @@
 
             <TextBox Grid.Column="0"
                      PlaceholderText="Tìm kiếm sản phẩm..."
-                     Text="{Binding SearchText, Mode=TwoWay}"
-                     Margin="0,0,12,0" />
+                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,0,12,0">
+                <TextBox.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Enter" Command="{Binding ApplyFiltersCommand}" />
+                </TextBox.KeyboardAccelerators>
+            </TextBox>
 
             <Button Grid.Column="1"
-                    Command="{Binding LoadProductsCommand}"
-                    Margin="0,0,8,0">
-                <SymbolIcon Symbol="Refresh" />
+                    Command="{Binding ApplyFiltersCommand}"
+                    Margin="0,0,8,0"
+                    ToolTipService.ToolTip="Tìm kiếm">
+                <SymbolIcon Symbol="Find" />
             </Button>
 
             <Button Grid.Column="2"
-                    Command="{Binding GoToCartCommand}">
+                    Command="{Binding GoToCartCommand}"
+                    ToolTipService.ToolTip="Giỏ hàng">
                 <SymbolIcon Symbol="Shop" />
             </Button>
         </Grid>
 
-        <!-- Tab filter (Category/Supplier - displayed as Pivot) -->
+        <!-- Main content area with Pivot -->
         <Pivot Grid.Row="2" Margin="0,10,0,0">
-            <PivotItem Header="Tất cả">
+            <PivotItem Header="Danh sách">
                 <Grid>
-                    <!-- Product List with Refresh (if RefreshContainer works) -->
+                    <!-- Product List -->
                     <ListView ItemsSource="{Binding Products}"
                               IsItemClickEnabled="True"
                               ItemClick="ListView_ItemClick"
@@ -108,28 +116,132 @@
                                     <Button Grid.Column="3"
                                             Command="{Binding DataContext.AddToCartCommand, ElementName=PageRoot}"
                                             CommandParameter="{Binding}"
-                                            VerticalAlignment="Center">
+                                            VerticalAlignment="Center"
+                                            ToolTipService.ToolTip="Thêm vào giỏ hàng">
                                         <SymbolIcon Symbol="Add" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+
+                    <!-- Empty state -->
+                    <TextBlock Text="Không có sản phẩm nào"
+                               Visibility="{Binding HasProducts, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                 </Grid>
             </PivotItem>
 
-            <!-- Can add other PivotItems for category here -->
-            <PivotItem Header="Theo danh mục">
-                <TextBlock Text="Sẽ implement sau"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Style="{StaticResource BodyTextBlockStyle}"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <!-- Filter PivotItem -->
+            <PivotItem Header="Bộ lọc">
+                <ScrollViewer>
+                    <StackPanel Padding="16" Spacing="12">
+                        <!-- Category ID Filter -->
+                        <StackPanel>
+                            <TextBlock Text="Mã danh mục (ID)"
+                                       Style="{StaticResource BodyTextBlockStyle}" />
+                            <TextBox PlaceholderText="Nhập mã danh mục..."
+                                     InputScope="Number"
+                                     Text="{Binding CategoryId, Mode=TwoWay, Converter={StaticResource NullableIntConverter}}"
+                                     Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <!-- Supplier ID Filter -->
+                        <StackPanel>
+                            <TextBlock Text="Mã nhà cung cấp (ID)"
+                                       Style="{StaticResource BodyTextBlockStyle}" />
+                            <TextBox PlaceholderText="Nhập mã nhà cung cấp..."
+                                     InputScope="Number"
+                                     Text="{Binding SupplierId, Mode=TwoWay, Converter={StaticResource NullableIntConverter}}"
+                                     Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <!-- Price Range Filter -->
+                        <StackPanel>
+                            <TextBlock Text="Khoảng giá"
+                                       Style="{StaticResource BodyTextBlockStyle}" />
+                            <Grid Margin="0,4,0,0" ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox Grid.Column="0"
+                                         PlaceholderText="Giá tối thiểu"
+                                         InputScope="Number"
+                                         Text="{Binding MinPrice, Mode=TwoWay, Converter={StaticResource NullableDecimalConverter}}" />
+
+                                <TextBlock Grid.Column="1"
+                                           Text=" - "
+                                           VerticalAlignment="Center" />
+
+                                <TextBox Grid.Column="2"
+                                         PlaceholderText="Giá tối đa"
+                                         InputScope="Number"
+                                         Text="{Binding MaxPrice, Mode=TwoWay, Converter={StaticResource NullableDecimalConverter}}" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="8"
+                                    Margin="0,16,0,0">
+                            <Button Content="Xóa bộ lọc"
+                                    Command="{Binding ClearFiltersCommand}"
+                                    Style="{StaticResource OutlineButtonStyle}" />
+
+                            <Button Content="Áp dụng"
+                                    Command="{Binding ApplyFiltersCommand}"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </PivotItem>
         </Pivot>
 
+        <!-- Pagination Controls -->
+        <Grid Grid.Row="3"
+              Padding="16,8"
+              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              BorderThickness="0,1,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Previous Page Button -->
+            <Button Grid.Column="0"
+                    Command="{Binding PreviousPageCommand}"
+                    IsEnabled="{Binding HasPreviousPage}"
+                    ToolTipService.ToolTip="Trang trước">
+                <SymbolIcon Symbol="Previous" />
+            </Button>
+
+            <!-- Page Info -->
+            <TextBlock Grid.Column="1"
+                       Text="{Binding PageInfo}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource BodyTextBlockStyle}" />
+
+            <!-- Next Page Button -->
+            <Button Grid.Column="2"
+                    Command="{Binding NextPageCommand}"
+                    IsEnabled="{Binding HasNextPage}"
+                    ToolTipService.ToolTip="Trang sau">
+                <SymbolIcon Symbol="Next" />
+            </Button>
+        </Grid>
+
         <!-- Progress Ring when loading -->
-        <ProgressRing Grid.Row="1"
+        <ProgressRing Grid.Row="1" Grid.RowSpan="3"
                       IsActive="{Binding IsBusy}"
                       Width="50"
                       Height="50"
