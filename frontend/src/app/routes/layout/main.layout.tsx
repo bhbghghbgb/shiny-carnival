@@ -1,8 +1,7 @@
 // frontend/src/app/routes/modules/layout/main.layout.tsx
-import { createRoute } from '@tanstack/react-router';
-import { rootRoute } from '../__root';
+import { createRoute, Outlet } from '@tanstack/react-router';
 import MainLayout from '../../../layouts/MainLayout';
-import { Outlet } from '@tanstack/react-router';
+import { rootRoute } from '../__root';
 import { requireAuth } from '../utils/routeGuards';
 
 export const mainLayoutRoute = createRoute({

@@ -1,8 +1,8 @@
-import { Modal, Descriptions, Tag, Space, Typography, Divider } from 'antd'
 import { useQuery } from '@tanstack/react-query'
+import { Descriptions, Divider, Modal, Space, Tag, Typography } from 'antd'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import { productApiService } from '../api/ProductApiService'
 import type { ProductDetailsDto } from '../types/entity'
-import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 
 const { Title, Text } = Typography
 
@@ -105,6 +105,5 @@ export function ProductDetailModal({ productId, open, onClose }: ProductDetailMo
         </Modal>
     )
 }
-
 
 

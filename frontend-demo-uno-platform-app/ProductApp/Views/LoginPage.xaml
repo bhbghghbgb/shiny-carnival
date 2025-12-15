@@ -1,0 +1,79 @@
+<Page x:Class="ProductApp.Views.LoginPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:toolkit="using:Uno.Toolkit.WinUI"
+      xmlns:mvux="using:Uno.Extensions.Reactive.UI">
+
+    <toolkit:MaterialPage>
+        <Grid toolkit:SafeArea.Insets="All"
+              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <ScrollViewer>
+                <StackPanel Spacing="24" 
+                          Padding="24"
+                          VerticalAlignment="Center"
+                          MaxWidth="400">
+
+                    <!-- Header -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Retail Store"
+                                 FontSize="32"
+                                 FontWeight="Bold"
+                                 HorizontalAlignment="Center"
+                                 Foreground="{ThemeResource PrimaryBrush}"/>
+                        <TextBlock Text="Sign in to your account"
+                                 FontSize="16"
+                                 HorizontalAlignment="Center"
+                                 Foreground="{ThemeResource OnSurfaceVariantBrush}"/>
+                    </StackPanel>
+
+                    <!-- Login Form -->
+                    <StackPanel Spacing="16">
+                        <!-- Username -->
+                        <TextBox Header="Username"
+                               PlaceholderText="Enter your username"
+                               Text="{Binding Username, Mode=TwoWay}">
+                            <TextBox.Icon>
+                                <SymbolIcon Symbol="Contact"/>
+                            </TextBox.Icon>
+                        </TextBox>
+
+                        <!-- Password -->
+                        <PasswordBox Header="Password"
+                                  PlaceholderText="Enter your password"
+                                  Password="{Binding Password, Mode=TwoWay}">
+                            <PasswordBox.Icon>
+                                <SymbolIcon Symbol="Password"/>
+                            </PasswordBox.Icon>
+                        </PasswordBox>
+
+                        <!-- Error Message -->
+                        <Border Background="{ThemeResource ErrorContainer}"
+                                CornerRadius="4"
+                                Padding="12"
+                                Visibility="{Binding ShowError, Converter={StaticResource TrueToVisibleConverter}}">
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                     Foreground="{ThemeResource OnErrorContainer}"
+                                     TextWrapping="Wrap"/>
+                        </Border>
+
+                        <!-- Login Button -->
+                        <Button Content="Sign In"
+                                Command="{Binding LoginCommand}"
+                                HorizontalAlignment="Stretch"
+                                Style="{StaticResource FilledButtonStyle}"
+                                IsEnabled="{Binding LoginCommand.CanExecute}">
+                            <Button.Icon>
+                                <SymbolIcon Symbol="Signin"/>
+                            </Button.Icon>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Loading Indicator -->
+                    <ProgressRing IsActive="{Binding IsBusy}"
+                                Visibility="{Binding IsBusy, Converter={StaticResource TrueToVisibleConverter}}"
+                                HorizontalAlignment="Center"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </toolkit:MaterialPage>
+</Page>

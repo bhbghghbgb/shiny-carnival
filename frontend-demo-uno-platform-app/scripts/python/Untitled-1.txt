@@ -1,0 +1,1307 @@
+CONTEXT: Generate NestJS CRUD entities from Prisma schema with the following patterns and requirements:
+
+PROJECT STRUCTURE:
+- Each entity gets its own module in `src/modules/{entity-name}/`
+- Required files for each entity:
+  - `{entity-name}.module.ts`
+  - `{entity-name}.repository.ts` 
+  - `{entity-name}.service.ts`
+  - `{entity-name}.controller.ts`
+  - `dto/create-{entity-name}.dto.ts`
+  - `dto/update-{entity-name}.dto.ts`
+  - `dto/query-{entity-name}.dto.ts`
+  - `dto/paginated-query-{entity-name}.dto.ts`
+  - `dto/{entity-name}-response.dto.ts`
+  - `dto/pageable-{entity-name}-response.dto.ts`
+
+TECHNICAL STACK:
+- NestJS with TypeScript
+- Prisma ORM
+- class-validator for DTO validation
+- class-transformer for serialization
+- Swagger for API documentation
+- JWT authentication with role-based authorization
+
+KEY PATTERNS:
+
+1. REPOSITORY PATTERN:
+   - Extends BaseRepository<T, C, U, F>
+   - T = Entity type, C = Create input, U = Update input, F = Filter type
+   - Use Prisma generated types for type safety
+
+2. DTO PATTERNS:
+   - Create DTO: Validates creation input, maps to Prisma create input
+   - Update DTO: Extends PartialType(CreateDto) but may need custom fields
+   - Query DTO: Advanced filtering with relation support
+   - Response DTO: Maps entity to response, excludes sensitive fields
+   - Pageable Response DTO: Extends PageableResponseDto<ResponseDto>
+
+3. SERVICE PATTERN:
+   - Handles business logic and validation
+   - Maps between DTOs and entities
+   - Uses repository for data access
+   - Returns Response DTOs only
+
+4. CONTROLLER PATTERN:
+   - Two list endpoints: findAll (non-paginated) and findAllPaginated
+   - Uses @ApiBearerAuth() and @Roles() decorators
+   - Returns appropriate Response DTOs with Swagger documentation
+
+RELATION HANDLING:
+- For relations in create/update: Use Prisma connect syntax
+- Example: `{ user: { connect: { id: userId } } }`
+- Query DTOs should support filtering by related entities
+
+ADVANCED FILTERING REQUIREMENTS:
+Query DTOs should include comprehensive filtering options:
+- Exact match filters for all scalar fields
+- Partial text search (contains) for string fields  
+- Range filters for numeric/date fields
+- Relation filters (filter by related entity fields)
+- Multiple condition support (AND/OR)
+- Enum field filtering with all possible values
+- Null/not-null checks for optional fields
+
+AUTHENTICATION & AUTHORIZATION:
+- All routes secured with JWT by default
+- Use @Public() decorator for public routes
+- Use @Roles(UserRole.admin) for admin-only routes
+- Some entities may have role-specific access patterns
+
+SPECIAL NOTES:
+- Use `declare` modifier when overriding base properties in pageable DTOs
+- Handle nullable fields properly in Response DTOs with `| null` types
+- For password fields: Hash in service before saving, never return in response
+- Use proper Prisma relation syntax for nested creates/updates
+- Include comprehensive Swagger documentation with @ApiProperty decorators
+
+EXAMPLE PRISMA SCHEMA INPUT:
+```
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?  @unique
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  admin   Admin?
+  driver  Driver?
+  parent  Parent?
+  
+  sentNotifications     Notification[] @relation("NotificationSender")
+  receivedNotifications Notification[] @relation("NotificationReceiver")
+}
+
+model Admin {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+
+EXAMPLE CODE (BY MODULE) OUTPUT:
+
+Project Path: enums
+
+Source Tree:
+
+```txt
+enums
+├── attendance-action.enum.ts
+├── location-source.enum.ts
+├── notification-type.enum.ts
+├── trip-status.enum.ts
+├── trip-type.enum.ts
+└── user-role.enum.ts
+
+```
+
+`attendance-action.enum.ts`:
+
+```ts
+export enum AttendanceActionEnum {
+  picked_up = 'picked_up',
+  dropped_off = 'dropped_off',
+  absent = 'absent',
+}
+
+```
+
+`location-source.enum.ts`:
+
+```ts
+export enum LocationSourceEnum {
+  device = 'device',
+  gateway = 'gateway',
+}
+
+```
+
+`notification-type.enum.ts`:
+
+```ts
+export enum NotificationTypeEnum {
+  warning = 'warning',
+  info = 'info',
+  delay = 'delay',
+  arrival = 'arrival',
+}
+
+```
+
+`trip-status.enum.ts`:
+
+```ts
+export enum TripStatusEnum {
+  pending = 'pending',
+  in_progress = 'in_progress',
+  completed = 'completed',
+  cancelled = 'cancelled',
+}
+
+```
+
+`trip-type.enum.ts`:
+
+```ts
+export enum TripTypeEnum {
+  pickup = 'pickup',
+  dropoff = 'dropoff',
+}
+
+```
+
+`user-role.enum.ts`:
+
+```ts
+export enum UserRoleEnum {
+  admin = 'admin',
+  driver = 'driver',
+  parent = 'parent',
+}
+
+```
+
+Project Path: modules
+
+Source Tree:
+
+```txt
+src/modules
+├── admin
+│   ├── admin.controller.ts
+│   ├── admin.module.ts
+│   ├── admin.repository.ts
+│   ├── admin.service.ts
+│   └── dto
+│       ├── admin-response.dto.ts
+│       ├── create-admin.dto.ts
+│       ├── pageable-admin-response.dto.ts
+│       ├── paginated-query-admin.dto.ts
+│       ├── query-admin.dto.ts
+│       └── update-admin.dto.ts
+└── users
+    ├── dto
+    │   ├── create-user.dto.ts
+    │   ├── pageable-user-response.dto.ts
+    │   ├── paginated-query-user.dto.ts
+    │   ├── query-user.dto.ts
+    │   ├── update-user.dto.ts
+    │   └── user-response.dto.ts
+    ├── users.controller.ts
+    ├── users.module.ts
+    ├── users.repository.ts
+    └── users.service.ts
+
+```
+
+`admin\admin.controller.ts`:
+
+```ts
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { AdminService } from './admin.service';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
+import { QueryAdminDto } from './dto/query-admin.dto';
+import { PaginatedQueryAdminDto } from './dto/paginated-query-admin.dto';
+import { AdminResponseDto } from './dto/admin-response.dto';
+import { Roles } from '../../core/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
+import { PageableAdminResponseDto } from './dto/pageable-admin-response.dto';
+
+@ApiTags('admin')
+@ApiBearerAuth()
+@Controller('admin')
+@Roles(UserRole.admin) // Example of admin-only route
+export class AdminController {
+  constructor(private readonly adminService: AdminService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create admin' })
+  @ApiResponse({ status: 201, type: AdminResponseDto })
+  create(@Body() createAdminDto: CreateAdminDto) {
+    return this.adminService.create(createAdminDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all admins (non-paginated)' })
+  @ApiResponse({ status: 200, type: [AdminResponseDto] })
+  findAll(@Query() query: QueryAdminDto) {
+    return this.adminService.findAll(query);
+  }
+
+  @Get('paginated')
+  @ApiOperation({ summary: 'Get all admins (paginated)' })
+  @ApiResponse({ status: 200, type: PageableAdminResponseDto })
+  findAllPaginated(@Query() query: PaginatedQueryAdminDto) {
+    return this.adminService.findAllWithPagination(query);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get admin by ID' })
+  @ApiResponse({ status: 200, type: AdminResponseDto })
+  findOne(@Param('id') id: string) {
+    return this.adminService.findOne(+id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update admin' })
+  @ApiResponse({ status: 200, type: AdminResponseDto })
+  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
+    return this.adminService.update(+id, updateAdminDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete admin' })
+  remove(@Param('id') id: string) {
+    return this.adminService.remove(+id);
+  }
+}
+
+```
+
+`admin\admin.module.ts`:
+
+```ts
+import { Module } from '@nestjs/common';
+import { AdminService } from './admin.service';
+import { AdminController } from './admin.controller';
+import { AdminRepository } from './admin.repository';
+
+@Module({
+  controllers: [AdminController],
+  providers: [AdminService, AdminRepository],
+  exports: [AdminService],
+})
+export class AdminModule {}
+
+```
+
+`admin\admin.repository.ts`:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { BaseRepository } from '../../core/repositories/base.repository';
+import { Admin, Prisma } from '@prisma/client';
+
+@Injectable()
+export class AdminRepository extends BaseRepository<
+  Admin,
+  Prisma.AdminCreateInput,
+  Prisma.AdminUpdateInput,
+  Prisma.AdminWhereInput
+> {
+  protected readonly prisma: PrismaService;
+  protected readonly model = 'admin';
+
+  constructor(prisma: PrismaService) {
+    super();
+    this.prisma = prisma;
+  }
+}
+
+```
+
+`admin\admin.service.ts`:
+
+```ts
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { AdminRepository } from './admin.repository';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
+import { AdminResponseDto } from './dto/admin-response.dto';
+import { QueryAdminDto } from './dto/query-admin.dto';
+import { PaginatedQueryAdminDto } from './dto/paginated-query-admin.dto';
+import { Prisma } from '@prisma/client';
+import { PageableAdminResponseDto } from './dto/pageable-admin-response.dto';
+
+@Injectable()
+export class AdminService {
+  constructor(private readonly adminRepository: AdminRepository) {}
+
+  async create(createAdminDto: CreateAdminDto): Promise<AdminResponseDto> {
+    // Use Prisma relation connect syntax
+    const admin = await this.adminRepository.create({
+      user: {
+        connect: {
+          id: createAdminDto.userId,
+        },
+      },
+    });
+    return AdminResponseDto.fromAdmin(admin);
+  }
+
+  async findAll(query: QueryAdminDto): Promise<AdminResponseDto[]> {
+    const filter = this.buildFilter(query);
+    const admins = await this.adminRepository.findByFilter(filter);
+    return admins.map(AdminResponseDto.fromAdmin);
+  }
+
+  async findAllWithPagination(
+    query: PaginatedQueryAdminDto,
+  ): Promise<PageableAdminResponseDto> {
+    const { page, limit, sortBy, sortOrder, ...filterData } = query;
+    const filter = this.buildFilter(filterData);
+    const pagination = { page, limit, sortBy, sortOrder };
+
+    const result = await this.adminRepository.findByFilterWithPagination(
+      filter,
+      pagination,
+    );
+
+    return {
+      ...result,
+      data: result.data.map(AdminResponseDto.fromAdmin),
+    };
+  }
+
+  async findOne(id: number): Promise<AdminResponseDto> {
+    const admin = await this.adminRepository.findById(id);
+    if (!admin) {
+      throw new NotFoundException(`Admin with ID ${id} not found`);
+    }
+    return AdminResponseDto.fromAdmin(admin);
+  }
+
+  async update(
+    id: number,
+    updateAdminDto: UpdateAdminDto,
+  ): Promise<AdminResponseDto> {
+    const admin = await this.adminRepository.findById(id);
+    if (!admin) {
+      throw new NotFoundException(`Admin with ID ${id} not found`);
+    }
+
+    const updatedAdmin = await this.adminRepository.update(id, {
+      user: {
+        connect: {
+          id: updateAdminDto.userId,
+        },
+      },
+    });
+    return AdminResponseDto.fromAdmin(updatedAdmin);
+  }
+
+  async remove(id: number): Promise<void> {
+    const admin = await this.adminRepository.findById(id);
+    if (!admin) {
+      throw new NotFoundException(`Admin with ID ${id} not found`);
+    }
+    await this.adminRepository.delete(id);
+  }
+
+  private buildFilter(query: QueryAdminDto): Prisma.AdminWhereInput {
+    const filter: Prisma.AdminWhereInput = {};
+
+    if (query.userId) {
+      filter.userId = query.userId;
+    }
+
+    return filter;
+  }
+}
+
+```
+
+`admin\dto\admin-response.dto.ts`:
+
+```ts
+import { ApiProperty } from '@nestjs/swagger';
+import { Admin } from '@prisma/client';
+
+export class AdminResponseDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  userId: number;
+
+  static fromAdmin(admin: Admin): AdminResponseDto {
+    const dto = new AdminResponseDto();
+    dto.id = admin.id;
+    dto.userId = admin.userId;
+    return dto;
+  }
+}
+
+```
+
+`admin\dto\create-admin.dto.ts`:
+
+```ts
+import { ApiProperty } from '@nestjs/swagger';
+import { IsInt } from 'class-validator';
+
+export class CreateAdminDto {
+  @ApiProperty()
+  @IsInt()
+  userId: number;
+}
+
+```
+
+`admin\dto\pageable-admin-response.dto.ts`:
+
+```ts
+import { ApiProperty } from '@nestjs/swagger';
+import { PageableResponseDto } from '../../../core/dto/pageable-response.dto';
+import { AdminResponseDto } from './admin-response.dto';
+
+export class PageableAdminResponseDto extends PageableResponseDto<AdminResponseDto> {
+  @ApiProperty({ type: [AdminResponseDto] })
+  declare data: AdminResponseDto[];
+}
+
+```
+
+`admin\dto\paginated-query-admin.dto.ts`:
+
+```ts
+import { IntersectionType } from '@nestjs/swagger';
+import { QueryAdminDto } from './query-admin.dto';
+import { BaseQueryDto } from '../../../core/dto/base-query.dto';
+
+export class PaginatedQueryAdminDto extends IntersectionType(
+  QueryAdminDto,
+  BaseQueryDto,
+) {}
+
+```
+
+`admin\dto\query-admin.dto.ts`:
+
+```ts
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsInt } from 'class-validator';
+
+export class QueryAdminDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  userId?: number;
+}
+
+```
+
+`admin\dto\update-admin.dto.ts`:
+
+```ts
+import { PartialType } from '@nestjs/swagger';
+import { CreateAdminDto } from './create-admin.dto';
+
+export class UpdateAdminDto extends PartialType(CreateAdminDto) {}
+
+```
+
+`users\dto\create-user.dto.ts`:
+
+```ts
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import { UserRoleEnum } from 'src/core/enums/user-role.enum';
+
+export class CreateUserDto {
+  @ApiProperty()
+  @IsEmail()
+  email: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(1)
+  password: string;
+
+  @ApiProperty()
+  @IsString()
+  fullName: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({ enum: UserRoleEnum })
+  @IsEnum(UserRoleEnum)
+  role: UserRoleEnum;
+}
+
+```
+
+`users\dto\pageable-user-response.dto.ts`:
+
+```ts
+import { ApiProperty } from '@nestjs/swagger';
+import { PageableResponseDto } from '../../../core/dto/pageable-response.dto';
+import { UserResponseDto } from './user-response.dto';
+
+export class PageableUserResponseDto extends PageableResponseDto<UserResponseDto> {
+  @ApiProperty({ type: [UserResponseDto] })
+  declare data: UserResponseDto[];
+}
+
+```
+
+`users\dto\paginated-query-user.dto.ts`:
+
+```ts
+import { IntersectionType } from '@nestjs/swagger';
+import { BaseQueryDto } from 'src/core/dto/base-query.dto';
+import { QueryUserDto } from './query-user.dto';
+
+export class PaginatedQueryUserDto extends IntersectionType(
+  QueryUserDto,
+  BaseQueryDto,
+) {}
+
+```
+
+`users\dto\query-user.dto.ts`:
+
+```ts
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { UserRoleEnum } from 'src/core/enums/user-role.enum';
+
+export class QueryUserDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  fullName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiPropertyOptional({ enum: UserRoleEnum })
+  @IsOptional()
+  @IsEnum(UserRoleEnum)
+  role?: UserRoleEnum;
+}
+
+```
+
+`users\dto\update-user.dto.ts`:
+
+```ts
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { UserRoleEnum } from 'src/core/enums/user-role.enum';
+import { CreateUserDto } from './create-user.dto';
+
+export class UpdateUserDto extends PartialType(CreateUserDto) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  password?: string;
+
+  @ApiPropertyOptional({ enum: UserRoleEnum })
+  @IsOptional()
+  @IsEnum(UserRoleEnum)
+  role?: UserRoleEnum;
+}
+
+```
+
+`users\dto\user-response.dto.ts`:
+
+```ts
+import { ApiProperty } from '@nestjs/swagger';
+import { User, UserRole } from '@prisma/client';
+
+export class UserResponseDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  fullName: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  phone: string | null;
+
+  @ApiProperty({ enum: UserRole })
+  role: UserRole;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+
+  static fromUser(user: User): UserResponseDto {
+    const dto = new UserResponseDto();
+    dto.id = user.id;
+    dto.email = user.email;
+    dto.fullName = user.fullName;
+    dto.phone = user.phone;
+    dto.role = user.role;
+    dto.createdAt = user.createdAt;
+    dto.updatedAt = user.updatedAt;
+    return dto;
+  }
+}
+
+```
+
+`users\users.controller.ts`:
+
+```ts
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { UserRoleEnum } from 'src/core/enums/user-role.enum';
+import { Roles } from '../../core/decorators/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { PageableUserResponseDto } from './dto/pageable-user-response.dto';
+import { PaginatedQueryUserDto } from './dto/paginated-query-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UsersService } from './users.service';
+
+@ApiTags('users')
+@ApiBearerAuth()
+@Controller('users')
+@Roles(UserRoleEnum.admin)
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Create user' })
+  @ApiResponse({ status: 201, type: UserResponseDto })
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all users (non-paginated)' })
+  @ApiResponse({ status: 200, type: [UserResponseDto] })
+  findAll(@Query() query: QueryUserDto) {
+    return this.usersService.findAll(query);
+  }
+
+  @Get('paginated')
+  @ApiOperation({ summary: 'Get all users (paginated)' })
+  @ApiResponse({ status: 200, type: PageableUserResponseDto })
+  findAllPaginated(@Query() query: PaginatedQueryUserDto) {
+    return this.usersService.findAllWithPagination(query);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update user' })
+  @ApiResponse({ status: 200, type: UserResponseDto })
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete user' })
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
+  }
+}
+
+```
+
+`users\users.module.ts`:
+
+```ts
+import { Module } from '@nestjs/common';
+import { UsersController } from './users.controller';
+import { UsersRepository } from './users.repository';
+import { UsersService } from './users.service';
+
+@Module({
+  controllers: [UsersController],
+  providers: [UsersService, UsersRepository],
+  exports: [UsersService, UsersRepository],
+})
+export class UsersModule {}
+
+```
+
+`users\users.repository.ts`:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { Prisma, User } from '@prisma/client';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { BaseRepository } from '../../core/repositories/base.repository';
+
+@Injectable()
+export class UsersRepository extends BaseRepository<
+  User,
+  Prisma.UserCreateInput,
+  Prisma.UserUpdateInput,
+  Prisma.UserWhereInput
+> {
+  protected readonly prisma: PrismaService;
+  protected readonly model = 'user';
+
+  constructor(prisma: PrismaService) {
+    super();
+    this.prisma = prisma;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+    });
+  }
+
+  async findByPhone(phone: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { phone },
+    });
+  }
+
+  async findByEmailOrPhone(emailOrPhone: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        OR: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+      },
+    });
+  }
+}
+
+```
+
+`users\users.service.ts`:
+
+```ts
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Prisma, User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create-user.dto';
+import { PageableUserResponseDto } from './dto/pageable-user-response.dto';
+import { PaginatedQueryUserDto } from './dto/paginated-query-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { UsersRepository } from './users.repository';
+
+@Injectable()
+export class UsersService {
+  constructor(private readonly usersRepository: UsersRepository) {}
+
+  async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const { password, ...userData } = createUserDto;
+
+    // Check if email already exists
+    const existingUser = await this.usersRepository.findByEmail(userData.email);
+    if (existingUser) {
+      throw new ConflictException('Email already exists');
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const user = await this.usersRepository.create({
+      ...userData,
+      passwordHash,
+    });
+
+    return UserResponseDto.fromUser(user);
+  }
+
+  async findAll(query: QueryUserDto): Promise<UserResponseDto[]> {
+    const filter = this.buildFilter(query);
+    const users = await this.usersRepository.findByFilter(filter);
+    return users.map(UserResponseDto.fromUser);
+  }
+
+  async findAllWithPagination(
+    query: PaginatedQueryUserDto,
+  ): Promise<PageableUserResponseDto> {
+    const { page, limit, sortBy, sortOrder, ...filterData } = query;
+    const filter = this.buildFilter(filterData);
+    const pagination = { page, limit, sortBy, sortOrder };
+
+    const result = await this.usersRepository.findByFilterWithPagination(
+      filter,
+      pagination,
+    );
+
+    return {
+      ...result,
+      data: result.data.map(UserResponseDto.fromUser),
+    };
+  }
+
+  async findOne(id: number): Promise<UserResponseDto> {
+    const user = await this.usersRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return UserResponseDto.fromUser(user);
+  }
+
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    const { password, ...updateData } = updateUserDto;
+    const updateInput: Prisma.UserUpdateInput = { ...updateData };
+
+    if (password) {
+      updateInput.passwordHash = await bcrypt.hash(password, 12);
+    }
+
+    const updatedUser = await this.usersRepository.update(id, updateInput);
+    return UserResponseDto.fromUser(updatedUser);
+  }
+
+  async remove(id: number): Promise<void> {
+    const user = await this.usersRepository.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    await this.usersRepository.delete(id);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findByEmail(email);
+  }
+
+  async findByEmailOrPhone(emailOrPhone: string): Promise<User | null> {
+    return this.usersRepository.findByEmailOrPhone(emailOrPhone);
+  }
+
+  async validateUser(
+    identifier: string,
+    password: string,
+  ): Promise<User | null> {
+    const user = await this.usersRepository.findByEmailOrPhone(identifier);
+    if (user && (await bcrypt.compare(password, user.passwordHash))) {
+      return user;
+    }
+    return null;
+  }
+
+  private buildFilter(query: QueryUserDto): Prisma.UserWhereInput {
+    const filter: Prisma.UserWhereInput = {};
+
+    if (query.email) {
+      filter.email = { contains: query.email, mode: 'insensitive' };
+    }
+
+    if (query.fullName) {
+      filter.fullName = { contains: query.fullName, mode: 'insensitive' };
+    }
+
+    if (query.phone) {
+      filter.phone = { contains: query.phone };
+    }
+
+    if (query.role) {
+      filter.role = query.role;
+    }
+
+    return filter;
+  }
+}
+
+```
+src/app.module.ts
+```
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { JwtAuthGuard } from './core/guards/jwt-auth.guard';
+import { RolesGuard } from './core/guards/roles.guard';
+import { PrismaModule } from './core/prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
+import { AdminModule } from './modules/admin/admin.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: {
+        // @ts-ignore
+        expiresIn: (process.env.JWT_EXPIRATION as string) || '1d',
+      },
+    }),
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    AdminModule,
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
+})
+export class AppModule {}
+```
+
+EXPECTED OUTPUT:
+Generate all the required files for each entity following the above patterns, with special attention to:
+1. Proper Prisma relation handling in create/update operations
+2. Comprehensive query filtering with relation support
+3. Correct TypeScript types and Swagger documentation
+4. Proper authentication and authorization setup
+5. Consistent code style and patterns across all entities
+
+Generate all codes for one module in the same codeblock, and write in this format:
+```
+// <file path>
+
+<content>
+
+// <file path>
+
+<content>
+```
+Basically, a comment on file path, then file content, then repeat. File path is relative from project root
+I will provide prisma schema for you to start generating code for the remaining entities (User and Admin is already done as an example above)
+
+```
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?  @unique
+  role         UserRole
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  admin   Admin?
+  driver  Driver?
+  parent  Parent?
+  
+  sentNotifications     Notification[] @relation("NotificationSender")
+  receivedNotifications Notification[] @relation("NotificationReceiver")
+}
+
+model Admin {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Driver {
+  id        Int    @id @default(autoincrement())
+  userId    Int    @unique
+  citizenId String @unique
+  licenseId String @unique
+  
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schedules Schedule[]
+}
+
+model Parent {
+  id        Int    @id @default(autoincrement())
+  userId    Int    @unique
+  citizenId String @unique
+  
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students ParentStudent[]
+}
+
+model Student {
+  id          Int             @id @default(autoincrement())
+  fullName    String
+  class       String?
+  studentCode String          @unique
+  
+  parents   ParentStudent[]
+  schedules StudentSchedule[]
+  attendances Attendance[]
+}
+
+model ParentStudent {
+  parentId  Int
+  studentId Int
+  
+  parent  Parent  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  @@id([parentId, studentId])
+}
+
+model Bus {
+  id           Int        @id @default(autoincrement())
+  licensePlate String     @unique
+  capacity     Int?
+  currentLat   Decimal?
+  currentLng   Decimal?
+  lastUpdated  DateTime?  @default(now())
+  
+  schedules       Schedule[]
+  locationEvents  LocationEvent[]
+}
+
+model Route {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String?
+  
+  itineraries Itinerary[]
+  schedules   Schedule[]
+}
+
+model StopPoint {
+  id        Int     @id @default(autoincrement())
+  name      String
+  address   String?
+  latitude  Decimal
+  longitude Decimal
+  
+  itineraries            Itinerary[]
+  pickupStudentSchedules StudentSchedule[] @relation("PickupStop")
+  dropoffStudentSchedules StudentSchedule[] @relation("DropoffStop")
+  attendances            Attendance[]
+}
+
+model Itinerary {
+  id           Int       @id @default(autoincrement())
+  routeId      Int
+  stopId       Int
+  stopOrder    Int
+  estimatedTime DateTime?
+  
+  route Route     @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  stop  StopPoint @relation(fields: [stopId], references: [id], onDelete: Cascade)
+  
+  @@unique([routeId, stopOrder])
+}
+
+model Schedule {
+  id         Int         @id @default(autoincrement())
+  routeId    Int
+  busId      Int
+  driverId   Int
+  dayOfWeek  Int
+  tripType   TripType
+  startTime  DateTime
+  
+  route    Route            @relation(fields: [routeId], references: [id])
+  bus      Bus              @relation(fields: [busId], references: [id])
+  driver   Driver           @relation(fields: [driverId], references: [id])
+  trips    Trip[]
+  students StudentSchedule[]
+  
+  @@unique([routeId, dayOfWeek, tripType])
+}
+
+model StudentSchedule {
+  id            Int        @id @default(autoincrement())
+  studentId     Int
+  scheduleId    Int
+  pickupStopId  Int?
+  dropoffStopId Int?
+  
+  student     Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  schedule    Schedule   @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  pickupStop  StopPoint? @relation("PickupStop", fields: [pickupStopId], references: [id])
+  dropoffStop StopPoint? @relation("DropoffStop", fields: [dropoffStopId], references: [id])
+  
+  @@unique([studentId, scheduleId])
+}
+
+model Trip {
+  id                 Int        @id @default(autoincrement())
+  scheduleId         Int
+  tripDate           DateTime
+  
+  currentStatus      TripStatus @default(pending)
+  initialStatusTime  DateTime   @default(now())
+  finalStatusTime    DateTime?
+  actualStartTime    DateTime?
+  actualEndTime      DateTime?
+  
+  initialSnapshot Json?
+  finalSnapshot   Json?
+  
+  schedule       Schedule        @relation(fields: [scheduleId], references: [id])
+  locationEvents LocationEvent[]
+  attendances    Attendance[]
+  
+  @@unique([scheduleId, tripDate])
+}
+
+model LocationEvent {
+  id        Int     @id @default(autoincrement())
+  tripId    Int?
+  busId     Int
+  timestamp DateTime @default(now())
+  latitude  Decimal
+  longitude Decimal
+  speedKph  Float?
+  heading   Float?
+  source    LocationSource @default(device)
+  
+  trip Trip? @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  bus  Bus   @relation(fields: [busId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id        Int        @id @default(autoincrement())
+  tripId    Int
+  studentId Int
+  stopId    Int
+  action    AttendanceAction
+  timestamp DateTime   @default(now())
+  
+  trip    Trip      @relation(fields: [tripId], references: [id])
+  student Student   @relation(fields: [studentId], references: [id])
+  stop    StopPoint @relation(fields: [stopId], references: [id])
+  
+  @@unique([tripId, studentId])
+}
+
+model Notification {
+  id          Int        @id @default(autoincrement())
+  senderId    Int?
+  receiverId  Int
+  content     String
+  type        NotificationType
+  isRead      Boolean    @default(false)
+  sentTime    DateTime   @default(now())
+  
+  sender   User? @relation("NotificationSender", fields: [senderId], references: [id], onDelete: SetNull)
+  receiver User  @relation("NotificationReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  admin
+  driver
+  parent
+}
+
+enum TripType {
+  pickup
+  dropoff
+}
+
+enum TripStatus {
+  pending
+  in_progress
+  completed
+  cancelled
+}
+
+enum LocationSource {
+  device
+  gateway
+}
+
+enum AttendanceAction {
+  picked_up
+  dropped_off
+  absent
+}
+
+enum NotificationType {
+  warning
+  info
+  delay
+  arrival
+}
+```

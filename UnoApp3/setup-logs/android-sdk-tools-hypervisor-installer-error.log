@@ -1,0 +1,12 @@
+﻿package.xml parsing problem. unrecognized type name: {http://schemas.android.com/repository/android/common/02}platformDetailsType. Did you mean {http://schemas.android.com/sdk/android/repo/repository2/03}platformDetailsType?package.xml parsing problem. Unable to create an instance of com.android.repository.impl.generated.v2.TypeDetails
+Found corrupted package.xml at C:\Program Files (x86)\Android\android-sdk\platforms\android-36\package.xml
+Exception while marshalling C:\Program Files (x86)\Android\android-sdk\platforms\android-36\package.xml. Probably the SDK is read-only
+Packages to install:
+- Android Emulator hypervisor driver (installer) (extras;google;Android_Emulator_Hypervisor_Driver)
+
+
+Preparing "Install Android Emulator hypervisor driver (installer) v.2.2.0".
+Failed to read or create install properties file.
+Failed packages:
+- Android Emulator hypervisor driver (installer) (extras;google;Android_Emulator_Hypervisor_Driver)
+

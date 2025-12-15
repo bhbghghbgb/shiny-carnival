@@ -82,4 +82,3 @@ export function requireAuth(ctx: LoaderContext) {
   return createRoleGuard(['both'])(ctx);
 }
 
-

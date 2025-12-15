@@ -1,0 +1,50 @@
+<Project Sdk="Uno.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>
+            net10.0;net10.0-ios;net10.0-android;net10.0-maccatalyst;net10.0-browser;net10.0-desktop
+        </TargetFrameworks>
+
+        <OutputType>Exe</OutputType>
+        <UnoSingleProject>true</UnoSingleProject>
+
+        <!-- Display name -->
+        <ApplicationTitle>ProductApp</ApplicationTitle>
+        <!-- App Identifier -->
+        <ApplicationId>com.companyname.productapp</ApplicationId>
+        <!-- Versions -->
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <!-- Package Publisher -->
+        <ApplicationPublisher>ProductApp</ApplicationPublisher>
+        <!-- Package Description -->
+        <Description>ProductApp powered by Uno Platform.</Description>
+
+        <!--
+          UnoFeatures are used to quickly add and manage features enabled for your app.
+          https://aka.platform.uno/singleproject-features
+        -->
+        <UnoFeatures>
+            Material;
+            Toolkit;
+            Mvvm;
+            SkiaRenderer;
+        </UnoFeatures>
+
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    </PropertyGroup>
+    <ItemGroup/>
+    <ItemGroup/>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting"/>
+        <PackageReference Include="Microsoft.Extensions.Http"/>
+        <PackageReference Include="Refit.HttpClientFactory"/>
+        <PackageReference Include="System.Text.Json"/>
+        <PackageReference Include="Uno.Extensions.Hosting.WinUI"/>
+        <PackageReference Include="Uno.Extensions.Navigation"/>
+        <PackageReference Include="Uno.Extensions.Navigation.Toolkit.WinUI"/>
+        <PackageReference Include="Uno.Extensions.Reactive.WinUI"/>
+        <PackageReference Include="Uno.Toolkit.UI"/>
+    </ItemGroup>
+
+</Project>

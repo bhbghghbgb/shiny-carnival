@@ -1,9 +1,9 @@
 
-import { useState, useRef, type ReactNode } from 'react';
 import { Layout } from 'antd';
-import Sidebar from '../components/layout/Sidebar';
-import AppHeader from '../components/layout/Header';
+import { useRef, useState, type ReactNode } from 'react';
 import AppFooter from '../components/layout/Footer';
+import AppHeader from '../components/layout/Header';
+import Sidebar from '../components/layout/Sidebar';
 
 const { Content, Sider } = Layout;
 

@@ -1,6 +1,6 @@
-import { Result, Button } from 'antd';
 import { HomeOutlined, LockOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
+import { Button, Result } from 'antd';
 import { ENDPOINTS } from '../../../app/routes/type/routes.endpoint';
 
 /**
@@ -41,5 +41,4 @@ export function UnauthorizedPage() {
     </div>
   );
 }
-
 

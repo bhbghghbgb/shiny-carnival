@@ -1,0 +1,54 @@
+<Page x:Class="ProductApp.Views.HomePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:toolkit="using:Uno.Toolkit.WinUI"
+      xmlns:views="using:ProductApp.Views">
+
+    <toolkit:MaterialPage>
+        <Grid toolkit:SafeArea.Insets="All">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="{ThemeResource PrimaryBrush}"
+                    Padding="16,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                             Text="{Binding Title}"
+                             FontSize="20"
+                             FontWeight="SemiBold"
+                             VerticalAlignment="Center"
+                             Foreground="{ThemeResource OnPrimaryBrush}"/>
+
+                    <Button Grid.Column="1"
+                            Command="{Binding ViewCartCommand}"
+                            Style="{StaticResource IconButtonStyle}"
+                            Margin="8,0">
+                        <SymbolIcon Symbol="Shop"
+                                  Foreground="{ThemeResource OnPrimaryBrush}"/>
+                    </Button>
+
+                    <Button Grid.Column="2"
+                            Command="{Binding LogoutCommand}"
+                            Style="{StaticResource IconButtonStyle}">
+                        <SymbolIcon Symbol="LeaveChat"
+                                  Foreground="{ThemeResource OnPrimaryBrush}"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Product List Section -->
+            <views:ProductListPage Grid.Row="1"
+                                 DataContext="{Binding ProductListViewModel}"/>
+        </Grid>
+    </toolkit:MaterialPage>
+</Page>

@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "ProductApp",
+  "display": "standalone",
+  "name": "ProductApp",
+  "short_name": "ProductApp",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

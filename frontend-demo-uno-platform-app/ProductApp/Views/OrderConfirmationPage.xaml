@@ -1,0 +1,95 @@
+<Page x:Class="ProductApp.Views.OrderConfirmationPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:toolkit="using:Uno.Toolkit.WinUI">
+
+    <toolkit:MaterialPage>
+        <Grid toolkit:SafeArea.Insets="All"
+              Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+            <ScrollViewer>
+                <StackPanel Spacing="24" 
+                          Padding="24"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          MaxWidth="400">
+
+                    <!-- Success Icon -->
+                    <Border Background="{ThemeResource SuccessContainerBrush}"
+                            Width="80"
+                            Height="80"
+                            CornerRadius="40"
+                            HorizontalAlignment="Center">
+                        <Viewbox>
+                            <SymbolIcon Symbol="Accept" 
+                                       Foreground="{ThemeResource OnSuccessContainerBrush}"/>
+                        </Viewbox>
+                    </Border>
+
+                    <!-- Confirmation Message -->
+                    <StackPanel Spacing="8" HorizontalAlignment="Center">
+                        <TextBlock Text="Order Confirmed!"
+                                  FontSize="24"
+                                  FontWeight="Bold"
+                                  HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding OrderNumber, Converter={StaticResource StringFormatConverter}, ConverterParameter='Order #: {0}'}"
+                                  FontSize="16"
+                                  Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                  HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Order Summary -->
+                    <Border Background="{ThemeResource SurfaceVariantBrush}"
+                            CornerRadius="12"
+                            Padding="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Order Summary"
+                                      FontWeight="SemiBold"
+                                      FontSize="16"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                          Text="Total Amount"
+                                          FontSize="14"/>
+                                <TextBlock Grid.Column="1"
+                                          Text="{Binding TotalAmount, Converter={StaticResource StringFormatConverter}, ConverterParameter='${0:F2}'}"
+                                          FontSize="16"
+                                          FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <TextBlock Text="{Binding Order.OrderDate, Converter={StaticResource StringFormatConverter}, ConverterParameter='Ordered on {0:MMM dd, yyyy}'}"
+                                      FontSize="12"
+                                      Foreground="{ThemeResource OnSurfaceVariantBrush}"
+                                      Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Spacing="8">
+                        <Button Content="Continue Shopping"
+                                Command="{Binding GoToHomeCommand}"
+                                Style="{StaticResource FilledButtonStyle}"
+                                HorizontalAlignment="Stretch">
+                            <Button.Icon>
+                                <SymbolIcon Symbol="Shop"/>
+                            </Button.Icon>
+                        </Button>
+
+                        <Button Content="View Order Details"
+                                Command="{Binding ViewOrderDetailsCommand}"
+                                Style="{StaticResource OutlinedButtonStyle}"
+                                HorizontalAlignment="Stretch">
+                            <Button.Icon>
+                                <SymbolIcon Symbol="View"/>
+                            </Button.Icon>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </toolkit:MaterialPage>
+</Page>
