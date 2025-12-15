@@ -10,7 +10,7 @@ namespace RetailStoreManagement.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/orders")]
-[Authorize] // Both Admin and Staff can access
+[Authorize(Roles = "Admin")] // Only Admin can access
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
@@ -35,6 +35,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize] // Both Admin and Staff can create orders
     public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request)
     {
         var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -43,6 +44,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPatch("{id}/status")]
+    [Authorize] // Both Admin and Staff can update order status
     public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusRequest request)
     {
         var result = await _orderService.UpdateOrderStatusAsync(id, request);
@@ -50,6 +52,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPost("{orderId}/items")]
+    [Authorize] // Both Admin and Staff can add order items
     public async Task<IActionResult> AddOrderItem(int orderId, [FromBody] AddOrderItemRequest request)
     {
         var result = await _orderService.AddOrderItemAsync(orderId, request);
@@ -57,6 +60,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpPut("{orderId}/items/{itemId}")]
+    [Authorize] // Both Admin and Staff can update order items
     public async Task<IActionResult> UpdateOrderItem(int orderId, int itemId, [FromBody] UpdateOrderItemRequest request)
     {
         var result = await _orderService.UpdateOrderItemAsync(orderId, itemId, request);
@@ -64,6 +68,7 @@ public class OrdersController : ControllerBase
     }
 
     [HttpDelete("{orderId}/items/{itemId}")]
+    [Authorize] // Both Admin and Staff can delete order items
     public async Task<IActionResult> DeleteOrderItem(int orderId, int itemId)
     {
         var result = await _orderService.DeleteOrderItemAsync(orderId, itemId);

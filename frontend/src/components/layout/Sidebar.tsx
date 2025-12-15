@@ -1,10 +1,7 @@
+import { useMemo } from 'react';
 import { Avatar, Menu, Typography } from 'antd'
 import {
   AppstoreOutlined,
-  ContainerOutlined,
-  DesktopOutlined,
-  PieChartOutlined,
-  QrcodeOutlined,
   UserOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons';
@@ -12,11 +9,11 @@ import type { MenuProps } from 'antd';
 import { Link } from "@tanstack/react-router";
 import { ENDPOINTS } from '../../app/routes/type/routes.endpoint';
 import { useAuthStore } from '../../features/auth/store/authStore';
+import { canAccessMenuItem } from './menuConfig';
 
 type MenuItem = Required<MenuProps>['items'][number]
 
 const items: MenuItem[] = [
-  { key: '1', icon: <UserOutlined />, label: <Link to={ENDPOINTS.AUTH.PROFILE as any}>Hồ sơ</Link> },
   { key: '2', icon: <ShoppingCartOutlined />, label: <Link to={ENDPOINTS.STAFF.ORDER as any}>Order</Link> }, 
   // { key: '3', icon: <QrcodeOutlined />, label: <Link to={ENDPOINTS.STAFF.QR_SCANNER as any}>QR Scanner</Link> },
   {
@@ -44,7 +41,53 @@ interface SidebarProps {
 const Sidebar = ({ collapsed }: SidebarProps) => {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAdmin = useAuthStore((state) => state.isAdmin());
+  const isStaff = useAuthStore((state) => state.isStaff());
 
+  // Filter menu items dựa trên role
+  const filteredItems = useMemo(() => {
+    if (!isAuthenticated) {
+      return [];
+    }
+
+    return items
+      .map((item): MenuItem | null => {
+        // Type guard: đảm bảo item là object
+        if (!item || typeof item !== 'object') {
+          return null;
+        }
+
+        // Nếu là menu item có children (submenu)
+        if ('children' in item && item.children && Array.isArray(item.children)) {
+          // Filter children items dựa trên role
+          const filteredChildren = item.children.filter((child): child is MenuItem => {
+            if (child && typeof child === 'object' && 'key' in child && child.key) {
+              return canAccessMenuItem(String(child.key), isAdmin, isStaff);
+            }
+            return false;
+          });
+
+          // Chỉ hiển thị submenu nếu có ít nhất 1 child item được phép
+          if (filteredChildren.length === 0) {
+            return null;
+          }
+
+          return {
+            ...item,
+            children: filteredChildren,
+          } as MenuItem;
+        }
+
+        // Nếu là menu item đơn lẻ
+        if ('key' in item && item.key) {
+          const hasAccess = canAccessMenuItem(String(item.key), isAdmin, isStaff);
+          return hasAccess ? item : null;
+        }
+
+        return item;
+      })
+      .filter((item): item is MenuItem => item !== null);
+  }, [isAuthenticated, isAdmin, isStaff]);
 
   return (
     <div>
@@ -62,14 +105,15 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
           <Typography.Text ellipsis style={{ color: 'white', fontWeight: '500', marginLeft: "10px" }}>
             {user?.username || "No Name"}
           </Typography.Text>
+          <Link to={ENDPOINTS.AUTH.PROFILE as any}>Hồ sơ</Link>
         </div>
       )}
       <Menu
-        defaultSelectedKeys={['1']}
+        // defaultSelectedKeys={['1']}
         mode="inline"
         theme="dark"
         inlineCollapsed={collapsed}
-        items={items}
+        items={filteredItems}
       />
     </div>
   )

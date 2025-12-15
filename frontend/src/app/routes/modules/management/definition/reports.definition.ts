@@ -46,4 +46,5 @@ export const reportAdminDefinition: ManagementRouteDefinition<
   component: ReportManagementPage,
   searchSchema: reportSearchSchema,
   loader: (ctx) => fetchReports(ctx),
+  allowedRoles: ['admin'], // Chỉ Admin được truy cập
 };

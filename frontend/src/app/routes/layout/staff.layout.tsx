@@ -10,20 +10,22 @@ export function createStaffLayoutRoute(parentRoute: AnyRoute) {
     component: () => <Outlet />, // Render Outlet để hiển thị các route con
     beforeLoad: async () => {
       // Lấy state từ auth store
-      const { isAuthenticated, isStaff } = useAuthStore.getState();
+      const { isAuthenticated } = useAuthStore.getState();
 
       // Kiểm tra xem user đã đăng nhập chưa
       if (!isAuthenticated) {
         // Redirect đến trang login
-        // Sử dụng window.location vì route có thể chưa được type-check trong route tree
-        window.location.href = '/auth/login';
-        return;
+        throw redirect({
+          to: '/auth/login' as any,
+        });
       }
 
-      // Kiểm tra quyền staff
-      if (!isStaff()) {
+      // Kiểm tra quyền staff - chỉ Staff được truy cập, Admin không được
+      // Admin có role === 0, Staff có role === 1
+      const { user } = useAuthStore.getState();
+      if (!user || user.role !== 1) {
         throw redirect({
-          to: '/',
+          to: '/auth/unauthorized' as any,
         });
       }
     }

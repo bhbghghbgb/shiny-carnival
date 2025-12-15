@@ -79,7 +79,7 @@ axiosClient.interceptors.request.use(
         skipLogging?: boolean;
       };
       error.isRedirecting = true;
-      error.skipLogging = true; // Flag để không log error này
+      error.skipLogging = false; // Tắt skipLogging để xem lỗi chi tiết
       return Promise.reject(error);
     }
 
@@ -96,7 +96,7 @@ axiosClient.interceptors.request.use(
         isRedirecting?: boolean;
         skipLogging?: boolean;
       };
-      error.skipLogging = true;
+      error.skipLogging = false; // Tắt skipLogging để xem lỗi chi tiết
       return Promise.reject(error);
     }
 
@@ -218,6 +218,19 @@ axiosClient.interceptors.response.use(
     if (error.response?.data) {
       // Backend có thể trả về ApiResponse hoặc ProblemDetails (application/problem+json) hoặc validation errors
       const responseData = error.response.data as any;
+
+      // Log error chi tiết (luôn log để debug, nhưng đánh dấu nếu có skipLogging)
+      const errorWithSkipLogging = error as unknown as { skipLogging?: boolean };
+      const logPrefix = errorWithSkipLogging.skipLogging ? '⚠️ [Axios] API Error (skipLogging=true):' : '❌ [Axios] API Error:';
+      console.error(logPrefix, {
+        url: originalRequest?.url,
+        method: originalRequest?.method,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: responseData,
+        headers: error.response?.headers,
+        skipLogging: errorWithSkipLogging.skipLogging || false,
+      });
 
       // Lấy message từ nhiều nguồn có thể
       let errorMessage = 'Có lỗi xảy ra';

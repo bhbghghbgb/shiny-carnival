@@ -69,6 +69,7 @@ export const productAdminDefinition: ManagementRouteDefinition<
   component: ProductManagementPage,
   searchSchema: productSearchSchema,
   loader: (ctx) => fetchProducts(ctx),
+  allowedRoles: ['admin', 'staff'], // Admin và Staff đều truy cập được
 };
 
 export function createProductsQueryOptions(search: ProductSearch) {

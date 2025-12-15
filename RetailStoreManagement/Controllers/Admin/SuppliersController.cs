@@ -9,7 +9,7 @@ namespace RetailStoreManagement.Controllers.Admin;
 
 [ApiController]
 [Route("api/admin/suppliers")]
-[Authorize(Roles = "Admin")]
+[Authorize] // Both Admin and Staff can access
 public class SuppliersController : ControllerBase
 {
     private readonly ISupplierService _supplierService;

@@ -11,6 +11,7 @@ import {
 } from '../type/types';
 import { PendingComponent } from '../../../components/feedback/PendingComponent';
 import { ErrorComponent } from '../../../components/feedback/ErrorComponent';
+import { createRoleGuard } from './routeGuards';
 
 /**
  * Helper function để tự động thêm basePath vào path tương đối
@@ -100,6 +101,10 @@ export function generateCRUDRoutesConfigs<
 ): HierarchicalModuleRouteConfig[] {
   const { entityName, basePath, components, loaders, searchSchemas } = definition;
 
+  // Tạo role guard dựa trên allowedRoles (mặc định: chỉ admin)
+  const allowedRoles = definition.allowedRoles || ['admin'];
+  const roleGuard = createRoleGuard(allowedRoles);
+
   // 1. List Route - Độc lập
   const listConfig = createHierarchicalRouteConfig(
     {
@@ -107,6 +112,7 @@ export function generateCRUDRoutesConfigs<
       component: components.list,
       searchSchema: searchSchemas.list,
       loader: loaders.list,
+      beforeLoad: roleGuard, // ✅ Thêm role guard
       meta: { title: `Quản lý ${entityName}`, requiresAuth: true },
       // ✅ KHÔNG có children
     },
@@ -118,6 +124,7 @@ export function generateCRUDRoutesConfigs<
     {
       path: resolvePath(basePath, 'create'), // ✅ Tự động thành 'customers/create'
       component: components.create,
+      beforeLoad: roleGuard, // ✅ Thêm role guard
       meta: { title: `Tạo ${entityName} mới`, requiresAuth: true },
       // ✅ KHÔNG có children
     },
@@ -130,6 +137,7 @@ export function generateCRUDRoutesConfigs<
       path: resolvePath(basePath, '$id'), // ✅ Tự động thành 'customers/$id'
       component: components.detail,
       loader: loaders.detail,
+      beforeLoad: roleGuard, // ✅ Thêm role guard
       meta: { title: `Chi tiết ${entityName}`, requiresAuth: true },
       // ✅ KHÔNG có children
     },
@@ -142,6 +150,7 @@ export function generateCRUDRoutesConfigs<
       path: resolvePath(basePath, '$id/edit'), // ✅ Tự động thành 'customers/$id/edit'
       component: components.edit,
       loader: loaders.detail, // ✅ Có thể dùng lại loader của detail
+      beforeLoad: roleGuard, // ✅ Thêm role guard
       meta: { title: `Chỉnh sửa ${entityName}`, requiresAuth: true },
       // ✅ KHÔNG có children
     },
@@ -163,12 +172,17 @@ export function generateManagementRouteConfigs<
     definition: ManagementRouteDefinition<TLoaderData, TSearch, TRouterContext>,
     customRouteConfig: Partial<RouteOptions<any>> = {}
 ): HierarchicalModuleRouteConfig[] {
+    // Tạo role guard dựa trên allowedRoles (mặc định: chỉ admin)
+    const allowedRoles = definition.allowedRoles || ['admin'];
+    const roleGuard = createRoleGuard(allowedRoles);
+
     const adminConfig = createHierarchicalRouteConfig(
         {
             path: definition.path,
             component: definition.component,
             searchSchema: definition.searchSchema,
             loader: definition.loader,
+            beforeLoad: roleGuard, // ✅ Thêm role guard
             meta: {
                 title: `Quản trị ${definition.entityName}`,
                 requiresAuth: true,

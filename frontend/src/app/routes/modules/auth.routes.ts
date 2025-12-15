@@ -4,6 +4,7 @@ import { RegisterPage } from '../../../features/auth/pages/RegisterPage';
 import { ForgotPasswordPage } from '../../../features/auth/pages/ForgotPasswordPage';
 import { ResetPasswordPage } from '../../../features/auth/pages/ResetPasswordPage';
 import { ProfilePage } from '../../../features/profile/pages/ProfilePage';
+import { UnauthorizedPage } from '../../../features/auth/pages/UnauthorizedPage';
 import { PendingComponent } from '../../../components/feedback/PendingComponent';
 import { useAuthStore } from '../../../features/auth/store/authStore';
 
@@ -72,6 +73,16 @@ export const authRoutes: ModuleRoutes<any> = {
             title: 'Hồ sơ cá nhân',
             description: 'Trang quản lý hồ sơ cá nhân và đơn hàng',
             requiresAuth: true,
+          },
+        },
+        {
+          path: 'unauthorized',
+          component: UnauthorizedPage,
+          pendingComponent: PendingComponent,
+          meta: {
+            title: 'Không có quyền truy cập',
+            description: 'Bạn không có quyền truy cập trang này',
+            requiresAuth: false,
           },
         },
       ],
