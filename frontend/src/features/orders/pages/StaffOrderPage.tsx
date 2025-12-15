@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Card, message } from 'antd'
+import { useQueryClient } from '@tanstack/react-query'
 import { CreateOrderForm } from '../components/CreateOrderForm'
 import { PaymentConfirmationModal } from '../components/PaymentConfirmationModal'
 import { orderApiService } from '../api/OrderApiService'
 import { useUpdateOrderStatus } from '../hooks/useOrders'
+import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import { API_CONFIG } from '../../../config/api.config'
 import type { CreateOrderRequest } from '../types/api'
 
@@ -12,10 +14,28 @@ export function StaffOrderPage() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
     const [paymentModalOpen, setPaymentModalOpen] = useState(false)
     const [createdOrderId, setCreatedOrderId] = useState<number | null>(null)
+    const printPdfRef = useRef<(() => Promise<void>) | null>(null)
+    const queryClient = useQueryClient()
+    const queryKeys = createQueryKeys('orders')
 
     const updateOrderStatus = useUpdateOrderStatus({
-        onSuccess: () => {
+        onSuccess: async () => {
             message.success('Xác nhận thanh toán thành công!')
+            
+            // Đợi một chút để đảm bảo query được invalidate
+            await new Promise(resolve => setTimeout(resolve, 300))
+            
+            // Refetch order details để có status mới nhất
+            if (createdOrderId) {
+                await queryClient.refetchQueries({ queryKey: queryKeys.detail(createdOrderId) })
+                // Đợi thêm một chút để UI cập nhật
+                await new Promise(resolve => setTimeout(resolve, 300))
+                // Xuất PDF nếu có callback
+                if (printPdfRef.current) {
+                    await printPdfRef.current()
+                }
+            }
+            
             setPaymentModalOpen(false)
             setCreatedOrderId(null)
         },
@@ -81,9 +101,13 @@ export function StaffOrderPage() {
                 onClose={() => {
                     setPaymentModalOpen(false)
                     setCreatedOrderId(null)
+                    printPdfRef.current = null
                 }}
                 onConfirmPayment={handleConfirmPayment}
                 isConfirming={updateOrderStatus.isPending}
+                onPrintPdfReady={(printFn) => {
+                    printPdfRef.current = printFn
+                }}
             />
         </>
     )

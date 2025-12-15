@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Typography } from 'antd'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 import { API_CONFIG } from '../../../config/api.config'
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
 import { orderApiService } from '../api/OrderApiService'
@@ -13,6 +15,7 @@ interface PaymentConfirmationModalProps {
     onClose: () => void
     onConfirmPayment: (orderId: number) => Promise<void>
     isConfirming?: boolean
+    onPrintPdfReady?: (printFn: () => Promise<void>) => void
 }
 
 export function PaymentConfirmationModal({
@@ -21,6 +24,7 @@ export function PaymentConfirmationModal({
     onClose,
     onConfirmPayment,
     isConfirming = false,
+    onPrintPdfReady,
 }: PaymentConfirmationModalProps) {
     const queryKeys = createQueryKeys('orders')
 
@@ -81,6 +85,52 @@ export function PaymentConfirmationModal({
         return labelMap[status] || status
     }
 
+    // Expose printPDF function to parent component
+    const printPDF = async () => {
+        if (!orderId) return
+        
+        const input = document.getElementById('order-detail-pdf')
+        if (!input) return
+
+        const pdf = new jsPDF('p', 'mm', 'a4')
+
+        const pageWidth = pdf.internal.pageSize.getWidth()
+        const pageHeight = pdf.internal.pageSize.getHeight()
+        const contentWidth = pageWidth - 15 * 2
+        const contentHeight = pageHeight
+
+        const drawHeader = () => {
+            pdf.setFontSize(14)
+            pdf.setFont('helvetica', 'bold')
+            pdf.text('CHI TIET DON HANG #' + orderId, pageWidth / 2, 20, { align: 'center' })
+            pdf.setLineWidth(0.3)
+            pdf.line(15, 35, pageWidth - 15, 35)
+        }
+
+        const canvas = await html2canvas(input, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+        const imgData = canvas.toDataURL('image/jpeg', 1.0)
+        const imgHeight = (canvas.height * contentWidth) / canvas.width
+        let heightLeft = imgHeight
+        let position = 20
+
+        drawHeader()
+        pdf.addImage(imgData, 'JPEG', 15, position, contentWidth, imgHeight)
+
+        heightLeft -= contentHeight
+        while (heightLeft > 0) {
+            pdf.addPage()
+            position = 20 - (imgHeight - heightLeft)
+            pdf.addImage(imgData, 'JPEG', 15, position, contentWidth, imgHeight)
+            heightLeft -= contentHeight
+        }
+        pdf.save(`don-hang-${orderId}.pdf`)
+    }
+
+    // Expose printPDF to parent when modal opens
+    if (open && onPrintPdfReady && orderId) {
+        onPrintPdfReady(printPDF)
+    }
+
     const handleConfirmPayment = async () => {
         if (!orderId) return
         try {
@@ -116,6 +166,7 @@ export function PaymentConfirmationModal({
             {isLoading ? (
                 <div style={{ textAlign: 'center', padding: '40px' }}>Đang tải...</div>
             ) : orderDetails ? (
+                <div id="order-detail-pdf">
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                     {/* Thông tin đơn hàng */}
                     <Descriptions title="Thông tin đơn hàng" bordered column={2}>
@@ -198,6 +249,7 @@ export function PaymentConfirmationModal({
                         </div>
                     )}
                 </Space>
+                </div>
             ) : (
                 <div style={{ textAlign: 'center', padding: '40px' }}>
                     Không tìm thấy thông tin đơn hàng
