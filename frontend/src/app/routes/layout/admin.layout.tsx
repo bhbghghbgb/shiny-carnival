@@ -10,22 +10,19 @@ export function createAdminLayoutRoute(parentRoute: AnyRoute) {
     component: () => <Outlet />, // Render Outlet để hiển thị các route con
     beforeLoad: async () => {
       // Lấy state từ auth store
-      const { isAuthenticated, isAdmin } = useAuthStore.getState();
+      const { isAuthenticated } = useAuthStore.getState();
 
-      // Kiểm tra xem user đã đăng nhập chưa
+      // Chỉ kiểm tra authentication ở layout level
+      // Route guards ở từng route sẽ kiểm tra quyền cụ thể (admin/staff)
       if (!isAuthenticated) {
         // Redirect đến trang login
-        // Sử dụng window.location vì route có thể chưa được type-check trong route tree
-        window.location.href = '/auth/login';
-        return;
-      }
-
-      // Kiểm tra quyền admin
-      if (!isAdmin()) {
         throw redirect({
-          to: '/',
+          to: '/auth/login' as any,
         });
       }
+
+      // Không kiểm tra role ở đây - để route guards ở từng route kiểm tra
+      // Điều này cho phép Staff truy cập các routes mà họ có quyền (Products, Inventory, Suppliers)
     }
   });
 }

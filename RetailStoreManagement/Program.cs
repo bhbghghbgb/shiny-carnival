@@ -4,6 +4,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RetailStoreManagement.Data;
@@ -16,14 +17,31 @@ using RetailStoreManagement.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Log để kiểm tra environment và config files được load
+var environment = builder.Environment.EnvironmentName;
+var logger = LoggerFactory.Create(config => config.AddConsole()).CreateLogger<Program>();
+logger.LogInformation("=== Configuration Loading ===");
+logger.LogInformation($"Environment: {environment}");
+logger.LogInformation($"Content Root: {builder.Environment.ContentRootPath}");
+logger.LogInformation($"Config files sẽ được load theo thứ tự:");
+logger.LogInformation("1. appsettings.json (base)");
+logger.LogInformation($"2. appsettings.{environment}.json (override)");
+logger.LogInformation("3. Environment variables");
+logger.LogInformation("4. Command line arguments");
+
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+// CORS Configuration
+var corsSettings = builder.Configuration.GetSection("CorsSettings");
+var allowedOrigins = corsSettings.GetSection("AllowedOrigins").Get<string[]>() 
+    ?? new[] { "http://localhost:5173" }; // Fallback nếu không có config
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173")
+            policy.WithOrigins(allowedOrigins)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials(); // Cho phép gửi cookies
@@ -57,6 +75,9 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+
+// Background Services
+builder.Services.AddHostedService<RefreshTokenCleanupService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));

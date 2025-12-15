@@ -1,18 +1,17 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Form, Input, InputNumber, Button, Space, Card, Table, Typography, Divider, message, Alert } from 'antd'
-import { PlusOutlined, DeleteOutlined, QrcodeOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useQueryClient } from '@tanstack/react-query'
 import { DropDownWithFilter } from '../../../components/common/DropDownWithFilter'
 import { customerApiService } from '../../customers/api/CustomerApiService'
 import { productApiService } from '../../products/api/ProductApiService'
 import { useOrderStore, type DraftOrderItem } from '../store/orderStore'
 import { createQueryKeys } from '../../../lib/query/queryOptionsFactory'
-import { QRCodeScanner } from './QRCodeScanner'
-import { ProductPreviewModal } from './ProductPreviewModal'
 import type { CustomerEntity } from '../../customers/types/entity'
-import type { ProductEntity } from '../../products/types/entity'
+import type { ProductEntity, ProductDetailsDto } from '../../products/types/entity'
 import type { CreateOrderRequest } from '../types/api'
 import type { DropDownWithFilterOption } from '../../../components/common/DropDownWithFilter'
+import { QRScanner } from '../../qr-scanner/components/QRScanner'
 
 const { Title, Text } = Typography
 
@@ -34,10 +33,6 @@ export function CreateOrderForm({
     const [form] = Form.useForm()
     const [selectedProduct, setSelectedProduct] = useState<number | null>(null)
     const [quantity, setQuantity] = useState<number>(1)
-    const [isScanning, setIsScanning] = useState(false)
-    const [scannedProduct, setScannedProduct] = useState<ProductEntity | null>(null)
-    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
-    const [isSearchingProduct, setIsSearchingProduct] = useState(false)
     const queryClient = useQueryClient()
     const productQueryKeys = createQueryKeys('products')
 
@@ -48,7 +43,7 @@ export function CreateOrderForm({
     // Load draft từ localStorage khi component mount (chỉ một lần)
     useEffect(() => {
         const draftOrder = useOrderStore.getState().draftOrder
-        const initialValues: any = {}
+        const initialValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>> = {}
         if (draftOrder.customerId) {
             initialValues.customerId = draftOrder.customerId
         }
@@ -62,10 +57,10 @@ export function CreateOrderForm({
     }, []) // Chỉ chạy một lần khi mount để load draft từ localStorage
 
     // Fetch products để lấy thông tin khi thêm vào order - sử dụng TanStack Query
-    const fetchProductDetails = async (productId: number): Promise<ProductEntity | null> => {
+    const fetchProductDetails = async (productId: number): Promise<ProductDetailsDto | null> => {
         try {
             // Sử dụng queryClient.fetchQuery để đảm bảo data được cache và có thể reuse
-            const product = await queryClient.fetchQuery<ProductEntity>({
+            const product = await queryClient.fetchQuery<ProductDetailsDto>({
                 queryKey: productQueryKeys.detail(productId),
                 queryFn: () => productApiService.getById(productId),
             })
@@ -87,15 +82,7 @@ export function CreateOrderForm({
             return
         }
 
-        // Kiểm tra sản phẩm đã tồn tại chưa (đọc từ store bằng getState())
-        const currentDraftOrder = useOrderStore.getState().draftOrder
-        const existingItem = currentDraftOrder.orderItems.find(item => item.productId === selectedProduct)
-        if (existingItem) {
-            message.warning('Sản phẩm đã có trong đơn hàng. Vui lòng xóa và thêm lại nếu muốn thay đổi số lượng.')
-            return
-        }
-
-        // Fetch product details
+        // Fetch product details để lấy thông tin mới nhất (bao gồm giá có thể đã thay đổi)
         const product = await fetchProductDetails(selectedProduct)
         if (!product) {
             message.error('Không thể lấy thông tin sản phẩm')
@@ -105,6 +92,8 @@ export function CreateOrderForm({
         const newItem: DraftOrderItem = {
             productId: product.id,
             productName: product.productName,
+            categoryName: product.categoryName || '',
+            barcode: product.barcode,
             price: product.price,
             quantity: quantity,
             subtotal: product.price * quantity,
@@ -114,7 +103,6 @@ export function CreateOrderForm({
         setSelectedProduct(null)
         setQuantity(1)
         form.setFieldsValue({ productId: undefined, quantity: 1 })
-        message.success('Đã thêm sản phẩm vào đơn hàng')
     }
 
     const handleRemoveProduct = (productId: number) => {
@@ -130,92 +118,6 @@ export function CreateOrderForm({
         useOrderStore.getState().updateDraftOrderItemQuantity(productId, newQuantity)
     }
 
-    // QR Scanner handlers
-    const handleScanClick = () => {
-        setIsScanning(true)
-    }
-
-    const handleScanSuccess = async (decodedText: string) => {
-        try {
-            setIsSearchingProduct(true)
-            setIsScanning(false) // Pause scanner
-
-            // Search product by barcode
-            const products = await productApiService.searchByBarcode(decodedText)
-            
-            if (products.length === 0) {
-                message.error('Không tìm thấy sản phẩm với mã vạch này')
-                setIsSearchingProduct(false)
-                setIsScanning(true) // Resume scanner
-                return
-            }
-
-            // Use first matching product
-            const product = products[0]
-            setScannedProduct(product)
-            setIsPreviewModalOpen(true)
-            setIsSearchingProduct(false)
-        } catch (error: any) {
-            console.error('Error searching product by barcode:', error)
-            message.error(error?.response?.data?.message || 'Có lỗi xảy ra khi tìm kiếm sản phẩm')
-            setIsSearchingProduct(false)
-            setIsScanning(true) // Resume scanner on error
-        }
-    }
-
-    const handleScanError = (error: string) => {
-        // Most scan errors are expected (no QR found, etc.)
-        // Only log meaningful errors
-        if (error && !error.includes('No QR code found')) {
-            console.warn('Scan error:', error)
-        }
-    }
-
-    const handleCancelScan = () => {
-        setIsScanning(false)
-    }
-
-    const handleConfirmProduct = () => {
-        if (!scannedProduct) {
-            return
-        }
-
-        // Check if product already exists in order
-        const currentDraftOrder = useOrderStore.getState().draftOrder
-        const existingItem = currentDraftOrder.orderItems.find(
-            item => item.productId === scannedProduct.id
-        )
-
-        if (existingItem) {
-            message.warning('Sản phẩm đã có trong đơn hàng. Vui lòng xóa và thêm lại nếu muốn thay đổi số lượng.')
-            setIsPreviewModalOpen(false)
-            setScannedProduct(null)
-            return
-        }
-
-        // Add product to order with quantity = 1
-        const newItem: DraftOrderItem = {
-            productId: scannedProduct.id,
-            productName: scannedProduct.productName,
-            price: scannedProduct.price,
-            quantity: 1,
-            subtotal: scannedProduct.price * 1,
-        }
-
-        useOrderStore.getState().addDraftOrderItem(newItem)
-        message.success('Đã thêm sản phẩm vào đơn hàng')
-        
-        // Close modal and reset state
-        setIsPreviewModalOpen(false)
-        setScannedProduct(null)
-    }
-
-    const handleCancelPreview = () => {
-        setIsPreviewModalOpen(false)
-        setScannedProduct(null)
-        setIsScanning(true) // Resume scanner
-    }
-
     const handleCancel = () => {
         // Reset form
         form.resetFields()
@@ -224,9 +126,6 @@ export function CreateOrderForm({
         // Reset local state
         setSelectedProduct(null)
         setQuantity(1)
-        setIsScanning(false)
-        setScannedProduct(null)
-        setIsPreviewModalOpen(false)
         // Call parent onCancel
         onCancel()
     }
@@ -274,7 +173,7 @@ export function CreateOrderForm({
 
     // Sync customer và promo code với draft khi form value thay đổi (sử dụng Form's onValuesChange)
     // Sử dụng getState() để đọc giá trị hiện tại và so sánh, tránh subscribe gây re-render
-    const handleFormValuesChange = (changedValues: any) => {
+    const handleFormValuesChange = (changedValues: Partial<Pick<DraftOrder, 'customerId' | 'promoCode'>>) => {
         const currentDraftOrder = useOrderStore.getState().draftOrder
 
         // Chỉ update store nếu giá trị thực sự thay đổi
@@ -299,6 +198,16 @@ export function CreateOrderForm({
             title: 'Sản phẩm',
             dataIndex: 'productName',
             key: 'productName',
+        },
+        {
+            title: 'Danh mục',
+            dataIndex: 'categoryName',
+            key: 'categoryName',
+        },
+        {
+            title: 'Mã vạch',
+            dataIndex: 'barcode',
+            key: 'barcode',
         },
         {
             title: 'Đơn giá',
@@ -332,7 +241,7 @@ export function CreateOrderForm({
             title: 'Thao tác',
             key: 'action',
             align: 'center' as const,
-            render: (_: any, record: DraftOrderItem) => (
+            render: (_: unknown, record: DraftOrderItem) => (
                 <Button
                     type="text"
                     danger
@@ -347,9 +256,9 @@ export function CreateOrderForm({
         <div style={{ display: 'flex', gap: '24px', minHeight: '500px' }}>
             {/* Form bên trái */}
             <div style={{ flex: 1 }}>
-                <Form 
-                    form={form} 
-                    layout="vertical" 
+                <Form
+                    form={form}
+                    layout="vertical"
                     onFinish={handleSubmit}
                     onValuesChange={handleFormValuesChange}
                 >
@@ -443,25 +352,19 @@ export function CreateOrderForm({
                                 />
                             </Form.Item>
 
-                            <Space style={{ width: '100%' }} size="middle">
-                                <Button
-                                    type="dashed"
-                                    icon={<PlusOutlined />}
-                                    onClick={handleAddProduct}
-                                    style={{ flex: 1 }}
-                                >
-                                    Thêm vào đơn hàng
-                                </Button>
-                                <Button
-                                    type="default"
-                                    icon={<QrcodeOutlined />}
-                                    onClick={handleScanClick}
-                                    style={{ flex: 1 }}
-                                >
-                                    Scan
-                                </Button>
-                            </Space>
+                            <Button
+                                type="dashed"
+                                icon={<PlusOutlined />}
+                                onClick={handleAddProduct}
+                                block
+                            >
+                                Thêm vào đơn hàng
+                            </Button>
                         </Space>
+                    </Card>
+
+                    <Card title="Quét mã QR sản phẩm" size="small" style={{ marginBottom: 16 }}>
+                        <QRScanner />
                     </Card>
 
                     <Form.Item
@@ -485,14 +388,7 @@ export function CreateOrderForm({
             {/* Preview panel bên phải */}
             <div style={{ flex: 1 }}>
                 <Card title="Thông tin đơn hàng" style={{ position: 'sticky', top: 0 }}>
-                    {isScanning ? (
-                        <QRCodeScanner
-                            onScanSuccess={handleScanSuccess}
-                            onScanError={handleScanError}
-                            onClose={handleCancelScan}
-                            visible={isScanning}
-                        />
-                    ) : orderItems.length === 0 ? (
+                    {orderItems.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '40px', color: '#999' }}>
                             Chưa có sản phẩm nào trong đơn hàng
                         </div>
@@ -530,16 +426,6 @@ export function CreateOrderForm({
                     )}
                 </Card>
             </div>
-
-            {/* Product Preview Modal */}
-            <ProductPreviewModal
-                product={scannedProduct}
-                open={isPreviewModalOpen}
-                onConfirm={handleConfirmProduct}
-                onCancel={handleCancelPreview}
-                loading={isSearchingProduct}
-            />
         </div>
     )
 }
-

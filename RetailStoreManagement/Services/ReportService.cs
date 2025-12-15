@@ -40,11 +40,17 @@ public class ReportService : IReportService
                     Period = $"{request.StartDate:yyyy-MM-dd} to {request.EndDate:yyyy-MM-dd}"
                 }).FirstOrDefaultAsync() ?? new RevenueSummaryDto();
 
-            var details = await query
-                .GroupBy(o => new { Period = GetGroupByKey(o.OrderDate, request.GroupBy) })
+            // Group by period using inline conditional expressions that EF Core can translate
+            // Cannot use custom method GetGroupByKey as EF Core cannot translate it to SQL
+            // Fetch orders first, then group in memory to avoid EF Core translation issues
+            // This allows us to use custom grouping logic that EF Core cannot translate
+            var orders = await query.ToListAsync();
+            
+            var details = orders
+                .GroupBy(o => GetGroupByKey(o.OrderDate, request.GroupBy))
                 .Select(g => new RevenueDetailDto
                 {
-                    Period = g.Key.Period,
+                    Period = g.Key,
                     TotalRevenue = g.Sum(o => o.TotalAmount - o.DiscountAmount),
                     TotalOrders = g.Count(),
                     TotalDiscount = g.Sum(o => o.DiscountAmount),
@@ -52,7 +58,7 @@ public class ReportService : IReportService
                     Date = g.Min(o => o.OrderDate)
                 })
                 .OrderBy(d => d.Date)
-                .ToListAsync();
+                .ToList();
 
             var report = new RevenueReportDto
             {

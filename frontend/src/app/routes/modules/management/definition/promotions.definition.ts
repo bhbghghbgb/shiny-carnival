@@ -60,6 +60,7 @@ export const promotionAdminDefinition: ManagementRouteDefinition<
   component: PromotionManagementPage,
   searchSchema: promotionSearchSchema,
   loader: (ctx) => fetchPromotions(ctx),
+  allowedRoles: ['admin'], // Chỉ Admin được truy cập
 };
 
 export function createPromotionsQueryOptions(search: PromotionSearch) {

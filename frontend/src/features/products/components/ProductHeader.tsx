@@ -1,5 +1,6 @@
 import { FileExcelOutlined, FilePdfOutlined, ShoppingOutlined } from '@ant-design/icons';
 import { Button, Card, Col, Row, Space, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { exportTablePdf } from '../../../utils/exportPdf';
 import { buildOptionMap, getIdFromOptionMap, importTableExcel } from '../../../utils/importExcel';
 import type { CreateProductRequest, ProductEntity } from '../api';
@@ -16,12 +17,51 @@ interface ProductHeaderProps {
 }
 
 export const ProductHeader = ({ products }: ProductHeaderProps) => {
-    const {createProduct} = useProductManagementPage()  
+    const {createProduct} = useProductManagementPage();
+    const [categoryMap, setCategoryMap] = useState<Map<string, number>>(new Map());
+    const [supplierMap, setSupplierMap] = useState<Map<string, number>>(new Map());
+    const [mapsLoaded, setMapsLoaded] = useState(false);
+
+    // Lazy load category và supplier maps khi component mount
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadMaps = async () => {
+            try {
+                const [catMap, supMap] = await Promise.all([
+                    buildOptionMap(fetchCategoryOptions),
+                    buildOptionMap(fetchSupplierOptions)
+                ]);
+                
+                if (isMounted) {
+                    setCategoryMap(catMap);
+                    setSupplierMap(supMap);
+                    setMapsLoaded(true);
+                }
+            } catch (error) {
+                // Ignore errors khi đang redirect hoặc không có quyền truy cập
+                const err = error as Error & { isRedirecting?: boolean; skipLogging?: boolean };
+                if (!err.isRedirecting && !err.skipLogging) {
+                    console.error('Lỗi khi tải danh sách categories/suppliers:', error);
+                }
+            }
+        };
+
+        loadMaps();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const exportPDF = () => {
         exportTablePdf(productPageConfig,products,"products");
     };
     const importExcel = async (file: File) => {
+        if (!mapsLoaded) {
+            throw new Error('Danh sách categories và suppliers chưa được tải. Vui lòng thử lại sau.');
+        }
+
         await importTableExcel(file, payload => 
             createProduct.mutateAsync({
                 ...(payload as CreateProductRequest),
@@ -80,6 +120,7 @@ export const ProductHeader = ({ products }: ProductHeaderProps) => {
                             size="large"
                             icon={<FileExcelOutlined />}
                             onClick={() => document.getElementById("importExcelInput")?.click()}
+                            disabled={!mapsLoaded}
                             style={{
                                 borderRadius: '8px',
                                 height: '40px',

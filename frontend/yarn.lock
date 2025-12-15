@@ -2152,7 +2152,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.13.2":
+"axios@npm:^1.12.2":
   version: 1.13.2
   resolution: "axios@npm:1.13.2"
   dependencies:
@@ -3336,6 +3336,16 @@ __metadata:
   dependencies:
     function-bind: "npm:^1.1.2"
   checksum: 10c0/3769d434703b8ac66b209a4cca0737519925bbdb61dd887f93a16372b14694c63ff4e797686d87c90f08168e81082248b9b028bad60d4da9e0d1148766f56eb9
+  languageName: node
+  linkType: hard
+
+"html2canvas@npm:^1.0.0-rc.5, html2canvas@npm:^1.4.1":
+  version: 1.4.1
+  resolution: "html2canvas@npm:1.4.1"
+  dependencies:
+    css-line-break: "npm:^2.1.0"
+    text-segmentation: "npm:^1.0.3"
+  checksum: 10c0/6de86f75762b00948edf2ea559f16da0a1ec3facc4a8a7d3f35fcec59bb0c5970463478988ae3d9082152e0173690d46ebf4082e7ac803dd4817bae1d355c0db
   languageName: node
   linkType: hard
 
@@ -5557,6 +5567,10 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-react-refresh: "npm:^0.4.22"
     globals: "npm:^16.4.0"
+    html2canvas: "npm:^1.4.1"
+    html5-qrcode: "npm:^2.3.8"
+    jspdf: "npm:^3.0.4"
+    pdfmake: "npm:^0.2.20"
     react: "npm:^19.1.1"
     react-dom: "npm:^19.1.1"
     react-hook-form: "npm:^7.65.0"

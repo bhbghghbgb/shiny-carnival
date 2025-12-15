@@ -35,7 +35,19 @@ export const ProfileOrdersTable: React.FC<ProfileOrdersTableProps> = ({ userId }
     params,
   );
 
-  const { data, isLoading } = useQuery(queryOptions);
+  const { data, isLoading, error } = useQuery({
+    ...queryOptions,
+    onError: (error: unknown) => {
+      // Log error chi tiết để debug
+      console.error('❌ [ProfileOrdersTable] Query error:', error);
+      console.error('❌ [ProfileOrdersTable] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        error: error,
+        params: params,
+      });
+    },
+  });
 
   const orders = data?.items ?? [];
   const total = data?.totalCount ?? 0;
