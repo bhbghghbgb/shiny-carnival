@@ -18,8 +18,8 @@ public class PagedList<T>
 
 public class PagedRequest
 {
-    public int PageIndex { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
-    public string SortColumn { get; set; }
-    public string SortDirection { get; set; } = "asc";
+    public int? Page { get; set; } = 1;
+    public int? PageSize { get; set; } = 10;
+    public string? SortBy { get; set; }
+    public bool? SortDesc { get; set; } = true;
 }

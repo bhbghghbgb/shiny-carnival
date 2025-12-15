@@ -30,6 +30,10 @@
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
 
             <converters:QuantityIsGreaterThanOneToBoolConverter x:Key="QuantityIsGreaterThanOneToBoolConverter" />
+
+            <!-- In App.xaml or your ResourceDictionary -->
+            <converters:NullableIntConverter x:Key="NullableIntConverter" />
+            <converters:NullableDecimalConverter x:Key="NullableDecimalConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

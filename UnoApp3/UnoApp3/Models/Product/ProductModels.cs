@@ -12,9 +12,8 @@ public class ProductListDto
     public string CategoryName { get; set; }
     public string SupplierName { get; set; }
     public int InventoryQuantity { get; set; }
-
+    
     public string ImageUrl { get; set; }
-
     // Computed properties for formatting
     public string PriceFormatted => $"{Price:N0} đ";
     public string InventoryFormatted => $"Tồn kho: {InventoryQuantity}";

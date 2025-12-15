@@ -119,7 +119,7 @@ public partial class App : Application
             //     await navigator.NavigateViewModelAsync<LoginScaffoldViewModel>(this, qualifier: Qualifiers.Nested);
             // }
 
-            await navigator.NavigateViewModelAsync<MainViewModel>(this, qualifier: Qualifiers.Nested);
+            await navigator.NavigateViewModelAsync<LoginViewModel>(this, qualifier: Qualifiers.Nested);
             this.Log().LogInformation("Navigated to login page");
         });
         this.Log().LogInformation("Navigated Async");
@@ -153,7 +153,7 @@ public partial class App : Application
             new ViewMap<LoginPage, LoginViewModel>(),
             new ViewMap<MainPage, MainViewModel>(),
             new ViewMap<ProductListPage, ProductListViewModel>(),
-            new ViewMap<ProductDetailPage, ProductDetailViewModel>(),
+            new DataViewMap<ProductDetailPage, ProductDetailViewModel, ProductDetailViewModelData>(),
             new ViewMap<CartPage, CartViewModel>(),
             new ViewMap<OrderConfirmationPage, OrderConfirmationViewModel>()
         );
@@ -162,8 +162,8 @@ public partial class App : Application
             new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
                 Nested:
                 [
-                    new("Login", View: views.FindByViewModel<LoginViewModel>()),
-                    new("Main", View: views.FindByViewModel<MainViewModel>(), IsDefault: true,
+                    new("Login", View: views.FindByViewModel<LoginViewModel>(), IsDefault: true),
+                    new("Main", View: views.FindByViewModel<MainViewModel>(),
                         Nested:
                         [
                             new("ProductList", View: views.FindByViewModel<ProductListViewModel>(), IsDefault: true),
@@ -215,5 +215,7 @@ public partial class App : Application
         // Assuming you have a static property for this
         ProductImageUrlConverter.BaseImageUrl =
             !string.IsNullOrEmpty(imageEndpoint) ? imageEndpoint : "http://10.0.0.2";
+        
+        services.AddMemoryCache();
     }
 }

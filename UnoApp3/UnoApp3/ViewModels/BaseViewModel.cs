@@ -7,16 +7,17 @@ namespace UnoApp3.ViewModels;
 
 public partial class BaseViewModel : ObservableObject
 {
-    [ObservableProperty] private bool _isBusy;
+    [ObservableProperty]
+    private bool _isBusy;
 
-    [ObservableProperty] private string _title;
+    [ObservableProperty]
+    private string _title;
 
     protected INavigator Navigator { get; }
-
+    
     public BaseViewModel(INavigator navigator)
     {
         Navigator = navigator;
-        IsBusy = true;
     }
 
     [RelayCommand]
@@ -25,7 +26,7 @@ public partial class BaseViewModel : ObservableObject
         // Changed: Use NavigateBackAsync() instead of GoBackAsync()
         await Navigator.NavigateBackAsync(this);
     }
-
+    
     // Virtual method for navigation lifecycle
     // Override this in derived ViewModels to handle navigation parameters
     public virtual Task OnNavigatedTo(IReadOnlyDictionary<string, object>? data = null)
