@@ -1,0 +1,52 @@
+Build with surface heuristics started at 20:47:38
+Use build tool: C:\Program Files\dotnet\sdk\10.0.100\MSBuild.dll
+CONSOLE: MSBuild version 18.0.2+b0f34d51f for .NET
+CONSOLE: Build started 12/15/2025 8:47:38 PM.
+CONSOLE: Project "C:\Users\ACER\AppData\Local\Temp\Cijewal.proj" on node 1 (default targets).
+CONSOLE: ControllerTarget:
+CONSOLE:   Run controller from C:\Program Files\JetBrains\JetBrains Rider 2025.2.1\lib\ReSharperHost\JetBrains.Platform.MsBuildTask.v17.dll
+0>------- Started building project: UnoApp3
+0>material_clockface_view.xml(26): Error APT2260 : attribute layout_constraintBottom_toBottomOf (aka com.companyname.UnoApp3:layout_constraintBottom_toBottomOf) not found.
+
+0>material_clockface_view.xml(26): Error APT2260 : attribute layout_constraintEnd_toEndOf (aka com.companyname.UnoApp3:layout_constraintEnd_toEndOf) not found.
+
+0>material_clockface_view.xml(26): Error APT2260 : attribute layout_constraintStart_toStartOf (aka com.companyname.UnoApp3:layout_constraintStart_toStartOf) not found.
+
+0>material_clockface_view.xml(26): Error APT2260 : attribute layout_constraintTop_toTopOf (aka com.companyname.UnoApp3:layout_constraintTop_toTopOf) not found.
+
+0>material_radial_view_group.xml(21): Error APT2260 : attribute layout_constraintBottom_toBottomOf (aka com.companyname.UnoApp3:layout_constraintBottom_toBottomOf) not found.
+
+0>material_radial_view_group.xml(21): Error APT2260 : attribute layout_constraintEnd_toEndOf (aka com.companyname.UnoApp3:layout_constraintEnd_toEndOf) not found.
+
+0>material_radial_view_group.xml(21): Error APT2260 : attribute layout_constraintStart_toStartOf (aka com.companyname.UnoApp3:layout_constraintStart_toStartOf) not found.
+
+0>material_radial_view_group.xml(21): Error APT2260 : attribute layout_constraintTop_toTopOf (aka com.companyname.UnoApp3:layout_constraintTop_toTopOf) not found.
+
+0>material_timepicker.xml(26): Error APT2260 : attribute constraint_referenced_ids (aka com.companyname.UnoApp3:constraint_referenced_ids) not found.
+
+0>material_timepicker.xml(26): Error APT2260 : attribute flow_horizontalGap (aka com.companyname.UnoApp3:flow_horizontalGap) not found.
+
+0>material_timepicker.xml(26): Error APT2260 : attribute layout_constraintEnd_toEndOf (aka com.companyname.UnoApp3:layout_constraintEnd_toEndOf) not found.
+
+0>material_timepicker.xml(26): Error APT2260 : attribute layout_constraintStart_toStartOf (aka com.companyname.UnoApp3:layout_constraintStart_toStartOf) not found.
+
+0>material_timepicker.xml(26): Error APT2260 : attribute layout_constraintTop_toTopOf (aka com.companyname.UnoApp3:layout_constraintTop_toTopOf) not found.
+
+0>material_timepicker.xml(45): Error APT2260 : attribute layout_constraintEnd_toEndOf (aka com.companyname.UnoApp3:layout_constraintEnd_toEndOf) not found.
+
+0>material_timepicker.xml(45): Error APT2260 : attribute layout_constraintStart_toStartOf (aka com.companyname.UnoApp3:layout_constraintStart_toStartOf) not found.
+
+0>material_timepicker.xml(45): Error APT2260 : attribute layout_constraintTop_toBottomOf (aka com.companyname.UnoApp3:layout_constraintTop_toBottomOf) not found.
+
+0>material_timepicker_dialog.xml(27): Error APT2260 : attribute layout_constraintStart_toStartOf (aka com.companyname.UnoApp3:layout_constraintStart_toStartOf) not found.
+
+0>material_timepicker_dialog.xml(27): Error APT2260 : attribute layout_constraintTop_toTopOf (aka com.companyname.UnoApp3:layout_constraintTop_toTopOf) not found.
+
+0>material_timepicker_dialog.xml(39): Error APT2260 : attribute layout_constraintBottom_toTopOf (aka com.companyname.UnoApp3:layout_constraintBottom_toTopOf) not found.
+
+0>material_timepicker_dialog.xml(39): Error APT2260 : attribute layout_constraintEnd_toEndOf (aka com.companyname.UnoApp3:layout_constraintEnd_toEndOf) not found.
+
+UnoApp3 -> D:\sgu doc\dotnet\shiny-carnival-uno-app\UnoApp3\UnoApp3\bin\Debug\net10.0\UnoApp3.dll
+UnoApp3 -> D:\sgu doc\dotnet\shiny-carnival-uno-app\UnoApp3\UnoApp3\bin\Debug\net10.0-desktop\UnoApp3.dll
+0>------- Finished building project: UnoApp3. Succeeded: False. Errors: 20. Warnings: 0
+Build completed in 00:00:11.406
