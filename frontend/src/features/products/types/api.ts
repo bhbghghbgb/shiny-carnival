@@ -7,6 +7,8 @@ export interface CreateProductRequest {
     barcode: string;
     price: number;
     unit: string;
+    imageUrl?: string;
+    imageFileId?: string;
 }
 
 export interface UpdateProductRequest {
@@ -16,4 +18,6 @@ export interface UpdateProductRequest {
     barcode?: string;
     price?: number;
     unit?: string;
+    imageUrl?: string;
+    imageFileId?: string;
 }

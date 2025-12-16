@@ -1,4 +1,4 @@
-import { Modal, Descriptions, Tag, Space, Typography, Divider } from 'antd'
+import { Modal, Descriptions, Tag, Space, Typography, Divider, Image } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { productApiService } from '../api/ProductApiService'
 import type { ProductDetailsDto } from '../types/entity'
@@ -45,6 +45,31 @@ export function ProductDetailModal({ productId, open, onClose }: ProductDetailMo
                 <div style={{ textAlign: 'center', padding: '40px' }}>Đang tải...</div>
             ) : productDetails ? (
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                    {/* Product Image Preview */}
+                    {(() => {
+                        if (productDetails.imageUrl) {
+                            return (
+                                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                                    <Image
+                                        src={productDetails.imageUrl}
+                                        alt={productDetails.productName}
+                                        style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
+                                        preview={{
+                                            mask: 'Xem ảnh',
+                                        }}
+                                    />
+                                </div>
+                            );
+                        }
+
+                        // Hiển thị placeholder nếu không có ảnh
+                        return (
+                            <div style={{ textAlign: 'center', marginBottom: '16px', padding: '20px', background: '#f5f5f5', borderRadius: '8px' }}>
+                                <Text type="secondary">Chưa có hình ảnh</Text>
+                            </div>
+                        );
+                    })()}
+
                     {/* Thông tin sản phẩm */}
                     <Descriptions title="Thông tin sản phẩm" bordered column={2}>
                         <Descriptions.Item label="Mã sản phẩm">

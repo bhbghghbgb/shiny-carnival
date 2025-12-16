@@ -154,6 +154,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Barcode).HasColumnName("barcode");
             entity.Property(e => e.Price).HasColumnName("price").HasColumnType("decimal(10,2)");
             entity.Property(e => e.Unit).HasColumnName("unit");
+            entity.Property(e => e.ImageUrl).HasColumnName("image_url");
+            entity.Property(e => e.ImageFileId).HasColumnName("image_file_id");
 
             entity.HasIndex(e => e.Barcode).IsUnique();
 

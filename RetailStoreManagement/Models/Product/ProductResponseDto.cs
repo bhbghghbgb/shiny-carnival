@@ -13,4 +13,14 @@ public class ProductResponseDto
     public string Unit { get; set; } = string.Empty;
     public int InventoryQuantity { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    /// <summary>
+    /// URL ảnh sản phẩm để FE hiển thị preview.
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// ImageKit file identifier (image_file_id) dùng để FE build URL ảnh sản phẩm.
+    /// </summary>
+    public string? ImageFileId { get; set; }
 }
