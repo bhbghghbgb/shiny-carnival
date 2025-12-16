@@ -59,30 +59,15 @@ export function ProductFormWithImage({
   const [imageFileIdState, setImageFileIdState] = useState<string | undefined>(undefined);
 
   // Load initial values vào form và preview image
-  // Reset state khi initialValues thay đổi (khi chuyển từ edit sang create hoặc ngược lại)
   useEffect(() => {
-    // Reset form và state trước
-    form.resetFields();
-    setPreviewImage(null);
-    setImageUrlState(undefined);
-    setImageFileIdState(undefined);
-    
-    // Sau đó load initialValues nếu có
     if (initialValues) {
       form.setFieldsValue(initialValues);
       if (initialValues.imageUrl) {
         setPreviewImage(initialValues.imageUrl);
         setImageUrlState(initialValues.imageUrl);
-      } else {
-        // Nếu initialValues không có imageUrl, đảm bảo state được reset
-        setPreviewImage(null);
-        setImageUrlState(undefined);
       }
       if (initialValues.imageFileId) {
         setImageFileIdState(initialValues.imageFileId);
-      } else {
-        // Nếu initialValues không có imageFileId, đảm bảo state được reset
-        setImageFileIdState(undefined);
       }
     }
   }, [initialValues, form]);
@@ -167,8 +152,8 @@ export function ProductFormWithImage({
         };
         
         await onSubmit(payload);
-        
-        // Reset state sau khi submit thành công (cho create mode)
+        // Reset form và state sau khi submit thành công (để tránh giữ giá trị cũ khi mở form mới)
+        form.resetFields();
         setImageUrlState(undefined);
         setImageFileIdState(undefined);
         setPreviewImage(null);
@@ -203,10 +188,11 @@ export function ProductFormWithImage({
         }
         
         await onSubmit(payload);
-        
-        // Reset state sau khi submit thành công (cho update mode)
-        // Note: Không reset hoàn toàn vì có thể user muốn tiếp tục edit
-        // State sẽ được reset khi initialValues thay đổi (khi mở form mới)
+        // Reset form và state sau khi submit thành công
+        form.resetFields();
+        setImageUrlState(undefined);
+        setImageFileIdState(undefined);
+        setPreviewImage(null);
       }
     } catch (error) {
       if (error && typeof error === 'object' && 'errorFields' in error) {
