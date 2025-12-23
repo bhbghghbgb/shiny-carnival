@@ -179,6 +179,8 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
             unit: record.unit,
             categoryId: record.categoryId,
             supplierId: record.supplierId,
+            imageUrl: record.imageUrl,
+            imageFileId: record.imageFileId,
         }),
         mapUpdatePayload: (values) => {
             const payload: UpdateProductRequest = {}
@@ -199,6 +201,12 @@ export const productPageConfig: GenericPageConfig<ProductEntity, CreateProductRe
             }
             if (values.supplierId !== undefined && values.supplierId !== null) {
                 payload.supplierId = values.supplierId
+            }
+            if (values.imageUrl !== undefined) {
+                payload.imageUrl = values.imageUrl
+            }
+            if (values.imageFileId !== undefined) {
+                payload.imageFileId = values.imageFileId
             }
             return payload
         },

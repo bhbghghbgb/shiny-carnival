@@ -47,7 +47,10 @@ public class MappingProfile : Profile
         CreateMap<ProductEntity, ProductResponseDto>()
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
             .ForMember(dest => dest.SupplierName, opt => opt.MapFrom(src => src.Supplier.Name))
-            .ForMember(dest => dest.InventoryQuantity, opt => opt.MapFrom(src => src.Inventory != null ? src.Inventory.Quantity : 0));
+            .ForMember(dest => dest.InventoryQuantity, opt => opt.MapFrom(src => src.Inventory != null ? src.Inventory.Quantity : 0))
+            // ImageUrl and ImageFileId are automatically mapped by AutoMapper (same property names)
+            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
+            .ForMember(dest => dest.ImageFileId, opt => opt.MapFrom(src => src.ImageFileId));
 
         CreateMap<ProductEntity, ProductListDto>()
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
@@ -72,6 +75,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Unit, opt => opt.Condition(src => !string.IsNullOrEmpty(src.Unit)))
             .ForMember(dest => dest.CategoryId, opt => opt.Condition(src => src.CategoryId.HasValue))
             .ForMember(dest => dest.SupplierId, opt => opt.Condition(src => src.SupplierId.HasValue))
+            // ImageUrl and ImageFileId: Map if provided (null means don't update, empty string means clear)
+            .ForMember(dest => dest.ImageUrl, opt => opt.Condition(src => src.ImageUrl != null))
+            .ForMember(dest => dest.ImageFileId, opt => opt.Condition(src => src.ImageFileId != null))
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())

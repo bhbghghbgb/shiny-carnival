@@ -6,6 +6,7 @@ import { ProductDetailModal } from '../components/ProductDetailModal'
 import { ProductHeader } from '../components/ProductHeader'
 import { ProductSearchFilter } from '../components/ProductSearchFilter'
 import { ProductStatistics } from '../components/ProductStatistics'
+import { ProductFormWithImage } from '../components/ProductFormWithImage'
 import { productPageConfig } from '../config/productPageConfig'
 import { useProductManagementPage } from '../hooks/useProductManagementPage'
 import type { CreateProductRequest, UpdateProductRequest } from '../types/api'
@@ -121,6 +122,7 @@ export function ProductManagementPage() {
                         Chi tiết
                     </Button>
                 )}
+                renderCustomForm={ProductFormWithImage}
             />
             <ProductDetailModal
                 productId={selectedProductId}

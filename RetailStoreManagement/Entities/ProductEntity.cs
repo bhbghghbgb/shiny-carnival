@@ -25,6 +25,18 @@ public class ProductEntity : BaseEntity<int>
     [MaxLength(20)]
     public string Unit { get; set; } = "pcs";
 
+    /// <summary>
+    /// URL ảnh sản phẩm (được build từ ImageKit hoặc lưu trực tiếp).
+    /// </summary>
+    [MaxLength(1024)]
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// ImageKit file identifier (image_file_id) dùng để build URL ảnh sản phẩm.
+    /// </summary>
+    [MaxLength(255)]
+    public string? ImageFileId { get; set; }
+
     // Navigation properties
     public virtual CategoryEntity Category { get; set; } = null!;
 

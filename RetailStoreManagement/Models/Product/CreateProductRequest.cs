@@ -26,4 +26,16 @@ public class CreateProductRequest
     [Required]
     [MaxLength(MAX_LENGTH_UNIT)]
     public string Unit { get; set; } = "pcs";
+
+    /// <summary>
+    /// URL ảnh sản phẩm (nếu FE build sẵn từ ImageKit).
+    /// </summary>
+    [MaxLength(1024)]
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// ImageKit file identifier (image_file_id) sau khi upload ảnh sản phẩm.
+    /// </summary>
+    [MaxLength(MAX_LENGTH_CODE)]
+    public string? ImageFileId { get; set; }
 }

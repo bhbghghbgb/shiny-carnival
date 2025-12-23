@@ -7,6 +7,8 @@ export interface ProductEntity {
     barcode: string;
     price: number;
     unit: string;
+    imageUrl?: string;
+    imageFileId?: string;
 }
 
 // Extended Product with Details (from ProductResponseDto)
